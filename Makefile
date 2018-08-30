@@ -1,9 +1,9 @@
-VERSION := 0.0.5
+VERSION := 1.3.0
 PROGRAM_NAME := AMIGOS-invasion
 
-CC := g++
+ CC := g++
 # CC := g++-mp-7 # typical macports compiler name
-# CC := g++-7 # typical homebrew compiler name 
+# CC := g++-7 # typical homebrew compiler name
 
 # Check for environment definitions of compiler 
 # e.g., on CC = g++-7 on OSX
@@ -39,7 +39,8 @@ BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_contai
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o 
 
-PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o
+PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
+PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
@@ -50,10 +51,10 @@ pugixml_OBJECTS := pugixml.o
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# compile the project  
-
-all: main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
+#compile the project 
+	
+all: main-ecm.cpp $(ALL_OBJECTS)
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main-ecm.cpp 
 
 # PhysiCell core components	
 
@@ -124,12 +125,24 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
 	
+PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
+	
+PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
+	
 # user-defined PhysiCell modules
 
 AMIGOS-invasion.o: ./custom_modules/AMIGOS-invasion.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion.cpp
 
 # cleanup
+
+reset:
+	rm -f *.cpp 
+	cp ./sample_projects/Makefile-default Makefile 
+	rm -f ./custom_modules/*
+	touch ./custom_modules/empty.txt 
 	
 clean:
 	rm -f *.o
@@ -139,8 +152,11 @@ data-cleanup:
 	rm -f *.mat
 	rm -f *.xml
 	rm -f *.svg
-	rm -f ./output/*
-	
+	rm -f *.txt
+	rm -f *.pov
+	rm -f ./Output/*
+	rm -f ./SVG/*
+
 # archival 
 	
 zip:

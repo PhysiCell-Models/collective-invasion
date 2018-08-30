@@ -3,23 +3,23 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1].    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.2.2) [1],    #
+# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
-#     lar Systems, PLoS Comput. Biol. 2017 (in review).                       #
-#     preprint DOI: 10.1101/088773                                            #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
 #    llelized diffusive transport solver for 3-D biological simulations,      #
@@ -29,7 +29,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2017, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -72,6 +72,11 @@ bool PhysiCell_standard_cycle_models_initialized = false;
 	
 Cycle_Model Ki67_advanced, Ki67_basic, live, apoptosis, necrosis, inert; 
 Death_Parameters apoptosis_parameters, necrosis_parameters; 
+
+// new cycle models:
+
+Cycle_Model flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model; 
+
 	
 void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -87,6 +92,15 @@ void standard_Ki67_negative_phase_entry_function( Cell* pCell, Phenotype& phenot
 }
 
 void standard_live_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// the cell wants to double its volume 
+	phenotype.volume.target_solid_nuclear *= 2.0; 
+	phenotype.volume.target_solid_cytoplasmic *= 2.0; 
+	
+	return; 
+}
+
+void S_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// the cell wants to double its volume 
 	phenotype.volume.target_solid_nuclear *= 2.0; 
@@ -266,6 +280,74 @@ void create_live_model( void )
 	return; 
 }
 
+bool create_cytometry_cycle_models( void )
+{
+	// basic one first 
+	flow_cytometry_cycle_model.code = PhysiCell_constants::flow_cytometry_cycle_model; 
+	flow_cytometry_cycle_model.name = "Flow cytometry model (basic)"; 
+	
+	flow_cytometry_cycle_model.data.time_units = "min"; 
+	
+	flow_cytometry_cycle_model.add_phase( PhysiCell_constants::G0G1_phase , "G0/G1" ); 
+	flow_cytometry_cycle_model.add_phase( PhysiCell_constants::S_phase , "S" ); 
+	flow_cytometry_cycle_model.add_phase( PhysiCell_constants::G2M_phase , "G2/M" ); 
+
+	flow_cytometry_cycle_model.phases[2].division_at_phase_exit = true; 
+	
+	flow_cytometry_cycle_model.add_phase_link( 0 , 1 , NULL ); // G0/G1 to S
+	flow_cytometry_cycle_model.add_phase_link( 1 , 2 , NULL ); // S to G2/M
+	flow_cytometry_cycle_model.add_phase_link( 2 , 0 , NULL ); // G2/M to G0/G1 
+
+	// need reference values! 
+	// https://www.ncbi.nlm.nih.gov/books/NBK9876/
+	flow_cytometry_cycle_model.transition_rate(0,1) = 0.00324; // 5.15 hours in G0/G1 by fitting 
+	flow_cytometry_cycle_model.transition_rate(1,2) = 0.00208; // 8 hours in S
+	flow_cytometry_cycle_model.transition_rate(2,0) = 0.00333; // 5 hours in G2/M 
+	
+	
+	flow_cytometry_cycle_model.phases[0].entry_function = NULL; //  ;
+	flow_cytometry_cycle_model.phases[1].entry_function = S_phase_entry_function; // Double nuclear volume ;
+	flow_cytometry_cycle_model.phases[2].entry_function = NULL;		
+
+	// // expanded flow cytometry model 
+	
+	flow_cytometry_separated_cycle_model.code = PhysiCell_constants::flow_cytometry_separated_cycle_model; 
+	flow_cytometry_separated_cycle_model.name = "Flow cytometry model (separated)"; 
+	
+	flow_cytometry_separated_cycle_model.data.time_units = "min"; 
+	
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::G0G1_phase , "G0/G1" ); 
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::S_phase , "S" ); 
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::G2_phase , "G2" ); 
+	flow_cytometry_separated_cycle_model.add_phase( PhysiCell_constants::M_phase , "M" ); 
+	
+	
+	flow_cytometry_separated_cycle_model.phases[3].division_at_phase_exit = true; 
+	
+	flow_cytometry_separated_cycle_model.add_phase_link( 0 , 1 , NULL ); // G0/G1 to S
+	flow_cytometry_separated_cycle_model.add_phase_link( 1 , 2 , NULL ); // S to G2
+	flow_cytometry_separated_cycle_model.add_phase_link( 2 , 3 , NULL ); // G2 to M 
+	flow_cytometry_separated_cycle_model.add_phase_link( 3 , 0 , NULL ); // M to G0/G1 
+
+	// need reference values! 
+	flow_cytometry_separated_cycle_model.transition_rate(0,1) = 0.00335; // 4.98 hours in G0/G1
+	flow_cytometry_separated_cycle_model.transition_rate(1,2) = 0.00208; // 8 hours in S  
+	flow_cytometry_separated_cycle_model.transition_rate(2,3) = 0.00417; // 4 hours in G2 
+	flow_cytometry_separated_cycle_model.transition_rate(3,0) = 0.0167; // 1 hour in M 
+	
+	flow_cytometry_separated_cycle_model.phases[0].entry_function = NULL; //  ;
+	flow_cytometry_separated_cycle_model.phases[1].entry_function = S_phase_entry_function; // Double nuclear volume ;
+	flow_cytometry_separated_cycle_model.phases[2].entry_function = NULL;		
+	flow_cytometry_separated_cycle_model.phases[3].entry_function = NULL;		
+	
+	
+	
+	
+	
+	
+	return true; 
+}
+
 bool create_standard_cell_cycle_models( void )
 {
 	if( PhysiCell_standard_cycle_models_initialized )
@@ -273,6 +355,8 @@ bool create_standard_cell_cycle_models( void )
 
 	create_ki67_models();
 	create_live_model();
+	
+	create_cytometry_cycle_models(); 
 
 	PhysiCell_standard_cycle_models_initialized = true;
 	if( PhysiCell_standard_death_models_initialized )
@@ -586,6 +670,8 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 	
 	if( indices_initiated == false )
 	{
+		// Ki67 models
+		
 		if( phenotype.cycle.model().code == PhysiCell_constants::advanced_Ki67_cycle_model || 
 			phenotype.cycle.model().code == PhysiCell_constants::basic_Ki67_cycle_model )
 		{
@@ -605,6 +691,8 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 				indices_initiated = true; 
 			}
 		}
+		
+		// live model 
 			
 		if( phenotype.cycle.model().code ==  PhysiCell_constants::live_cells_cycle_model )
 		{
@@ -613,6 +701,18 @@ void update_cell_and_death_parameters_O2_based( Cell* pCell, Phenotype& phenotyp
 			end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::live );
 			indices_initiated = true; 
 		}
+		
+		// cytometry models 
+		
+		if( phenotype.cycle.model().code == PhysiCell_constants::flow_cytometry_cycle_model || 
+			phenotype.cycle.model().code == PhysiCell_constants::flow_cytometry_separated_cycle_model )
+		{
+			start_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::G0G1_phase );
+			necrosis_index = phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+			end_phase_index = phenotype.cycle.model().find_phase_index( PhysiCell_constants::S_phase );
+			indices_initiated = true; 
+		}		
+		
 	}
 	
 	// don't continue if we never "figured out" the current cycle model. 

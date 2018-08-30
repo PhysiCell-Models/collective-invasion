@@ -62,7 +62,7 @@
 */
 
 #include "./AMIGOS-invasion.h"
-
+#include "./ECM.h"
 Cell_Definition leader_cell; 
 Cell_Definition follower_cell; 
 
@@ -97,8 +97,8 @@ void create_cell_types( void )
 	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	
-	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
-	cell_defaults.parameters.o2_reference = 38.0; 
+	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
+	cell_defaults.parameters.o2_reference = 38.0;
 	
 	// set default uptake and secretion 
 	// oxygen 
@@ -117,22 +117,22 @@ void create_cell_types( void )
 
 	// set the default cell type to no phenotype updates 
 	
-	cell_defaults.functions.update_phenotype = switching_phenotype_model; 
+//    cell_defaults.functions.update_phenotype = switching_phenotype_model;
 	
 	cell_defaults.name = "cancer cell"; 
 	cell_defaults.type = 0; 
 	
 	// set default motility parameters (even for when off)
 	
-	cell_defaults.phenotype.motility.is_motile = false; 
+	cell_defaults.phenotype.motility.is_motile = true;
 	cell_defaults.phenotype.motility.persistence_time = 15.0; 
 	cell_defaults.phenotype.motility.migration_speed = 1.0; 
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	cell_defaults.phenotype.motility.migration_bias = 0.5; 
+	cell_defaults.phenotype.motility.migration_bias = 0.90;
 	
 	// add custom data 
 	
-	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 10 ); 
+	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
 	
 	// leader cells 
 	
@@ -140,30 +140,51 @@ void create_cell_types( void )
 	leader_cell.name = "leader cell"; 
 	leader_cell.type = 1; 
 
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
+    
 	// 10% proliferation 
-	leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.1; 
+    leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
+    
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
 	
 	// turn on motility 
 	leader_cell.phenotype.motility.is_motile = true; 
 	
 	// reduce adhesion 
-	leader_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.1; 
 
-	leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal 
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
+    
+//    leader_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.1;
+    
+//    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal
+    
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
 
+    // modify ECM
+    
+    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, so this shoudl autoamtically make it so that followers can't modfiy ECM ...
 	
 	// set functions
 	
 	leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
-	// leader_cell.functions.update_phenotype = leader_cell_phenotype_model; 
+	
+    leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
 	
 	// follower cells
 
 	follower_cell = cell_defaults;
 	follower_cell.name = "follower cell"; 
-	follower_cell.type = 2; 
-	
-	follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal 
+	follower_cell.type = 2;
+    
+    follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm;
+    
+    follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
+
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
+    
+//    follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
+    
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
 	
 	return; 
 }
@@ -172,18 +193,22 @@ void setup_microenvironment( void )
 {
 	// set domain parameters
 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
+	default_microenvironment_options.X_range = {-1500, 1500};
+	default_microenvironment_options.Y_range = {-1500, 1500};
 	default_microenvironment_options.simulate_2D = true; 
 	
 	// no gradients needed for this example 
 	
 	default_microenvironment_options.calculate_gradients = true; 
-	
+
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
+    
 	// 50 micron length scale 
-	microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 ); 
-	microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 ); 
-	
+//    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+//    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
+    
 	// let BioFVM use oxygen as the default 
 	
 	default_microenvironment_options.use_oxygen_as_first_field = true; 
@@ -191,10 +216,15 @@ void setup_microenvironment( void )
 	// set Dirichlet conditions 
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // normoxic conditions 
-	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions 
-	default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions 
-			
+	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // normoxic conditions
+    
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
+    
+//    default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
+//    default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
+
+//    For SIAM LS18 Motility presentation - eliminating leader/follower signal
+    
 	initialize_microenvironment(); 
 	
 	// run to get a decent startin conditoin 
@@ -209,6 +239,51 @@ void setup_microenvironment( void )
 
 	return; 
 }	
+
+void ECM_setup(double numvox)
+{
+    ecm.sync_to_BioFVM();
+    ecm.ecm_data.resize(numvox);
+//    std::cout<<"Hi! 1"<<std::endl;
+//    double ECM_radius = default_microenvironment_options.X_range[1]
+    
+//    std::cout<<ecm.mesh.voxels.size()<<std::endl;
+//    double temp = ecm.mesh.voxels[numvox-1].center.at(0);
+//    std::cout<<temp<<std::endl;
+	
+	for (int i = 0; i<numvox-1; i++)
+    {
+//  /*      std::cout<<"Hi! 2"<<std::endl;
+//          std::cout<<i<<std::endl;
+        
+//	This block of code is to randomly orient the ecm fibers using vector randomization from BioFVM_vector.cpp, line 262
+//  Pick a random angle from 0 to 2pi and then set components equal to sin(theta) and cos(theta)
+		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+		ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+		
+		
+		
+	//This block of code is used for orienting the ecm fibers radially outward from the origin
+        /*double epsilon = 1E-6;
+        double ECM_radius = sqrt(ecm.mesh.voxels[i].center.at(0) * ecm.mesh.voxels[i].center.at(0)
+                                 +ecm.mesh.voxels[i].center.at(1) * ecm.mesh.voxels[i].center.at(1)
+                                 + ecm.mesh.voxels[i].center.at(2) * ecm.mesh.voxels[i].center.at(2));
+//        std::cout<<"Hi! 3"<<std::endl;
+        ecm.ecm_data[i].ECM_orientation[0] = ecm.mesh.voxels[i].center[0]/(ECM_radius + epsilon);
+        ecm.ecm_data[i].ECM_orientation[1] = ecm.mesh.voxels[i].center[1]/(ECM_radius + epsilon);
+        ecm.ecm_data[i].ECM_orientation[2] = ecm.mesh.voxels[i].center[2]/(ECM_radius + epsilon);
+//        std::cout<<"Hi! 4"<<std::endl;
+        normalize(ecm.ecm_data[i].ECM_orientation);
+//        std::cout<<"Hi! 5"<<std::endl;*/
+        
+        
+    }
+    
+    
+    return;
+}
 
 void run_biotransport( double t_max )
 {
@@ -247,18 +322,24 @@ void setup_tissue( void )
 {
 	// place a cluster of tumor cells at the center 
 	
+//    pCell->custom_data[0] = NormalRandom( 1.0, 0.33 );
+//    if( pCell->custom_data[0] < 0.0 )
+//    { pCell->custom_data[0] = 0.0; }
+//    if( pCell->custom_data[0] > 2.0 )
+//    { pCell->custom_data[0] = .0; }
+    
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	double tumor_radius = 250.0; 
+	double tumor_radius = 175.0; //change this to make smaller sim
 	
 	Cell* pCell = NULL; 
 	
-	double x = 0.0; 
+	double x = 0.0;
 	double x_outer = tumor_radius; 
-	double y = 0.0; 
+	double y = 0.0;
 	
-	double leader_cell_fraction = 0.10; 
+	double leader_cell_fraction = 0.2;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -301,6 +382,7 @@ void setup_tissue( void )
 					{ pCell = create_cell(leader_cell); }
 					else
 					{ pCell = create_cell(follower_cell); }
+//                    std::cout<<"created follower cell"<<std::endl;
 					pCell->assign_position( -x , -y , 0.0 );
 				}
 			}
@@ -324,10 +406,64 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	// otherwise, biased motility towards cargo chemoattractant 
 	
 	phenotype.motility.is_motile = true; 
-	phenotype.motility.migration_bias = 0.5; 
+	phenotype.motility.migration_bias = 0.95;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);	
 	
 	return; 
+}
+
+void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt )
+{
+    //change bias
+
+    //    std::vector<double> migration bias direction is the 3-D vector giving the cell's preferred
+    //    direction of motility for biased Brownian motion. If the user modies this vector, they must ensure
+    //    it is a unit vector :
+    //    jjmigration bias directionjj = 1: (14)
+    //    54
+    //    5. double migration bias (with a value in [0,1]) sets the degree to which cell motility is biased
+    //    along migration_bias_direction. If 0, then motion is completely Brownian. If 1, it is completely
+    //    deterministc along the bias direction.
+
+    int ecm_index =  pCell->get_current_voxel_index();
+    double a = ecm.ecm_data[ecm_index].anisotropy;
+    
+    std::vector<double> d = pCell->phenotype.motility.motility_vector; ////// Changed to motility_vector instead of bias - so the blending is of the actual velocity instead of just the direction it wants to go in
+    //    d = norm(d);
+    std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
+    double ddotf = 0.0;
+//normalize( &( phenotype.motility.migration_bias_direction ) );
+    normalize(d);
+    normalize(f);
+
+    //     pCell->phenotype.motility.migration_bias = a;
+
+    //change bias direction
+    for( int i=0; i < d.size() ; i++ )
+    {
+        //         double temp = d[i] * f[i];
+        ddotf += d[i] * f[i];
+    }
+
+    if(ddotf < 0.0)
+    {
+        for( int i=0; i< f.size(); i++)
+        {
+            f[i] *= -1.0;
+            //            ecm.ecm_data[ecm_index].ECM_orientation[i] = -1.0 * f[i];
+        }
+    }
+
+    for( int i=0; i < d.size() ; i++ )
+    {
+        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
+    }
+
+    normalize(pCell->phenotype.motility.migration_bias_direction);
+    
+    phenotype.motility.migration_bias = a;
+
+    return;
 }
 
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) 
@@ -338,18 +474,32 @@ void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype ,
 }
 
 
-void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double dt ) 
+void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double dt )
 {
-	// o2-based birth and death, nothing more 
-	tumor_cell_phenotype_with_oncoprotein(pCell,phenotype,dt);
-	
-	return; 
+    // o2-based birth and death, nothing more
+    tumor_cell_phenotype_with_oncoprotein(pCell,phenotype,dt);
+
+    return;
 }
 
 
 /* old */ 
 
 
+std::vector<std::string> ECM_anisotropy_coloring_function( Cell* pCell)
+{
+    std::vector< std::string > output( 4, "black" );
+    char color [1024];
+    int ecm_index = pCell->get_current_voxel_index();
+//    std::cout<<ecm_index<<std::endl;
+    double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
+    sprintf( color , "rgb(%d,%d,%d)" , int(anisotropy*255.0), int(anisotropy* 255.0), int(255-anisotropy*255));
+//    std::cout<<color<<std::endl;
+//    rgb(0,0,255)
+    output[0] = color;
+    output[2] = color;
+    return output;
+}
 
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
 {
@@ -363,12 +513,18 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
 		return output; 
 	} 
 
+    if( pCell->type == 2 )
+    {
+        output[0] = "yellow";
+        output[2] = "yellow";
+        return output;
+    }
 	
 	// live followers cells are red,
 	if( pCell->phenotype.death.dead == false )
 	{
-		output[0] = "red"; 
-		output[2] = "red"; 
+		output[0] = "red";
+		output[2] = "red";
 		
 		return output; 
 	}
@@ -408,22 +564,64 @@ void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt
 	// set death and birth 
 	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt); 
 
-	if( pO2 > pCell->custom_data[hypoxic_i] )
-	{
-		// proliferate (don't overwrite) 
-//		phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) = 
-//			10.0 * pCell->parameters.pReference_live_phenotype->cycle.data.transition_rate(start_phase_index,end_phase_index);
-		// turn off motility 
-		phenotype.motility.is_motile = false ;
-	}
-	else
-	{
-		// don't proliferate, 
-		phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) *= 0.1;  
-		// turn on motility 
-		phenotype.motility.is_motile = true; 
-	}
-	return; 
+// ALWAYS MOTILE
+
+    phenotype.motility.is_motile = true;
+    
+//    if( pO2 > pCell->custom_data[hypoxic_i] )
+//    {
+//        // proliferate (don't overwrite)
+////        phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) =
+////            10.0 * pCell->parameters.pReference_live_phenotype->cycle.data.transition_rate(start_phase_index,end_phase_index);
+//        // turn off motility
+//        phenotype.motility.is_motile = true ;
+//    }
+//    else
+//    {
+//        // don't proliferate,
+////        phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) *= 0.1;
+//        // turn on motility
+//        phenotype.motility.is_motile = true;
+//    }
+	return;
+}
+
+
+void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
+{
+    static int hypoxic_i = pCell->custom_data.find_variable_index( "hypoxic switch value" );
+    static int oxygen_i = pCell->get_microenvironment()->find_density_index( "oxygen" );
+    
+    
+    int cycle_start_index = live.find_phase_index( PhysiCell_constants::live );
+    int cycle_end_index = live.find_phase_index( PhysiCell_constants::live );
+    
+    double pO2 = (pCell->nearest_density_vector())[oxygen_i]; // PhysiCell_constants::oxygen_index];
+    
+    // set death and birth
+    update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
+    
+    // ALWAYS MOTILE
+    
+    phenotype.motility.is_motile = true;
+//    phenotype.motility.migration_bias = 1.0;
+    
+    //    if( pO2 > pCell->custom_data[hypoxic_i] )
+    //    {
+    //        // proliferate (don't overwrite)
+    ////        phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) =
+    ////            10.0 * pCell->parameters.pReference_live_phenotype->cycle.data.transition_rate(start_phase_index,end_phase_index);
+    //        // turn off motility
+    //        phenotype.motility.is_motile = true ;
+    //    }
+    //    else
+    //    {
+    //        // don't proliferate,
+    ////        phenotype.cycle.data.transition_rate(cycle_start_index,cycle_end_index) *= 0.1;
+    //        // turn on motility
+    //        phenotype.motility.is_motile = true;
+    //    }
+    return;
 }
 
 void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
@@ -452,9 +650,85 @@ void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
 	if( pO2 < pCell->custom_data[hypoxic_i] && pCell->type == 2 )
 	{
 		if( (pCell->nearest_density_vector())[1] < 0.1 )
-		{ pCell->convert_to_cell_definition( leader_cell ); }
+		{ 
+	     pCell->convert_to_cell_definition( leader_cell ); 
+		}
 	}	
 	
 	return; 
 }
 
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
+{
+//    Cell* pCell = (*all_cells)[i];
+    int ecm_index = pCell->get_current_voxel_index();
+    
+    // Type 2 are the followers. This prohibits them from modifying the ECM - the will be affected by its direction and ani, but can't change those properties.
+    
+//    if( pCell->type == 2 )
+//    {
+//        return;
+//    }
+    
+    // Cell-ECM density interaction
+    
+    double density = ecm.ecm_data[ecm_index].density;
+    double r = 0.0;//Setting this to zero for now, change it back to something else before we run another simulation
+    
+    ecm.ecm_data[ecm_index].density = density / (1 + (r*dt));
+    
+    // END Cell-ECM density interaction
+    
+    // Cell-ECM Fiber realingment
+
+    std::vector<double> ECM_orientation = ecm.ecm_data[ecm_index].ECM_orientation;
+    
+    double motility_vector_norm = norm( phenotype.motility.motility_vector );
+    if( motility_vector_norm < 1e-12 )
+    { return; }
+    else
+        
+        // FIX ME!!!!
+        
+    { phenotype.motility.motility_vector /= motility_vector_norm; }
+//    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector);
+    double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
+    double migration_speed = pCell->phenotype.motility.migration_speed;
+
+    double r_0 = 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! shoudl be the same but worth noting!!!!
+
+    double r_realignment = r_0 * (1-anisotropy);
+    
+    // START HERE! Double check math as well as if time step is working!
+
+    for( int i=0; i < phenotype.motility.motility_vector.size() ; i++ )
+    {
+        double temp = ECM_orientation[i] + dt * (r_realignment * (ECM_orientation[i] - phenotype.motility.motility_vector[i]));
+//        std::cout<<temp<<std::endl<<std::endl;
+        ecm.ecm_data[ecm_index].ECM_orientation[i] = temp;
+		
+		/*Make sure each vector component of the ecm orientation is going the same direction as its corresponding component*
+		 *of the cell's motility vector*/
+		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
+	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
+    }
+	
+    normalize(&(ecm.ecm_data[ecm_index].ECM_orientation));
+
+
+    // End Cell-ECM Fiber realingment
+    
+    // Cell-ECM Anisotrophy Modification
+    
+    double r_a0 = 1.0/100.0; // min-1 - changes on same time scale as fiber realignment????
+    double r_anisotropy = r_a0 * migration_speed; // What is a typical cell speed????
+//    std::cout<<migration_speed<<std::endl;
+    ecm.ecm_data[ecm_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+    
+    // END Cell-ECM Anisotropy Modification
+    
+    return;
+    
+    
+    
+}

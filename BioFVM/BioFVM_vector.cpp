@@ -286,7 +286,7 @@ void axpy( std::vector<double>* y, std::vector<double>& a , std::vector<double>&
 {
  for( int i=0; i < (*y).size() ; i++ )
  {
-  (*y)[i] += a[i] * x[i] ; 
+  (*y)[i] += a[i] * x[i] ;
  }
  return; 
 }

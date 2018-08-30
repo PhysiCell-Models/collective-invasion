@@ -74,6 +74,7 @@ extern Cell_Definition follower_cell;
 
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) ;// done 
 void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt ); // done 
+//void change_speed_ecm(Cell* pCell);
 
 // follower cell rules 
 
@@ -82,6 +83,8 @@ void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double
 // leader cell rules
 
 void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt ); 
+
+void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt ); 
 
 void leader_cell_motility_model0( Cell* pCell , Phenotype& phenotype , double dt ); 
 
@@ -100,11 +103,14 @@ class Options
 // set the tumor cell properties, then call the function 
 // to set up the tumor cells 
 void create_cell_types( void ); // done 
-
+void ECM_setup(double numvox);
 void setup_tissue(); // done 
 
 // set up the microenvironment to include the immunostimulatory factor 
 void setup_microenvironment( void );  // done 
 
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
+std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
+void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );

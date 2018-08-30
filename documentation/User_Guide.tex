@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.2.2} 
+\newcommand{\Version}{1.3.0} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -33,7 +33,7 @@
 \usepackage{bold-extra}
   
 \hypersetup{
-pdftitle={PhysiCell User Guide 1.2.2}, 
+pdftitle={PhysiCell User Guide \Version}, 
 pdfauthor={Paul Macklin and the PhysiCell Project}, 
 pdfsubject={PhysiCell},
 pdfproducer={http://MathCancer.org}, 
@@ -98,7 +98,7 @@ urlcolor=blue
 
 \author{PhysiCell Project (Lead: Paul Macklin)}
 \title{PhysiCell User Guide (Version \Version)}
-\date{Revision: November 4, 2017}%\today}
+\date{Revision: February 23, 2018}%\today}
 
 \maketitle
 
@@ -121,21 +121,24 @@ We built our model using PhysiCell (Version \Version) [1]. \\
 
 
 [1] A. Ghaffarizadeh, R. Heiland, S.H. Friedman, S.M. Mumenthaler, and P. Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems, 
-bioRxiv 088773, 2017. DOI: 
+PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: \href{https://dx.doi.org/10.1371/journal.pcbi.1005991}{10.1371/journal.pcbi.1005991}. 
+% bioRxiv 088773, 2017. 
+% 
+preprint DOI: 
 \href{http://dx.doi.org/10.1101/088773}{10.1101/088773}. \\
 }
 
-We will update this citation information as PhysiCell progresses through peer review.
+% We will update this citation information as PhysiCell progresses through peer review.
 
-If you prefer to cite a peer-reviewed journal publication while waiting for our 
-main method paper, you you can also cite an earlier (2-D) 
-version of the code by our 2012 paper in the Journal of Theoretical Biology:
+% If you prefer to cite a peer-reviewed journal publication while waiting for our 
+% main method paper, you you can also cite an earlier (2-D) 
+% version of the code by our 2012 paper in the Journal of Theoretical Biology:
 
-\hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
-P. Macklin, M.E. Edgerton, A.M. Thompson, and V. Cristini. 
-Patient-calibrated agent-based modelling of ductal carcinoma in situ (DCIS): From microscopic measurements to macroscopic predictions of clinical progression. J. Theor. Biol. 301:122-40, 2012. 
-DOI: \href{http://dx.doi.org/10.1016/j.jtbi.2012.02.002}{10.1016/j.jtbi.2012.02.002}.%
-}
+% \hspace{.075\textwidth}\parbox[top]{0.85\textwidth}{%
+% P. Macklin, M.E. Edgerton, A.M. Thompson, and V. Cristini. 
+% Patient-calibrated agent-based modelling of ductal carcinoma in situ (DCIS): From microscopic measurements to macroscopic predictions of clinical progression. J. Theor. Biol. 301:122-40, 2012. 
+% DOI: \href{http://dx.doi.org/10.1016/j.jtbi.2012.02.002}{10.1016/j.jtbi.2012.02.002}.%
+% }
 
 \TOClink
 
@@ -462,8 +465,10 @@ subdirectories:
 to fully replace these files with any later version of BioFVM. Note that BioFVM distributions also include 
 pugixml (an efficient cross-platform XML parser) \cite{ref:pugixml}. 
 \item 
-\smallcode{config} While this directory is not currently used, PhysiCell will eventually parse XML files with 
-configuration information in this directory. Any custom configuration files should be placed in this directory. 
+\smallcode{beta} This directory is used for beta functionality used by our team during 
+testing and development. Use at your own risk! 
+\item 
+\smallcode{config} This directory is ued for XML configuration files with. Any custom configuration files should be placed in this directory. 
 \item 
 \smallcode{core} The core library files for PhysiCell are kept in this directory. Users should not modify functions in 
 the core library. 
@@ -1115,7 +1120,7 @@ evaluates the diffusion solver.
 
 \TOClink
 
-\subsubsection{Refined control of Dirchlet conditions}
+\subsubsection{Refined control of Dirichlet conditions}
 \label{sec:refined_Dirichlet_conditions}
 
 As of Version 1.2.1, you can now now control Dirichlet conditions on a 
@@ -3922,6 +3927,281 @@ Cell_Container* cell_container = create_cell_container_for_microenvironment(
 
 \TOClink
 
+\section{PhysiCell Inputs}
+As of Version 1.3.0, we began introducing functions to read XML files to initialize 
+PhysiCell options. We will continue expanding these functions over the next few 
+releases. 
+
+\subsection{XML parsing in PhysiCell}
+\label{sec:XML}
+The following functions make use of pugixml \cite{ref:pugixml} to parse XML files and 
+extract parameters. Note that in the DOM (document object model), pugixml's key data 
+structure is the \v|pugi::xml_node|, which corresponds roughly to an XML tag. It 
+can have attribute, a data value, parent elements, and child elements. 
+
+PhysiCell's XML parsing is found in \v|./modules/PhysiCell_pugixml.*|, and it all 
+is based upon finding XML nodes relative to a supplied parent (pugixml) XML node. 
+Here are the main functions: 
+ 
+\begin{enumerate}
+\item 
+\smallcode{pugi::xml\_node xml\_find\_node(pugi::xml\_node\& parent\_node , std::string find\_me)} 
+returns the first XML child node named \v|find_me| under the XML \v|parent_node|. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me />
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{std::string xml\_get\_string\_value(pugi::xml\_node\& parent\_node , std::string find\_me)} returns a string value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>output32</find_me> 
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{double xml\_get\_double\_value(pugi::xml\_node\& parent\_node , std::string find\_me)}
+returns a double value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>3.14</find_me> 
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{double xml\_get\_int\_value(pugi::xml\_node\& parent\_node , std::string find\_me)}
+returns an integer value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>3</find_me> 
+</parent_node>
+\end{verbatim}
+
+\item 
+\smallcode{double xml\_get\_bool\_value(pugi::xml\_node\& parent\_node , std::string find\_me)}
+returns an Boolean value for the \v|find_me| tag within the \v|parent_node| parent. For example: 
+
+\begin{verbatim}
+<parent_node>
+   <find_me>true</find_me> 
+</parent_node>
+\end{verbatim}
+Note that Booleans can be represented as 0 and 1, or \v|false| and \v|true|. 
+
+\end{enumerate}
+\TOClink
+
+\subsection{Passing XML options to PhysiCell}
+\label{sec:XML_options}
+PhysiCell 1.3.0 introduced prelimanary support for XML configuration files, via 
+\v|./modules/PhysiCell_settings.*|. It primarily works by creating two data 
+structures defined as: 
+
+\begin{verbatim}
+class PhysiCell_Settings
+{
+ private:
+ public:
+     // overall 
+     double max_time;   
+
+     // units
+     std::string time_units; 
+     std::string space_units; 
+ 
+     // parallel options 
+     int omp_num_threads; 
+     
+     // save options
+     std::string folder; 
+
+     double full_save_interval;  
+     bool enable_full_saves; 
+     bool enable_legacy_saves; 
+     
+     double SVG_save_interval; 
+     bool enable_SVG_saves; 
+     
+     PhysiCell_Settings();
+     
+     void read_from_pugixml( void ); 
+};
+
+class PhysiCell_Globals
+{
+ private:
+ public:
+     double current_time; 
+     double next_full_save_time; 
+     double next_SVG_save_time; 
+     int full_output_index; 
+     int SVG_output_index; 
+};
+\end{verbatim}
+
+Notice that PhysiCell needs to load an XML configuration file 
+before it can be queried for parameter values. Use: 
+
+\v|bool load_PhysiCell_config_file( std::string filename );| 
+
+Note that the sample projects allow the user to specify 
+the XML configuration file. For example, if your executable is 
+\v|run_me|, and your configuration file is saved in 
+\v|./config/my_config.xml|, then use: 
+
+\v|> ./run_me ./config/my_config.xml|
+
+Note that PhysiCell will default to \v|./config/PhysiCell_settings.xml| 
+in the sample projects if no XML file is supplied: 
+
+\v|> ./run_me |
+
+\TOClink 
+
+\subsubsection{Member data}
+\begin{enumerate}
+\item 
+\smallcode{double max\_time} is the maximum simulation time. 
+
+\item 
+\smallcode{std::string time\_units} is the human-readable time units. 
+All PhysiCell functions currently work in minutes, so this should 
+probably be left as \v|min| for now!
+
+\item 
+\smallcode{std::string space\_units} is the human-readable space units. 
+All PhysiCell functions currently work in $\micron$, so this should 
+probably be left as \v|micron| for now!
+
+\item 
+\smallcode{int omp\_num\_threads} is the number of threads to 
+use for OpenMP parallelization. 
+
+\item 
+\smallcode{std::string folder} sets where PhysiCell saves data. 
+
+\item 
+\smallcode{double full\_save\_interval} says how often (in \v|time_units|) 
+PhysiCell saves full simulation data (in MultiCellDS format \cite{ref:MultiCellDS}). 
+
+\item 
+\smallcode{bool enable\_full\_saves} sets whether PhysiCell saves 
+full simulation data. 
+
+\item 
+\smallcode{bool enable\_legacy\_saves} sets whether PhysiCell saves 
+legacy data and logs for the original demos. If enabled (default: off), 
+it saves at the same frequency as the full saves. 
+
+\item 
+\smallcode{double SVG\_save\_interval} says how often (in \v|time_units|) 
+PhysiCell saves SVG cross-sections; see Section \ref{sec:SVG_functions}. 
+
+\item 
+\smallcode{bool enable\_SVG\_saves} sets whether PhysiCell saves 
+SVG snapshots.  
+\end{enumerate}
+
+\TOClink 
+
+\subsubsection{Member functions}
+
+\begin{enumerate}
+\item 
+\smallcode{void read\_from\_pugixml( void )} initializes the member data 
+based upon the DOM that has previously been loaded with 
+\v|load_PhysiCell_config_file|. 
+
+\end{enumerate}
+
+\TOClink 
+
+
+\subsection{Structure of PhysiCell XML parameter files}
+\label{sec:XML_PhysiCell_structure}
+PhysiCell's XML files look like this (as of Version 1.3.0); they 
+are subject to extension. 
+
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<user_details />
+
+<PhysiCell_settings version="devel-version">
+   <domain>
+      <xmin>0.02</xmin>
+      <xmax>52.01</xmax>
+      <ymin>-5.03</ymin>
+      <ymax>5.04</ymax>
+      <zmin>-10.01</zmin>
+      <zmax>10.7</zmax>
+      <dx>20</dx>
+      <dy>20</dy>
+      <dz>-20.02</dz>
+   </domain>
+   
+   <overall>
+      <max_time units="min">7200</max_time>  
+      <time_units>min</time_units>
+      <space_units>micron</space_units>
+   </overall>
+   
+   <parallel>
+      <omp_num_threads>4</omp_num_threads>
+   </parallel> 
+   
+   <save>
+      <folder>output</folder> <!-- use . for root --> 
+
+      <full_data>
+         <interval units="min">60</interval>
+         <enable>true</enable>
+      </full_data>
+      
+      <SVG>
+         <interval units="min">42.0</interval>
+         <enable>true</enable>
+      </SVG>
+      
+      <legacy_data>
+         <enable>false</enable>
+      </legacy_data>
+   </save>
+   
+   <custom>
+   </custom>
+
+</PhysiCell_settings>
+\end{verbatim}
+
+The main groupings of settings are: 
+\begin{enumerate}
+\item
+\smallcode{domain} will eventually have settings on the simulation domain size. 
+This is in alpha-stage planning. 
+
+\item
+\smallcode{overall} stores overall simulation settings, like units 
+and maximum simulation time. 
+
+\item 
+\smallcode{parallel} stores OpenMP options. 
+
+\item 
+\smallcode{save} stores settings for where and how often data are saved. 
+
+\item 
+\smallcode{custom} will eventually be a place for storing custom, 
+user-defined settings. 
+\end{enumerate}
+
+\TOClink 
+
 \section{PhysiCell Outputs \DONE}
 \label{sec:Outputs}
 PhysiCell supports several methods of output, including 
@@ -5246,6 +5526,145 @@ volume) and reference parameter values can be found in \cite{ref:PhysiCell}.
 
 \TOClink 
 
+\subsubsection{Flow Cytometry (\texttt{flow\_cytometry\_cycle\_model})\\
+(code: \texttt{PhysiCell\_constants::flow\_cytometry\_cycle\_model})}
+\label{sec:Standard_Models:Flow_Cytometry}
+This \v|Cycle_Mode| has the following \v|Phase|s: 
+\begin{enumerate}
+\item 
+\textbf{Phase 0:} Named \v|G0G1| with code \v|PhysiCell_constants::G0G1_phase|. This is the default 
+phase of the model. 
+
+\item 
+\textbf{Phase 1:} Named \v|S| with code \\ \v|PhysiCell_constants::S_phase|. 
+
+\item 
+\textbf{Phase 2:} Named \v|G2M| with code \\ \v|PhysiCell_constants::G2M_phase|. 
+
+\end{enumerate}
+
+In this model, $G_0/G_1$ cells can enter the cell cycle to 
+become $S$-phase cells, at transition rate $r_{01}$. $S$-phase cells 
+can become $G_2/M$-phase cells at rate $r_{12}$. 
+$G_2/M$-phase cells can divide into two $G_0/G_1$ daughter cells 
+at rate $r_{20}$. 
+See Fig. \ref{fig:cycle_model:flow_cytometry}. The 
+population-scale model is given by: 
+\beqa
+\frac{d\t{G0G1}}{dt} & = & -r_{01} \t{G0G1} + 2 r_{20} \t{G2M} \\
+\frac{d\t{S}}{dt} & = &  r_{01} \t{G0G1} -r_{12} \t{S} \\
+\frac{d\t{G2M}}{dt} & = &  r_{12} \t{S} -r_{20} \t{G2M} 
+\eeqa
+Further details on the \emph{biology} of this model (including 
+details the placement of daughter cells and changes in cell 
+volume) and reference parameter values can be found in \cite{ref:PhysiCell}. 
+
+\begin{figure}
+\begin{mdframed}[style=mystyle]
+% \begin{centering}
+% \begin{tikzpicture}
+% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1cm}}
+% \tikzset{edge/.style = {->,> = latex'}}
+% vertices
+% \node[vertex] (L) at (0,0) {Live};
+%edges
+% \draw[edge] (L) to[loop right] (L) {};
+% \end{tikzpicture}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,thick]
+\tikzstyle{every state}=[fill=lightgray,draw=black,text=black,minimum size=2.5cm]
+% \node[initial,state] (L) {Live}; 
+\node[initial,state] (A) {$G_0/G_1$}; 
+\node[state] (B) [above right of=A]{$S$}; 
+\node[state] (C) [below right of=B]{$G_2/M$}; 
+\path 
+(A) edge [bend left] node {$r_{01}$} (B)
+(B) edge [bend left] node {$r_{12}$ } (C)
+(C) edge [bend left] node {$r_{20}$ (divides)} (A);
+\end{tikzpicture}
+\caption{The graph structure of the Flow Cytometry cell cycle model. The default phase is marked 
+``start.''}
+\label{fig:cycle_model:flow_cytometry}
+\end{mdframed}
+\end{figure}
+
+\TOClink 
+
+
+\subsubsection{Flow Cytometry Separated (\texttt{flow\_cytometry\_separated\_cycle\_model})\\
+(code: \texttt{PhysiCell\_constants::flow\_cytometry\_separated\_cycle\_model})}
+\label{sec:Standard_Models:Flow_Cytometry_Separated}
+This \v|Cycle_Mode| has the following \v|Phase|s: 
+\begin{enumerate}
+\item 
+\textbf{Phase 0:} Named \v|G0G1| with code \v|PhysiCell_constants::G0G1_phase|. This is the default 
+phase of the model. 
+
+\item 
+\textbf{Phase 1:} Named \v|S| with code \\ \v|PhysiCell_constants::S_phase|. 
+
+\item 
+\textbf{Phase 2:} Named \v|G2| with code \\ \v|PhysiCell_constants::G2_phase|. 
+
+\item 
+\textbf{Phase 3:} Named \v|M| with code \\ \v|PhysiCell_constants::M_phase|. 
+
+\end{enumerate}
+
+In this model, $G_0/G_1$ cells can enter the cell cycle to 
+become $S$-phase cells, at transition rate $r_{01}$. $S$-phase cells 
+can become $G_2$-phase cells at rate $r_{12}$. 
+$G_2$-phase cells can become $M$-phase cells at rate $r_{23}$. 
+$M$-phase cells can divide into two $G_0/G_1$ daughter cells 
+at rate $r_{30}$. 
+See Fig. \ref{fig:cycle_model:flow_cytometry_separated}. The 
+population-scale model is given by: 
+\beqa
+\frac{d\t{G0G1}}{dt} & = & -r_{01} \t{G0G1} + 2 r_{30} \t{M} \\
+\frac{d\t{S}}{dt} & = &  r_{01} \t{G0G1} -r_{12} \t{S} \\
+\frac{d\t{G2}}{dt} & = &  r_{12} \t{S} -r_{23} \t{G2} \\
+\frac{d\t{M}}{dt} & = &  r_{23} \t{G2} -r_{30} \t{M} 
+\eeqa
+Further details on the \emph{biology} of this model (including 
+details the placement of daughter cells and changes in cell 
+volume) and reference parameter values can be found in \cite{ref:PhysiCell}. 
+
+\begin{figure}
+\begin{mdframed}[style=mystyle]
+% \begin{centering}
+% \begin{tikzpicture}
+% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1cm}}
+% \tikzset{edge/.style = {->,> = latex'}}
+% vertices
+% \node[vertex] (L) at (0,0) {Live};
+%edges
+% \draw[edge] (L) to[loop right] (L) {};
+% \end{tikzpicture}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,thick]
+\tikzstyle{every state}=[fill=lightgray,draw=black,text=black,minimum size=2.5cm]
+% \node[initial,state] (L) {Live}; 
+\node[initial,state] (A) {$G_0/G_1$}; 
+\node[state] (B) [above right of=A]{$S$}; 
+\node[state] (C) [below right of=B]{$G_2$}; 
+\node[state] (D) [below left of=C]{$M$}; 
+\path 
+(A) edge [bend left] node {$r_{01}$} (B)
+(B) edge [bend left] node {$r_{12}$ } (C)
+(C) edge [bend left] node {$r_{23}$ } (D)
+(D) edge [bend left] node {$r_{40}$ (divides)} (A);
+\end{tikzpicture}
+\caption{The graph structure of the Flow Cytometry Separated cell cycle model. The default phase is marked 
+``start.''}
+\label{fig:cycle_model:flow_cytometry_separated}
+\end{mdframed}
+\end{figure}
+
+\TOClink 
+
+
+
+
+
+
 
 \subsection{Death Cycle Models}
 \label{sec:Standard_Models:Death}
@@ -5863,12 +6282,14 @@ Several features are planned for upcoming PhysiCell releases:
 \item 
 We will further refine the MultiCellDS output functions to capture 
 more of the cell's state, including custom variable values. 
+\red{(Completed in Version 1.2.2)}
 
 \item 
 We will add functions to read in a saved simulation state. 
 
 \item 
 We will add an XML-based configuration file. 
+\red{(Completed in Version 1.3.0)}
 
 \item 
 We will add a function like 
@@ -5889,7 +6310,7 @@ its neighbors).
 
 \item 
 We will generalize the cell-cell adhesion model to allow differing levels of adhesion 
-between different types of cells. 
+between different types of cells. \red{(Completed in Version 1.2.0)} 
 
 \item 
 We will merge the \v|Vector_Variable| and \v|Variable| types for a more unified 
@@ -5897,12 +6318,26 @@ We will merge the \v|Vector_Variable| and \v|Variable| types for a more unified
 
 \item 
 We may update \v|motilty| and associated update functions to 
-build in some hysteresis (bias towards the last directoin of the day).
+build in some hysteresis (bias towards the last direction of the day).
 
 \item 
 We will consider partial SBML support for importing molecular-scale models. 
 
+\item 
+We will continue to refine XML parsing for options and configuration. 
+
+\item 
+We will allow ellipsoidal cell potential functions for better approximation of cell shapes. 
+
+\item 
+We will introduce  a standard library of simplified (bulk) vasculatures. 
+
+\item 
+We will introduce a standard library of simplified ECM functions. 
+
 \end{enumerate}
+
+\TOClink 
 
 % \section{Last code changes}
 
@@ -5967,6 +6402,7 @@ so that the apoptotic fraction is approximately 2\%
 order of 0.04 hr${}^\textrm{-1}$ \cite{ref:MultiCellDS,ref:MCF10A-NeoST,ref:MCF10A_PSON}. 
 
 \subsection{Live cycle model}
+\label{sec:parameters:live}
 For the Live cell model (Section \ref{sec:Standard_Models:Live}), we fit the 
 system of ODEs
 \beqa
@@ -5977,7 +6413,7 @@ and we note that
 \beqa
 \frac{d}{dt}\tt{Total} 
 & = & b \tt{Live} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( b (1-\textrm{AI}) + \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \left( b (1-\textrm{AI}) - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
 Here, $r = 0.04\textrm{ hr}^{-1}$, $\textrm{AI} = 0.02$ is the apoptotic index, and
@@ -5989,7 +6425,10 @@ To get the death rate $d$, we use a simple iterative fitting method
 (see \\
 \v|./documentation/matlab/tune_death_in_live_model|) to get $d \sim 0.00319 \textrm{ hr}^{-1}$. 
 
+\TOClink 
+
 \subsection{Ki67 Basic model}
+\label{sec:parameters:Ki67_basic}
 For the Ki67 Basic model (Section \ref{sec:Standard_Models:Ki67_Basic}), 
 we fit the system of ODEs 
 \beqa
@@ -6001,7 +6440,7 @@ and we note that
 \beqa
 \frac{d}{dt}\tt{Total} 
 & = & \frac{1}{t_K} \tt{Ki67+} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( \frac{\textrm{KI}}{T_K} + \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \left( \frac{\textrm{KI}}{T_K} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
 We set $T_K = 13 + 2.5$ hr (the duration of the two phases in the Ki67 Advanced model), 
@@ -6010,7 +6449,10 @@ $d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimate. We thus need to fit
 $T_Q$. We use a simple iterative fitting method 
 (see \v|./documentation/matlab/tune_Ki67_basic|) to get $T_Q \sim 4.59 \textrm{ hr}$. 
 
+\TOClink 
+
 \subsection{Ki67 Advanced model}
+\label{sec:parameters:Ki67_advanced}
 For the Ki67 Advanced model (Section \ref{sec:Standard_Models:Ki67_Advanced}), 
 we fit the system of ODEs 
 \beqa
@@ -6023,7 +6465,7 @@ and we note that
 \beqa
 \frac{d}{dt}\tt{Total} 
 & = & \frac{1}{T_{K1}} \tt{Ki67+}_1 - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
-& = & \left( \frac{\textrm{KI}_1}{T_{K1}} + \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & \left( \frac{\textrm{KI}_1}{T_{K1}} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
 & = & r \tt{Total} 
 \eeqa
 We set $T_{K1} = 13$ hr, $T_{K2} = 2.5$ hr, $T_A = 8.6$ hr, and 
@@ -6035,6 +6477,74 @@ $T_Q$. We use a simple iterative fitting method
 % approximately 74\%, in line with independent MCF10A measurements 
 % in 21\% oxygenation prior to confluence effects 
 \cite{ref:Ki67_MCF10A}. 
+
+\TOClink 
+
+\subsection{Flow Cytometry model}
+\label{sec:parameters:flow_cytometry}
+For the Flow Cytometry model (Section \ref{sec:Standard_Models:Flow_Cytometry}), 
+we fit the system of ODEs 
+\beqa
+\frac{d}{dt}\tt{G0G1} & = & -\left( \frac{1}{T_{G0G1}} + d \right) \tt{G0G1} + \frac{2}{T_{G2M}}\tt{G2M}  \\
+\frac{d}{dt}\tt{S} & = & \frac{1}{T_{G0G1}} \tt{G0G1} - \left( \frac{1}{T_{S}} + d \right) \tt{S} \\
+\frac{d}{dt}\tt{G2M} & = &  \frac{1}{T_{S}} \tt{S} - \left( \frac{1}{T_{G2M}} + d \right) \tt{G2M} \\
+\frac{d}{dt}\tt{Apoptotic} & = & d\left( \tt{G0G1} + \tt{S} + \tt{G2M} \right) -\frac{1}{T_A} \tt{Apoptotic}, 
+\eeqa
+and we note that 
+\beqa
+\frac{d}{dt}\tt{Total} 
+& = & \frac{1}{T_{G2M}} \tt{G2M} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
+& = & \left( \frac{1}{T_{G2M}} \frac{\tt{G2M}}{\tt{Total}} - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & r \tt{Total} 
+\eeqa
+For consistency with our estimates for the Ki67-Advanced model (see Section \ref{sec:parameters:Ki67_advanced}), 
+we set $T_{S} = 8$ hr, $T_{G2M} = T_{G2} + T_{M} = 5$ hr, $T_A = 8.6$ hr, and 
+$r = 0.04 \textrm{ hr}^{-1}$, and we set AI = 0.02 as before and keep 
+$d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimates. We thus need to fit  
+$T_{G0G1}$. We use a simple iterative fitting method 
+(see \v|./documentation/matlab/tune_cytometry|) to get $T_{G0G1} \sim 5.15 \textrm{ hr}$ for this model. 
+% It is interesting to note that this parameter set gives an (predicted; unfitted) Ki67+ fraction of 
+% approximately 74\%, in line with independent MCF10A measurements 
+% in 21\% oxygenation prior to confluence effects 
+\cite{ref:Ki67_MCF10A}. 
+
+\TOClink 
+
+\subsection{Separated Flow Cytometry model}
+\label{sec:parameters:flow_cytometry_separated}
+For the Flow Cytometry model (Section \ref{sec:Standard_Models:Flow_Cytometry_Separated}), 
+we fit the system of ODEs 
+\beqa
+\frac{d}{dt}\tt{G0G1} & = & -\left( \frac{1}{T_{G0G1}} + d \right) \tt{G0G1} + \frac{2}{T_{M}}\tt{M}  \\
+\frac{d}{dt}\tt{S} & = & \frac{1}{T_{G0G1}} \tt{G0G1} - \left( \frac{1}{T_{S}} + d \right) \tt{S} \\
+\frac{d}{dt}\tt{G2} & = &  \frac{1}{T_{S}} \tt{S} - \left( \frac{1}{T_{G2}} + d \right) \tt{G2} \\
+\frac{d}{dt}\tt{M} & = &  \frac{1}{T_{G2}} \tt{G2} - \left( \frac{1}{T_{M}} + d \right) \tt{M} \\
+\frac{d}{dt}\tt{Apoptotic} & = & d\left( \tt{G0G1} + \tt{S} + \tt{G2} + \tt{M} \right) -\frac{1}{T_A} \tt{Apoptotic}, 
+\eeqa
+and we note that 
+\beqa
+\frac{d}{dt}\tt{Total} 
+& = & \frac{1}{T_{M}} \tt{M} - \frac{1}{T_A} \tt{Apoptotic} \nonumber \\ 
+& = & \left( \frac{\tt{MI}}{T_{M}}  - \frac{\textrm{AI}}{T_A} \right) \tt{Total} \nonumber \\ 
+& = & r \tt{Total},
+\eeqa
+where $\tt{MI}$ is the mitotic index. 
+
+For consistency with our estimates for the Ki67-Advanced model (see Section \ref{sec:parameters:Ki67_advanced}), 
+we set $T_{S} = 8$ hr, $T_{G2} = 4$ h, $T_{M} = 1$ hr, $T_A = 8.6$ hr, and 
+$r = 0.04 \textrm{ hr}^{-1}$, and we set AI = 0.02 as before and keep 
+$d = 0.00319 \textrm{ hr}^{-1}$ from the prior estimates. We thus need to fit  
+$T_{G0G1}$. We use a simple iterative fitting method 
+(see \v|./documentation/matlab/tune_cytometry_separated|) to get $T_{G0G1} \sim 4.98 \textrm{ hr}$ for this model. 
+% It is interesting to note that this parameter set gives an (predicted; unfitted) Ki67+ fraction of 
+% approximately 74\%, in line with independent MCF10A measurements 
+% in 21\% oxygenation prior to confluence effects 
+\cite{ref:Ki67_MCF10A}. 
+
+\TOClink 
+
+
+
 
 % \pagebreak 
 % \section{Examples}
