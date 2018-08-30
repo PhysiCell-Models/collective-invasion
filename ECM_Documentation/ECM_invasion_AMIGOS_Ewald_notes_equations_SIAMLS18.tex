@@ -1,0 +1,256 @@
+\documentclass[11pt]{article}
+\newcommand{\Version}{1.2.0} 
+
+\usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{bbm}
+\usepackage{stmaryrd}
+\usepackage{graphicx}
+\usepackage{pbox}
+\usepackage{hyperref}
+\usepackage{changepage}
+\usepackage[dvipsnames,usenames]{color}
+%\usepackage{biblatex}
+
+\usepackage{caption}
+\captionsetup{justification=raggedright,singlelinecheck=false}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata,arrows.meta}
+
+\usepackage{mdframed}
+
+\mdfdefinestyle{mystyle}{
+    backgroundcolor=lightgray!10, 
+    innertopmargin=5mm, 
+    innerbottommargin=5mm, 
+    innerleftmargin=5mm, 
+    innerrightmargin=5mm 
+}
+
+
+\usepackage{bold-extra}
+
+ 
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage[nottoc]{tocbibind}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{color}
+% \usepackage{mathbb}
+
+\newcommand{\reals}{\mathbb{R}}
+
+
+
+
+\newcommand{\braces}[1]{\left\{#1\right\}}
+\newcommand{\N}{\mathcal{N}}
+
+\newcommand{\Heaviside}[1]{\textrm{H}\left(#1\right)}
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+
+\newcommand{\beqa}{\begin{eqnarray}}
+\newcommand{\eeqa}{\end{eqnarray}}
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\plus}[1]{\left(#1\right)^+}
+\newcommand{\minus}[1]{\left(#1\right)^-}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\grvec}[1]{\boldsymbol{#1}}
+
+%\newcommand{\braces}[1]{\left\{#1\right\}}
+%\newcommand{\abs}[1]{\left|#1\right|}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+%\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\norm}[1]{\left|\left|{#1}\right|\right|}
+
+%\newcommand{\Heaviside}[1]{\textrm{H}\left(#1\right)}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+%\newcommand{\grvec}[1]{\boldsymbol{#1}}
+
+%\newcommand{\beq}{\begin{equation}}
+%\newcommand{\eeq}{\end{equation}}
+%\newcommand{\beqa}{\begin{eqnarray}}
+%\newcommand{\eeqa}{\end{eqnarray}}
+\newcommand{\beqaN}{\begin{eqnarray*}}
+\newcommand{\eeqaN}{\end{eqnarray*}}
+
+\newcommand{\micron}{\mu\textrm{m}}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\newcommand{\boldrho}{\rho\hspace{-5.1pt}\rho}
+% \newcommand{\grvec}[1]{#1\hspace{-6pt}#1\hspace{-6pt}#1\hspace{1pt}}
+
+\newcommand{\one}{\mathds{1}}
+
+\newcommand{\hp}{\circ}%{\odot}%{\circ}
+\newcommand{\hd}{\hspace{-1.6mm}\fatslash}%{\oslash}'
+
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0in}
+
+\newcommand{\code}[1]{\verb|#1|}
+\renewcommand{\v}{\verb}
+\renewcommand{\t}[1]{\left[\mathrm{#1}\right]}
+\renewcommand{\tt}[1]{{\small \left[\texttt{#1}\right] }}
+
+\newcommand{\smallcode}[1]{\textbf{\texttt{#1}}} 
+%\newcommand{\smallcode}[1]{\textbf{\v|#1|}} 
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\magenta}[1]{\textcolor{magenta}{#1}}
+\newcommand{\FIX}{}%{\textbf{\red{[FIX ME]}}}
+\newcommand{\DONE}{}%{\textbf{\blue{[DONE]}}}
+\newcommand{\FINISH}{}%{\magenta{[FINISH ME]}}
+
+%\newcommand{\beqa}{\begin{eqnarray}}
+%\newcommand{\eeqa}{\end{eqnarray}}
+%\newcommand{\beq}{\begin{equation}}
+%\newcommand{\eeq}{\end{equation}}
+
+%\newcommand{\abs}[1]{\left|#1\right|}
+%\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+\newcommand{\ip}[2]{\left\langle#1,#2\right\rangle}
+
+%\newcommand{\Heaviside}[1]{\textrm{H}\left(#1\right)}
+
+\newcommand{\oxy}{\textrm{pO}_2}
+\newcommand{\oxyS}[1]{\textrm{pO2}_{2,\textrm{#1}}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\renewcommand{\max}[2]{\textrm{max}\left(#1,#2\right)}
+\renewcommand{\min}[2]{\textrm{min}\left(#1,#2\right)}
+
+\newcommand{\TOClink}{\begin{center}\hrule\vskip-10pt\phantom{.}\hfill[Return to \hyperlink{TOC}{Table of Contents}.]\hfill\phantom{.}\vskip3pt\hrule\end{center}}
+\begin{document}
+
+
+\author{TBD ... }
+\title{Modeling Extracellular-Cell Interactions using PhysiCell}
+\date{\today}
+
+\maketitle
+
+\section{Introduction}\label{sec:Intro}
+
+ECM has three components 
+
+- density ($\rho$) which represents amount of fiber present (runs from 0 to 1)
+
+-anisotropy (a) which represents alignment of the fibers in a voxel with each other (runs from 0 to 1)
+
+-fiber alignment ($\vec f$) which represents the average fiber alignment in a voxel - a normalized three component vector
+
+General notes on cell motility in PhysiCell:
+
+Let b be the migration bias with b such that 0 <= b <= 1 is bias parameter. 
+
+Let $\vec B$ be the normalized migration bias vector and $\vec D$ be the migration direction. 
+
+Then migration direction $\vec D$ is
+
+\beq
+\vec D = (1-b) \vec R + b \vec B
+\eeq
+
+where $\vec R$ is a normalized vector with 3 random components.
+
+Letting $\vec V$ be the cell velocity vector defined as:
+
+\beq
+\vec V = \frac{s_{cell}\vec D}{norm(\vec D)}
+\eeq
+
+where $s_{cell}$ is the cell speed.
+
+\section{Initialization}\label{sec:init}
+
+Density initialized to 0.5. This value produces no alteration to cell speed. 
+
+Anisotropy initialized to 0.
+
+Fiber alignment initialized to a random orientation.
+
+\section{Math Models}\label{sec:math_models}
+
+\subsection{Cells Modifying ECM}\label{sec:cells_to_ecm}
+
+Density: 
+
+\beq
+\frac{d\rho}{dt} = r_{density}
+\eeq
+
+where r$_{density}$ is a characteristic rate of growth of ECM density caused by a passing cell. Every cell in theory updates the density in its voxel in a growth like fashion in this version but currently r$_{density}$ = 0 to isolate the ECM fiber realignment effects only.
+
+Anisotropy:
+
+\beq
+\frac{da}{dt} = r_{a}(1-a)
+\eeq
+
+and
+
+\beq
+r_{a} = r_{a0} s_{cell}
+\eeq
+where r$_{a0}$ is a base rate of change and s$_{cell}$ is the migration speed of the cell changing the voxel anisotropy. 
+
+Fiber Alignment:
+
+\beq
+\frac{d\vec f}{dt} = r_R (\vec f - \vec d)
+\eeq
+
+and 
+
+\beq
+r_R = r_{R0} (1-a)
+\eeq
+
+where r$_{R0}$ is a base rate of change and $\vec d$ is the direction of the cell realigning the fiber. The fiber is assumed to have no orientation along itself, but instead cells can travel in either direction. As such, the ECM only influences the original direction of travel
+
+\subsection{ECM Modifying Cell Behavior}\label{sec:ecm_to_cells}
+
+Impact of density on cell:
+
+\beq
+s_{migration} = 4 \big((\rho-0.5)^2 + 1.0 \big)S_{max}
+\eeq
+
+where s$_{migration}$ is the updated cell migration speed and S$_{max}$ is the maximum speed of a cell. This reflects the concept that with either too little to grab onto or too much to push through, cell speed is impacted by the amount of fiber present.
+
+
+Impact of anisotropy on cell:
+
+\beq
+b_m = a;
+\eeq
+
+where b$_m$ is the bias of the motility vector. This reduces the random motility of the cell as fibers it interacts with become more aligned.
+
+Also, the higher the anisotropy, the more a cells motility is directed in the direction of the fibers. See below for more detail.
+
+Impact of fiber alignment on cell:
+
+
+\beq
+\vec  B = a \vec f + (1-a) \vec d
+\eeq
+
+where $\vec B$ is the new cell motility bias vector and $\vec d$ is the direction of the cell realigning the fiber.
+
+
+
+
+\end{document}

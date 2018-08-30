@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:custom_modules">
+   </FileRef>
+   <FileRef
+      location = "group:main-ecm.cpp">
+   </FileRef>
+   <FileRef
+      location = "group:config/PhysiCell_settings.xml">
+   </FileRef>
+   <FileRef
+      location = "group:Makefile">
+   </FileRef>
+</Workspace>
