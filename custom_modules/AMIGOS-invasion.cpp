@@ -717,7 +717,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 	for(int i = 0; i < 3; i++)
 	{
 		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
-		ecm.ecm_data[ecm_index].ECM_orientation[i] = dt * r_realignment * f_minus_d[i];
+		ecm.ecm_data[ecm_index].ECM_orientation[i] += dt * r_realignment * f_minus_d[i];
 	}
 	double ddotf;
 	std::vector<double> temp;
