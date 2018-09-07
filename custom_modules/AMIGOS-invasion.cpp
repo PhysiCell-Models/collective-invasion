@@ -695,23 +695,46 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
 
-    double r_0 = 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! shoudl be the same but worth noting!!!!
+    double r_0 = 1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 
     double r_realignment = r_0 * (1-anisotropy);
     
     // START HERE! Double check math as well as if time step is working!
 
-    for( int i=0; i < phenotype.motility.motility_vector.size() ; i++ )
+    /*for( int i=0; i < phenotype.motility.motility_vector.size() ; i++ )
     {
         double temp = ECM_orientation[i] + dt * (r_realignment * (ECM_orientation[i] - phenotype.motility.motility_vector[i]));
 //        std::cout<<temp<<std::endl<<std::endl;
         ecm.ecm_data[ecm_index].ECM_orientation[i] = temp;
 		
 		/*Make sure each vector component of the ecm orientation is going the same direction as its corresponding component*
-		 *of the cell's motility vector*/
+		 *of the cell's motility vector
 		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
-    }
+    }*/
+	std::vector<double> f_minus_d;
+	f_minus_d.resize(3,0.0);
+	for(int i = 0; i < 3; i++)
+	{
+		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
+		ecm.ecm_data[ecm_index].ECM_orientation[i] += dt * r_realignment * f_minus_d[i];
+	}
+	double ddotf;
+	std::vector<double> temp;
+	temp.resize(3,0.0);
+	for(int i = 0; i < 3; i++)
+	{
+		temp[i] = ECM_orientation[i] * phenotype.motility.motility_vector[i];
+	}
+	ddotf = temp[1] + temp[2] + temp[3];
+	
+	if(ddotf <= 0)
+	{
+		for(int i = 0; i < 3; i++)
+		{
+		ECM_orientation[i] *= -1.0;
+		}
+	}
 	
     normalize(&(ecm.ecm_data[ecm_index].ECM_orientation));
 
