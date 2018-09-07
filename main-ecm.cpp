@@ -98,7 +98,7 @@ int main( int argc, char* argv[] )
 	double t = 0.0; // current simulation time 
 	
 	double t_output_interval = 10; // output once per hour WHY ISN'T THE CONFIG FILE WORKING??
-	double t_max = 60*24*10;  // 10 days 
+	double t_max = 60*24*2;  // 1 days 
 	double t_next_output_time = t; 
 	int output_index = 0; // used for creating unique output filenames 
 
