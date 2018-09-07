@@ -695,7 +695,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
 
-    double r_0 = 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+    double r_0 = 1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 
     double r_realignment = r_0 * (1-anisotropy);
     
