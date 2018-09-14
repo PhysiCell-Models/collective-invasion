@@ -3,7 +3,7 @@ PROGRAM_NAME := AMIGOS-invasion
 
 # CC := g++
 # CC := g++-mp-7 # typical macports compiler name
-CC := g++-8 # typical homebrew compiler name
+CC := g++ # typical homebrew compiler name
 
 # Check for environment definitions of compiler 
 # e.g., on CC = g++-7 on OSX
