@@ -678,6 +678,7 @@ void switching_phenotype_model(Cell* pCell, Phenotype& phenotype, double dt)
 
 void ecm_update_from_cell(Cell* pCell, Phenotype& phenotype, double dt) // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
 {
+<<<<<<< HEAD
 	//    Cell* pCell = (*all_cells)[i];
 	int ecm_index = pCell->get_current_voxel_index();
 
@@ -737,18 +738,81 @@ void ecm_update_from_cell(Cell* pCell, Phenotype& phenotype, double dt) // NOTE 
 	std::vector<double> f_minus_d;
 	f_minus_d.resize(3, 0.0);
 	for (int i = 0; i < 3; i++)
+=======
+//    Cell* pCell = (*all_cells)[i];
+    int ecm_index = pCell->get_current_voxel_index();
+    
+    // Type 2 are the followers. This prohibits them from modifying the ECM - the will be affected by its direction and ani, but can't change those properties.
+    
+//    if( pCell->type == 2 )
+//    {
+//        return;
+//    }
+    
+    // Cell-ECM density interaction
+    
+    double density = ecm.ecm_data[ecm_index].density;
+    double r = 0.0;//Setting this to zero for now, change it back to something else before we run another simulation
+    
+    ecm.ecm_data[ecm_index].density = density / (1 + (r*dt));
+    
+    // END Cell-ECM density interaction
+    
+    // Cell-ECM Fiber realingment
+
+    std::vector<double> ECM_orientation = ecm.ecm_data[ecm_index].ECM_orientation;
+    
+    double motility_vector_norm = norm( phenotype.motility.motility_vector );
+    if( motility_vector_norm < 1e-12 )
+    { return; }
+    else
+        
+        // FIX ME!!!!
+        
+    { phenotype.motility.motility_vector /= motility_vector_norm; }
+//    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector);
+    double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
+    double migration_speed = pCell->phenotype.motility.migration_speed;
+
+    double r_0 = 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+
+    double r_realignment = r_0 * (1-anisotropy);
+    
+    // START HERE! Double check math as well as if time step is working!
+
+    /*for( int i=0; i < phenotype.motility.motility_vector.size() ; i++ )
+    {
+        double temp = ECM_orientation[i] + dt * (r_realignment * (ECM_orientation[i] - phenotype.motility.motility_vector[i]));
+//        std::cout<<temp<<std::endl<<std::endl;
+        ecm.ecm_data[ecm_index].ECM_orientation[i] = temp;
+		
+		/*Make sure each vector component of the ecm orientation is going the same direction as its corresponding component*
+		 *of the cell's motility vector
+		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
+	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
+    }*/
+	std::vector<double> f_minus_d;
+	f_minus_d.resize(3,0.0);
+	for(int i = 0; i < 3; i++)
+>>>>>>> origin/Brandon
 	{
 		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
 		ecm.ecm_data[ecm_index].ECM_orientation[i] += dt * r_realignment * f_minus_d[i];
 	}
 	double ddotf;
 	std::vector<double> temp;
+<<<<<<< HEAD
 	temp.resize(3, 0.0);
 	for (int i = 0; i < 3; i++)
+=======
+	temp.resize(3,0.0);
+	for(int i = 0; i < 3; i++)
+>>>>>>> origin/Brandon
 	{
 		temp[i] = ECM_orientation[i] * phenotype.motility.motility_vector[i];
 	}
 	ddotf = temp[1] + temp[2] + temp[3];
+<<<<<<< HEAD
 
 	if (ddotf <= 0)
 	{
@@ -777,3 +841,33 @@ void ecm_update_from_cell(Cell* pCell, Phenotype& phenotype, double dt) // NOTE 
 
 
 }
+=======
+	
+	if(ddotf <= 0)
+	{
+		for(int i = 0; i < 3; i++)
+		{
+		ECM_orientation[i] *= -1.0;
+		}
+	}
+	
+    normalize(&(ecm.ecm_data[ecm_index].ECM_orientation));
+
+
+    // End Cell-ECM Fiber realingment
+    
+    // Cell-ECM Anisotrophy Modification
+    
+    double r_a0 = 1.0/100.0; // min-1 - changes on same time scale as fiber realignment????
+    double r_anisotropy = r_a0 * migration_speed; // What is a typical cell speed????
+//    std::cout<<migration_speed<<std::endl;
+    ecm.ecm_data[ecm_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+    
+    // END Cell-ECM Anisotropy Modification
+    
+    return;
+    
+    
+    
+}
+>>>>>>> origin/Brandon
