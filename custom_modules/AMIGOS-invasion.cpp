@@ -725,7 +725,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 	{
 		for(int i = 0; i < 3; i++)
 		{
-		ECM_orientation[i] *= -1.0;
+		   ECM_orientation[i] *= -1.0;
 		}
 	}
 	
