@@ -712,13 +712,6 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
     }*/
-	std::vector<double> f_minus_d;
-	f_minus_d.resize(3,0.0);
-	for(int i = 0; i < 3; i++)
-	{
-		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
-		ecm.ecm_data[ecm_index].ECM_orientation[i] += dt * r_realignment * f_minus_d[i];
-	}
 	double ddotf;
 	std::vector<double> temp;
 	temp.resize(3,0.0);
@@ -728,13 +721,22 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 	}
 	ddotf = temp[1] + temp[2] + temp[3];
 	
-	if(ddotf <= 0)
+	if(ddotf < 0)
 	{
 		for(int i = 0; i < 3; i++)
 		{
-		ECM_orientation[i] *= -1.0;
+		   ECM_orientation[i] *= -1.0;
 		}
 	}
+	
+	std::vector<double> f_minus_d;
+	f_minus_d.resize(3,0.0);
+	for(int i = 0; i < 3; i++)
+	{
+		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
+		ecm.ecm_data[ecm_index].ECM_orientation[i] -= dt * r_realignment * f_minus_d[i];
+	}
+	
 	
     normalize(&(ecm.ecm_data[ecm_index].ECM_orientation));
 
