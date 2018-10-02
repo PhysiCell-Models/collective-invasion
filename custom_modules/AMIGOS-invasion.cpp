@@ -272,7 +272,7 @@ void ECM_setup(double numvox, double tumor_radius)
 		double y = ecm.mesh.voxels[i].center[1];
 		if((sqrt((x*x) + (y*y)) > (tumor_radius + buffer_region)))
 		{
-			ecm.ecm_data[i].density = 1.0;
+			ecm.ecm_data[i].density = 0.5;
 		}
 		
 	//This block of code is used for orienting the ecm fibers radially outward from the origin
