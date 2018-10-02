@@ -176,7 +176,9 @@ void create_cell_types( void )
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
     
-    follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm;
+    follower_cell.functions.custom_cell_rule = change_speed_ecm;
+    
+    follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm; // ALSO CHANGES bias of the motility vector.
     
     follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
 
@@ -193,8 +195,8 @@ void setup_microenvironment( void )
 {
 	// set domain parameters
 
-	default_microenvironment_options.X_range = {-1500, 1500};
-	default_microenvironment_options.Y_range = {-1500, 1500};
+	default_microenvironment_options.X_range = {-2000, 2000};
+	default_microenvironment_options.Y_range = {-2000, 2000};
 	default_microenvironment_options.simulate_2D = true; 
 	
 	// no gradients needed for this example 
@@ -263,12 +265,12 @@ void ECM_setup(double numvox, double tumor_radius)
 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 		
-		double buffer_region = 20;
+		double buffer_region = 0;
 		//if sqrt(x^2 + y^2) > (tumor rad + buf region)
 		//get coord from ecm.mesh.voxels[i].center[0] -x ecm.mesh.voxels[i].center[1]
 		double x = ecm.mesh.voxels[i].center[0];
 		double y = ecm.mesh.voxels[i].center[1];
-		if((sqrt((x*x) + (y*y)) > (tumor_radius + 20)))
+		if((sqrt((x*x) + (y*y)) > (tumor_radius + buffer_region)))
 		{
 			ecm.ecm_data[i].density = 1.0;
 		}
@@ -345,7 +347,7 @@ void setup_tissue( double tumor_radius )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.2;
+	double leader_cell_fraction = 0.1;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -418,6 +420,22 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	return; 
 }
 
+void change_speed_ecm(Cell* pCell , Phenotype& phenotype , double dt)
+{
+    double vmax = 0.5;
+    int ecm_index =  pCell->get_current_voxel_index();
+    double density = ecm.ecm_data[ecm_index].density;
+//    std::cout<<phenotype.motility.migration_speed<<std::endl;
+    if(pCell->phenotype.motility.is_motile == true)
+    {
+        // Needs min and max stuff
+        pCell->phenotype.motility.migration_speed = (-(4.0)*pow((density-0.5),2.0) + 1.0)*vmax;
+//        std::cout<<"Speed "<<pCell->phenotype.motility.migration_speed<<std::endl;
+    }
+    
+    return;
+}
+
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt )
 {
     //change bias
@@ -430,10 +448,10 @@ void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , doubl
     //    5. double migration bias (with a value in [0,1]) sets the degree to which cell motility is biased
     //    along migration_bias_direction. If 0, then motion is completely Brownian. If 1, it is completely
     //    deterministc along the bias direction.
-
+    
     int ecm_index =  pCell->get_current_voxel_index();
     double a = ecm.ecm_data[ecm_index].anisotropy;
-    
+    phenotype.motility.migration_bias = a;
     std::vector<double> d = pCell->phenotype.motility.motility_vector; ////// Changed to motility_vector instead of bias - so the blending is of the actual velocity instead of just the direction it wants to go in
     //    d = norm(d);
     std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
@@ -467,7 +485,7 @@ void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , doubl
 
     normalize(pCell->phenotype.motility.migration_bias_direction);
     
-    phenotype.motility.migration_bias = a;
+    
 
     return;
 }
@@ -675,7 +693,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 //    {
 //        return;
 //    }
-    
+//    std::cout<<phenotype.motility.migration_speed<<std::endl;
     // Cell-ECM density interaction
     
     double density = ecm.ecm_data[ecm_index].density;

@@ -113,4 +113,5 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
 std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
+void change_speed_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );

@@ -98,7 +98,7 @@ int main( int argc, char* argv[] )
 	double t = 0.0; // current simulation time 
 	
 	double t_output_interval = 10; // output once per hour WHY ISN'T THE CONFIG FILE WORKING??
-	double t_max = 60*24*2;  // 1 days 
+    double t_max = 1440*10;  // 1440 minutes (minutes in one day) * # of days 
 	double t_next_output_time = t; 
 	int output_index = 0; // used for creating unique output filenames 
 
@@ -203,7 +203,7 @@ int main( int argc, char* argv[] )
             
             // Need somethign that specifics that only followers do this. Maybe put that into the custom stuff ... Not sure how to do that. Will need somethign similar for the ECM realignment.
             
-            cell_update_from_ecm();
+//            cell_update_from_ecm();
 			
 			t += diffusion_dt; 
 		}
