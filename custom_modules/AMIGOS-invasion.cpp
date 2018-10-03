@@ -265,14 +265,14 @@ void ECM_setup(double numvox, double tumor_radius)
 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 		
-		double buffer_region = 0;
+		double basement_membrane_thickness = 20;
 		//if sqrt(x^2 + y^2) > (tumor rad + buf region)
 		//get coord from ecm.mesh.voxels[i].center[0] -x ecm.mesh.voxels[i].center[1]
 		double x = ecm.mesh.voxels[i].center[0];
 		double y = ecm.mesh.voxels[i].center[1];
-		if((sqrt((x*x) + (y*y)) > (tumor_radius + buffer_region)))
+		if( (sqrt( (x * x) + (y * y) ) > (tumor_radius) ) && (sqrt( x * x + y * y ) < ( tumor_radius + basement_membrane_thickness) ) )
 		{
-			ecm.ecm_data[i].density = 0.5;
+			ecm.ecm_data[i].density = 0.0;
 		}
 		
 	//This block of code is used for orienting the ecm fibers radially outward from the origin
