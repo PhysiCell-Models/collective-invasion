@@ -3,17 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
@@ -22,8 +26,8 @@
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
-#    llelized diffusive transport solver for 3-D biological simulations,      #
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -641,10 +645,106 @@ Mechanics::Mechanics()
 	
 	// this is a multiple of the cell (equivalent) radius
 	relative_maximum_adhesion_distance = 1.25; 
-	maximum_adhesion_distance = 0.0; 
+	// maximum_adhesion_distance = 0.0; 
 	
 	return; 
 }
+
+
+// new on July 29, 2018
+// change the ratio without changing the repulsion strength or equilibrium spacing 
+void Mechanics::set_relative_maximum_adhesion_distance( double new_value )
+{
+	// get old equilibrium spacing, based on equilibriation of pairwise adhesive/repulsive forces at that distance. 
+	
+		// relative equilibrium spacing (relative to mean cell radius)
+	double s_relative = 2.0; 
+	
+	double temp1 = cell_cell_adhesion_strength; 
+	temp1 /= cell_cell_repulsion_strength;
+	temp1 = sqrt( temp1 ); 
+	
+	double temp2 = 1.0; 
+	temp2 -= temp1; //  1 - sqrt( alpha_CCA / alpha_CCR );
+	
+	
+	s_relative *= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ); 
+	
+	temp1 /= relative_maximum_adhesion_distance; // sqrt( alpha_CCA / alpha_CCR)/f;
+	temp2 = 1.0; 
+	temp2 -= temp1; // 1 - sqrt( alpha_CCA / alpha_CCR )/f;
+
+	s_relative /= temp2; // 2*( 1 - sqrt( alpha_CCA / alpha_CCR ) ) / ( 1-1/f) ; 
+	
+	// now, adjust the relative max adhesion distance 
+	
+	relative_maximum_adhesion_distance = new_value; 
+	
+	// adjust the adhesive coefficient to preserve the old equilibrium distance
+
+	temp1 = s_relative; 
+	temp1 /= 2.0; 
+	
+	temp2 = 1.0;
+	temp2 -= temp1; // 1 - s_relative/2.0 
+	
+	temp1 /= relative_maximum_adhesion_distance; // s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 *= -1.0; // -s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 += 1.0; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
+	
+	temp2 /= temp1; 
+	temp2 *= temp2; 
+	
+	cell_cell_adhesion_strength = cell_cell_repulsion_strength;
+	cell_cell_adhesion_strength *= temp2; 
+
+	return; 
+}		
+		
+// new on July 29, 2018
+// set the cell-cell equilibrium spacing, accomplished by changing the 
+// cell-cell adhesion strength, while leaving the cell-cell repulsion 
+// strength and the maximum adhesion distance unchanged 
+void Mechanics::set_relative_equilibrium_distance( double new_value )
+{
+	if( new_value > 2.0 )
+	{
+		std::cout << "**** Warning in function " << __FUNCTION__ << " in " << __FILE__ << " : " << std::endl 
+			<< "\tAttempted to set equilibrium distance exceeding two cell radii." << std::endl
+			<< "\tWe will cap the equilibrium distance at 2.0 cell radii." << std::endl 
+			<< "****" << std::endl << std::endl; 
+			
+			new_value = 2.0; 
+	}
+ 
+	// adjust the adhesive coefficient to achieve the new (relative) equilibrium distance
+
+	double temp1 = new_value; 
+	temp1 /= 2.0; 
+	
+	double temp2 = 1.0;
+	temp2 -= temp1; // 1 - s_relative/2.0 
+	
+	temp1 /= relative_maximum_adhesion_distance; // s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 *= -1.0; // -s_relative/(2*relative_maximum_adhesion_distance); 
+	temp1 += 1.0; // 1.0 -s_relative/(2*relative_maximum_adhesion_distance); 
+	
+	temp2 /= temp1; 
+	temp2 *= temp2; 
+	
+	cell_cell_adhesion_strength = cell_cell_repulsion_strength;
+	cell_cell_adhesion_strength *= temp2; 
+
+	return; 
+}
+
+void Mechanics::set_absolute_equilibrium_distance( Phenotype& phenotype, double new_value )
+{
+	return set_relative_equilibrium_distance( new_value / phenotype.geometry.radius ); 
+}
+
+// void Mechanics::set_absolute_maximum_adhesion_distance( double new_value );
+// void 
 	
 	
 Motility::Motility()
@@ -790,6 +890,8 @@ Cell_Functions::Cell_Functions()
 	calculate_distance_to_membrane = NULL; 
 	
 	set_orientation = NULL; 
+	
+	contact_function = NULL; 
 
 	return; 
 }
