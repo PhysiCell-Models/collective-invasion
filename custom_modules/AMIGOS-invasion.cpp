@@ -240,7 +240,7 @@ void setup_microenvironment( void )
 	return; 
 }	
 
-void ECM_setup(double numvox)
+void ECM_setup(double numvox, double tumor_radius)
 {
     ecm.sync_to_BioFVM();
     ecm.ecm_data.resize(numvox);
@@ -263,7 +263,15 @@ void ECM_setup(double numvox)
 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 		
-		
+		double buffer_region = 20;
+		//if sqrt(x^2 + y^2) > (tumor rad + buf region)
+		//get coord from ecm.mesh.voxels[i].center[0] -x ecm.mesh.voxels[i].center[1]
+		double x = ecm.mesh.voxels[i].center[0];
+		double y = ecm.mesh.voxels[i].center[1];
+		if((sqrt((x*x) + (y*y)) > (tumor_radius + 20)))
+		{
+			ecm.ecm_data[i].density = 1.0;
+		}
 		
 	//This block of code is used for orienting the ecm fibers radially outward from the origin
         /*double epsilon = 1E-6;
@@ -318,7 +326,7 @@ void run_biotransport( double t_max )
 	return; 
 }
 
-void setup_tissue( void )
+void setup_tissue( double tumor_radius )
 {
 	// place a cluster of tumor cells at the center 
 	
@@ -330,8 +338,6 @@ void setup_tissue( void )
     
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
-	
-	double tumor_radius = 175.0; //change this to make smaller sim
 	
 	Cell* pCell = NULL; 
 	
@@ -673,9 +679,9 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
     // Cell-ECM density interaction
     
     double density = ecm.ecm_data[ecm_index].density;
-    double r = 0.0;//Setting this to zero for now, change it back to something else before we run another simulation
+    double r = 1.0;//Setting this to zero for now, change it back to something else before we run another simulation
     
-    ecm.ecm_data[ecm_index].density = density / (1 + (r*dt));
+    ecm.ecm_data[ecm_index].density = density + r * dt  * (0.5 - density);
     
     // END Cell-ECM density interaction
     
@@ -712,13 +718,6 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
     }*/
-	std::vector<double> f_minus_d;
-	f_minus_d.resize(3,0.0);
-	for(int i = 0; i < 3; i++)
-	{
-		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
-		ecm.ecm_data[ecm_index].ECM_orientation[i] += dt * r_realignment * f_minus_d[i];
-	}
 	double ddotf;
 	std::vector<double> temp;
 	temp.resize(3,0.0);
@@ -728,13 +727,22 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 	}
 	ddotf = temp[1] + temp[2] + temp[3];
 	
-	if(ddotf <= 0)
+	if(ddotf < 0)
 	{
 		for(int i = 0; i < 3; i++)
 		{
-		ECM_orientation[i] *= -1.0;
+		   ECM_orientation[i] *= -1.0;
 		}
 	}
+	
+	std::vector<double> f_minus_d;
+	f_minus_d.resize(3,0.0);
+	for(int i = 0; i < 3; i++)
+	{
+		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
+		ecm.ecm_data[ecm_index].ECM_orientation[i] -= dt * r_realignment * f_minus_d[i];
+	}
+	
 	
     normalize(&(ecm.ecm_data[ecm_index].ECM_orientation));
 

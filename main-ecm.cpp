@@ -112,9 +112,12 @@ int main( int argc, char* argv[] )
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
+	/*tumor_radius for setup_tissue and ECM_setup*/
+	double tumor_radius = 175.0;
+	
 	create_cell_types();
-	setup_tissue();
-	ECM_setup(microenvironment.number_of_voxels());
+	setup_tissue(tumor_radius);
+	ECM_setup(microenvironment.number_of_voxels(), tumor_radius);
 	
 	/* Users typically start modifying here. START USERMODS */ 
 	
