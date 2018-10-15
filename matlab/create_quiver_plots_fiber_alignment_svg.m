@@ -9,7 +9,7 @@
 %output...ECM.mat files are
 
 clear all;
-for i = 0:288
+for i = 0:1440
     filename1 = sprintf('output%08u_ECM.mat', i) ;
    % filename2 = sprintf('output%08u.xml',i) ;
     ECM = read_ecm_data(filename1);
@@ -21,7 +21,7 @@ for i = 0:288
     scaled_Y_fiber = ECM.data{1,1} .* ECM.data{1,4};
     quiver(ECM.X, ECM.Y, scaled_X_fiber', scaled_Y_fiber');
 
-    axis ([-1000 1000 -1000 1000]);
+    axis image;
     time = 0;
    %string(sprintf('%d',DATA2.metadata.current_time/60)) ;
     % title({'ECM Fiber Alignment' ; 'Time = ' + time + ' hrs'}) 

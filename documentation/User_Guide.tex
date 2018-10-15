@@ -1,5 +1,6 @@
 \documentclass[12pt]{article}
-\newcommand{\Version}{1.3.0} 
+\newcommand{\Version}{1.4.0} 
+\newcommand{\ReleaseDate}{September 26, 2018} 
 
 \usepackage[letterpaper,margin=0.5in,bottom=0.75in]{geometry}
 \usepackage{amsmath}
@@ -98,7 +99,7 @@ urlcolor=blue
 
 \author{PhysiCell Project (Lead: Paul Macklin)}
 \title{PhysiCell User Guide (Version \Version)}
-\date{Revision: February 23, 2018}%\today}
+\date{Revision: \ReleaseDate}%\today}
 
 \maketitle
 
@@ -280,7 +281,7 @@ In particular, I suggest the following:
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix1.html}{Tutorial 1} (navigation, creating directories, etc.) 
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix2.html}{Tutorial 2} (moving, copying files, etc.)
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix4.html}{Tutorial 4} (wildcards, filename conventions, etc.)
-\item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix7.html}{Tutorial 7} (compiling and runnign software, etc.)
+\item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix7.html}{Tutorial 7} (compiling and running software, etc.)
 \item \href{http://www.ee.surrey.ac.uk/Teaching/Unix/unix8.html}{Tutorial 8} (UNIX and environment variables, etc.) (\textbf{Note:} 
 May not work in Windows/MinGW.) 
 \end{enumerate}
@@ -425,7 +426,7 @@ and visualization:
 
 \begin{enumerate}
 \item 
-\textbf{ImageMagick} is a cross-flatform image manipulation suite, which can (among other things)
+\textbf{ImageMagick} is a cross-platform image manipulation suite, which can (among other things)
 resize and crop images, change formats, and insert text labels. In PhysiCell, ImageMagick is especially 
 useful for converting SVG files to PNG, JPG, or other raster-based formats for further animation. 
 
@@ -468,7 +469,7 @@ pugixml (an efficient cross-platform XML parser) \cite{ref:pugixml}.
 \smallcode{beta} This directory is used for beta functionality used by our team during 
 testing and development. Use at your own risk! 
 \item 
-\smallcode{config} This directory is ued for XML configuration files with. Any custom configuration files should be placed in this directory. 
+\smallcode{config} This directory is used for XML configuration files with. Any custom configuration files should be placed in this directory. 
 \item 
 \smallcode{core} The core library files for PhysiCell are kept in this directory. Users should not modify functions in 
 the core library. 
@@ -501,10 +502,10 @@ and any other (BSD-compatible) dependencies are kept here.
 \item 
 \smallcode{output} Some examples will put their outputs here. 
 \item 
-\smallcode{povray} This includes some basic utilities for visulization by povray (an open source raytracing package) \cite{ref:povray}. 
-\item 
-\smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
-moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
+\smallcode{povray} This includes some basic utilities for visualization by povray (an open source raytracing package) \cite{ref:povray}. 
+% \item 
+% \smallcode{template\_projects} This directory once stored template projects for 2D and 3D. These have been 
+% moved to the sample projects as of Version 1.2.2. This directory will be deprecated. 
 \item 
 \smallcode{sample\_projects} This directory includes sample projects, including 2D and 3D template projects 
 and at least the four sample projects in \cite{ref:PhysiCell}.  A good start to a new 
@@ -709,6 +710,10 @@ To clear out the compiler-generated objects (which would allow you to recompile 
 
 \v|make clean| 
 
+To reset to a clean slate (e.g., to clear out a sample project and populate another): 
+
+\v|make reset|
+
 \TOClink 
 
 \section{The BioFVM microenvironment \DONE}
@@ -847,7 +852,7 @@ to add a new substrate called \v|name| with units \v|units|. (e.g., crayons with
 
 \item 
 \smallcode{void Microenvironment::add\_density( std::string name , std::string units, double diffusion\_constant, double decay\_rate )} acts similarly as above, but also sets the diffusion coefficient and decay rate. Generally, 
-these shoudl be in the same units as the simulation: by default, $\micron^2/\textrm{min}$ for diffusion 
+these should be in the same units as the simulation: by default, $\micron^2/\textrm{min}$ for diffusion 
 and $1/\textrm{min}$ for decay. 
 \end{enumerate}
 
@@ -879,7 +884,7 @@ microenvironment.decay_rates[2] = 0.15625;
 	
 // rename the first density to be glucose, and change parameters 
 	
-microenvironment.set_density( "glucose", "dimensionless" ); 
+microenvironment.set_density(0, "glucose", "dimensionless" ); 
 microenvironment.diffusion_coefficients[0] = 1e3; 
 microenvironment.decay_rates[0] = 0.05625; 	
 \end{verbatim}
@@ -998,8 +1003,11 @@ while( t < t_max )
    // update the microenvironment
   
    microenvironment.simulate_diffusion_decay( diffusion_dt );
-   if( default_microenvironment_options.calculate_gradients )
-   { microenvironment.compute_all_gradient_vectors(); }   
+   // No longer needed as of BioFVM 1.3.1. Gradients 
+   // are automaticaly calculated in the update_all_cells() 
+   // function, as needed. 
+   // if( default_microenvironment_options.calculate_gradients )
+   // { microenvironment.compute_all_gradient_vectors(); }   
    
    // physicell functions 
   
@@ -1009,6 +1017,14 @@ while( t < t_max )
 
 As of Version 1.2.0, PhysiCell has automated cell secretions/uptake as part of its phenotype 
 updates. There is no need to explicitly call the BioFVM cell-based functions in the main program loop.
+
+As of Version 1.3.1, PhysiCell has automated calculation of gradients once per $\Delta t_\textrm{mechanics}$ 
+within the \texttt{update\_all\_cells()} functions. Users no longer need to explicitly calculate gradients. 
+Just make sure you enable them in your setup, via: 
+
+\begin{verbatim}
+default_microenvironment_options.calculate_gradients = true; 
+\end{verbatim}
 
 Note that the PhysiCell template projects and sample projects already include these critical setup commands. 
 See Section \ref{sec:templates}. 
@@ -1575,7 +1591,7 @@ stored in the Cell Definition in \verb+cd+. (See Section \ref{sec:Cell_Definitio
 information on cell definitions.) As of Version 1.2.2, this function does not overwrite 
 the \v|is_movable|, \v|is_out_of_domain|, and \v|displacement| data of the cell. 
 
-This function is particularly useful if you want to do thinks like stem cell heirarchies, where you 
+This function is particularly useful if you want to do thinks like stem cell hierarchies, where you 
 might ``convert'' a stem cell to a differentiated cell, each of which has been defined 
 separately. 
 
@@ -3587,10 +3603,10 @@ to penetration and deformation by cells).
 \smallcode{double relative\_maximum\_adhesion\_distance} is the maximum distance of cell adhesion 
 to other cells or a basement membrane, given as a (dimensionless) multiple of \texttt{geometry.radius}. 
 
-\item 
-\smallcode{double maximum\_adhesion\_distance} is the absolute maximum distance at which a cell 
-interacts adhesively with other cells or basement membrane. We tend not to use this variable 
-in PhysiCell functions, so it may be deprecated in future releases. 
+% \item 
+% \smallcode{double maximum\_adhesion\_distance} is the absolute maximum distance at which a cell 
+% interacts adhesively with other cells or basement membrane. We tend not to use this variable 
+% in PhysiCell functions, so it may be deprecated in future releases. 
 \end{enumerate}
 
 As future releases of PhysiCell may include 
@@ -3610,6 +3626,11 @@ class Mechanics
     
     double relative_maximum_adhesion_distance; 
     double maximum_adhesion_distance;
+	
+    void set_relative_maximum_adhesion_distance( double new_value );  
+    void set_relative_equilibrium_distance( double new_value );  
+	
+    void set_absolute_equilibrium_distance( Phenotype& phenotype, double new_value );  
     
     Mechanics();      
 };
@@ -3623,6 +3644,34 @@ class Mechanics
 \smallcode{Mechanics()} is the default constructor function. It sets the parameters to the reference value for 
 a generic breast epithelium line.  
 % MCF-10A breast cancer cells. 
+
+
+\item
+\smallcode{void set\_relative\_maximum\_adhesion\_distance( double new\_value )} sets the new maximum 
+adhesion interaction distance to \texttt{new\_value}, as a multiple of the cell's mean equivalent radius. It 
+preserves the repulsion strength and equilibrium cell-cell spacing, by adjusting the adhesion strength. 
+
+\item 
+\smallcode{void set\_relative\_equilibrium\_distance( double new\_value )} sets the new cell-cell equilibrium 
+spacing or distance to \texttt{new\_value}, as a multiple of the cell's mean equivalent radius. It 
+preserves the repulsion strength and maximum mechanical interaction distance, 
+by adjusting the adhesion strength. Note that this function performs a ``sanity check'' cap 
+\texttt{new\_value} at 2.0. 
+
+
+\item 
+\smallcode{void set\_absolute\_equilibrium\_distance( Phenotype\& phenotype, double new\_value )}
+ sets the new cell-cell equilibrium 
+spacing or distance to \texttt{new\_value}, in absolute units (microns). It requires the cell's 
+equivalent radius, as given within the supplied \texttt{phenotype}
+ as a multiple of the cell's mean equivalent radius. It 
+preserves the repulsion strength and maximum mechanical interaction distance, 
+by adjusting the adhesion strength.  Note that this function performs a ``sanity check'' cap 
+\texttt{new\_value} at 2 cell radii. Note also that internally, PhysiCell performs physical calculations 
+based upon the multiples of the cell's current radius. This means that the equilibrium distance will 
+stay the same relative to the cell's radius, but the absolute (dimensional) equilibrium spacing will 
+vary in time even after setting the value with this function. 
+
 \end{enumerate}
 
 \TOClink
@@ -3994,13 +4043,38 @@ returns an Boolean value for the \v|find_me| tag within the \v|parent_node| pare
 \end{verbatim}
 Note that Booleans can be represented as 0 and 1, or \v|false| and \v|true|. 
 
+
+\item 
+\smallcode{std::string xml\_get\_my\_name( pugi::xml\_node node )} helps to easily extract the name of an XML node. (e.g., \v|<bob units="none">| returns bob.) 
+
+\item 
+\smallcode{bool xml\_get\_my\_bool\_value( pugi::xml\_node node )} gets the Boolean value of an XML node. (e.g., \v|<bob units="none">true</bob>| returns true.) 
+
+
+\item 
+\smallcode{int xml\_get\_my\_int\_value( pugi::xml\_node node )} gets the int value of an XML node. (e.g., \v|<bob units="none">42</bob>| returns 42.) 
+ 
+
+\item 
+\smallcode{int xml\_get\_my\_double\_value( pugi::xml\_node node )} gets the double value of an XML node. (e.g., \v|<bob units="none">42.03</bob>| returns 42.03.) 
+ 
+
+\item 
+\smallcode{std::string xml\_get\_my\_string\_value( pugi::xml\_node node )} gets the string value of an XML node. (e.g., \v|<bob units="none">is nice</bob>| returns \"is nice\".) 
+
+
+
+
 \end{enumerate}
 \TOClink
 
 \subsection{Passing XML options to PhysiCell}
 \label{sec:XML_options}
-PhysiCell 1.3.0 introduced prelimanary support for XML configuration files, via 
-\v|./modules/PhysiCell_settings.*|. It primarily works by creating two data 
+PhysiCell 1.3.0 introduced preliminary support for XML configuration files, via \hfill\break
+\v|./modules/PhysiCell_settings.*|. Version 1.4.0 introduced further refinements that are 
+detailed in Sections \ref{sec:XML_PhysiCell_structure} and \ref{sec:XML_user_parameters}.
+
+XML options in PhysiCell work  primarily  by creating two data 
 structures defined as: 
 
 \begin{verbatim}
@@ -4061,6 +4135,9 @@ Note that PhysiCell will default to \v|./config/PhysiCell_settings.xml|
 in the sample projects if no XML file is supplied: 
 
 \v|> ./run_me |
+
+Lastly, we point out that the settings in the XML figuration files and the settings 
+data structures will likely be expanded in the next several PhysiCell releases. 
 
 \TOClink 
 
@@ -4125,7 +4202,7 @@ based upon the DOM that has previously been loaded with
 
 \subsection{Structure of PhysiCell XML parameter files}
 \label{sec:XML_PhysiCell_structure}
-PhysiCell's XML files look like this (as of Version 1.3.0); they 
+PhysiCell's XML files look like this (as of Version 1.4.0); they 
 are subject to extension. 
 
 \begin{verbatim}
@@ -4134,15 +4211,16 @@ are subject to extension.
 
 <PhysiCell_settings version="devel-version">
    <domain>
-      <xmin>0.02</xmin>
-      <xmax>52.01</xmax>
-      <ymin>-5.03</ymin>
-      <ymax>5.04</ymax>
-      <zmin>-10.01</zmin>
-      <zmax>10.7</zmax>
+      <x_min>-1000</x_min>
+      <x_max>1000</x_max>
+      <y_min>-1000</y_min>
+      <y_max>1000</y_max>
+      <z_min>-10</z_min>
+      <z_max>10</z_max>
       <dx>20</dx>
       <dy>20</dy>
-      <dz>-20.02</dz>
+      <dz>20</dz>
+      <use_2D>true</use_2D>
    </domain>
    
    <overall>
@@ -4173,8 +4251,8 @@ are subject to extension.
       </legacy_data>
    </save>
    
-   <custom>
-   </custom>
+   <user_parameters>
+   </user_parameters>
 
 </PhysiCell_settings>
 \end{verbatim}
@@ -4182,8 +4260,10 @@ are subject to extension.
 The main groupings of settings are: 
 \begin{enumerate}
 \item
-\smallcode{domain} will eventually have settings on the simulation domain size. 
-This is in alpha-stage planning. 
+\smallcode{domain} stores settings on the simulation domain size. As of 
+Version 1.4.0, all PhysiCell sample projects parse this section and set hte 
+simulation size accordingly, although most override the \v|use_2D| setting 
+due to 2D/3D specific tissue initializations. 
 
 \item
 \smallcode{overall} stores overall simulation settings, like units 
@@ -4196,9 +4276,185 @@ and maximum simulation time.
 \smallcode{save} stores settings for where and how often data are saved. 
 
 \item 
-\smallcode{custom} will eventually be a place for storing custom, 
-user-defined settings. 
+\smallcode{user\_parameters} stores user-defined parameters, specific to their 
+simulation. See \ref{sec:XML_user_parameters} for more details. 
 \end{enumerate}
+
+\TOClink 
+
+\subsection{User Parameters}
+\label{sec:XML_user_parameters}
+As of Version 1.4.0, PhysiCell supports custom Boolean, integer, double, and string user parameters, which are automatically parsed into PhysiCell into a \v|parameters| data structure and available for query throughout a project. In Section \ref{sec:XML_user_parameters_XML_structure}, we show how to structure new 
+user parameters in an XML parameter file. In Section \ref{sec:XML_user_parameters_reading_them}, 
+we show how to access them within a project. In section \ref{sec:XML_user_parameters_data_types}, 
+we formally define the data types. 
+
+A detailed tutorial on these parameters is provided at: 
+\begin{center}
+\href{http://www.mathcancer.org/blog/user-parameters-in-physicell/}{http://www.mathcancer.org/blog/user-parameters-in-physicell/}
+\end{center}
+
+\TOClink
+
+\subsubsection{Adding User Parameters to an XML Configuration File}
+\label{sec:XML_user_parameters_XML_structure}
+In the \v|<user_parameters>| section of an XML configuration file, you can 
+add any named parameter with the following syntax: 
+\begin{verbatim}
+   <user_parameters>
+      <parameter_name type="TYPE" units="UNITS">value</parameter_name>
+   </user_parameters>
+\end{verbatim}
+
+\begin{itemize}
+\item \textbf{parameter\_name} is the name of the parameter. Note that this cannot begin with a digit. 
+\item \textbf{type} is the type of parameter. Allowed types are bool (Boolean), int (integer), double (floating point double precision), and string (std::string). Note that if this attribute is not supplied, PhysiCell will attempt to process the parameter as a double. 
+\item \textbf{units} are the units (default: none). Note that PhysiCell does not convert units, so supplying units here is important communication between users to ensure all are using correct units. By default, PhysiCell works in microns for spatial units and minutes for time units. 
+\item \textbf{value} is the actual value of the parameter. 
+\end{itemize}
+
+Here is an example \v|<user_parameters>| with each of these types of data
+\begin{verbatim}
+   <user_parameters>
+      <enable_detailed_model type="bool" units="none">true</enable_detailed_model>
+      <number_of_initial_cells type="int" units="none">42</number_of_initial_cells>
+      <division_rate type="double" units="1/min">0.001</division_rate>
+      <mean_waiting_time type="double" units="min">1.2e2</mean_waiting_time>
+      <mutant_cell_color type="string" units="none">rgb(255,0,0)</mutant_cell_color>
+   </user_parameters>
+\end{verbatim}
+
+PhysiCell reads into a global data structure called \v|parameters|. All Boolean 
+parameters are in \v|parameters.bools|. All integer parameters are stored in 
+\v|parameters.ints|. All double parameters are stored in \v|parameters.doubles|. 
+All string parameters are stored in \v|parameters.strings|. See 
+\ref{sec:XML_user_parameters_data_types} for technical details of 
+these structures. 
+
+\TOClink
+
+\subsubsection{Accessing User Parameters in a Project}
+\label{sec:XML_user_parameters_reading_them}
+Use the () operator to access the \emph{value} of a parameter, either 
+by its name (easier) or by its index (faster). For example, to get 
+the value of the \v|mean_waiting_time|, use: 
+
+\begin{verbatim}
+parameters.doubles("mean_waiting_time")
+\end{verbatim}
+
+To find the index of this parameter, and then access by index, use: 
+
+\begin{verbatim}
+int i = parameters.doubles.find_index("mean_waiting_time");
+parameters.doubles(i); 
+\end{verbatim}
+
+Use the [] operator to access the \emph{full data structure} of a parameter, either 
+by its name (easier) or by its index (faster). For example, to get 
+the value of the \v|number_of_initial_cells|, use: 
+
+\begin{verbatim}
+Parameter<int> param = parameters.ints["number_of_initial_cells"];
+std::cout << param.name << " " << param.units << " " << param.value << std::endl; 
+std::cout << param << std::endl; 
+\end{verbatim}
+
+To find the index of this parameter, and then access by index, use: 
+
+\begin{verbatim}
+int i = parameters.ints.find_index("mean_waiting_time");
+Parameter<int> param = parameters.ints[i]; 
+std::cout << param.name << " " << param.units << " " << param.value << std::endl; 
+std::cout << param << std::endl; 
+\end{verbatim}
+
+The usage is similar for Boolean, string, and double parameters. 
+
+\TOClink
+
+
+\subsubsection{User Parameters Technical Details}
+\label{sec:XML_user_parameters_data_types}
+We first define a template class for a \v|Parameter|: 
+\begin{verbatim}
+template <class T> 
+class Parameter
+{
+ private:
+   template <class Y>
+   friend std::ostream& operator<<(std::ostream& os, const Parameter<Y>& param); 
+
+ public: 
+   std::string name; 
+   std::string units; 
+   T value; 
+   
+   Parameter();
+   Parameter( std::string my_name ); 
+   
+   void operator=( T& rhs ); 
+   void operator=( T rhs ); 
+   void operator=( Parameter& p ); 
+};
+\end{verbatim} 
+The supported types \v|T| are \v|int|, \v|double|, \v|bool|, and \v|std::string|. You can use 
+the assignment operator = to either access the entire parameter or just its value. 
+We also provide user-friendly streaming via the \v|<<| overator. 
+
+Next, we provide a template class \v|Parameters| that bundles a searchable vector of parameters. 
+\begin{verbatim}
+template <class T>
+class Parameters
+{
+ private:
+   std::unordered_map<std::string,int> name_to_index_map; 
+   
+   template <class Y>
+   friend std::ostream& operator<<( std::ostream& os , const Parameters<Y>& params ); 
+
+ public: 
+   Parameters(); 
+ 
+   std::vector< Parameter<T> > parameters; 
+   
+   void add_parameter( std::string my_name ); 
+   void add_parameter( std::string my_name , T my_value ); 
+   void add_parameter( std::string my_name , T my_value , std::string my_units ); 
+   
+   void add_parameter( Parameter<T> param );
+   
+   int find_index( std::string search_name ); 
+   
+   // these access the values 
+   T& operator()( int i );
+   T& operator()( std::string str ); 
+
+   // these access the full, raw parameters 
+   Parameter<T>& operator[]( int i );
+   Parameter<T>& operator[]( std::string str ); 
+   
+   int size( void ) const; 
+};
+\end{verbatim} 
+As shown in the examples above, use the () operator to access a specific parameter value, and use the [] operator to access a specific full parameter data structure. Use \v|find_index| to search for the index of a parameter. We also provide a friendly streaming operation to summarize the parameters. 
+
+Lastly, \v|User_Parameters| bundles Boolean, integer, double, and string parameters: 
+\begin{verbatim}
+class User_Parameters
+{
+ private:
+   friend std::ostream& operator<<( std::ostream& os , const User_Parameters up ); 
+ 
+ public:
+   Parameters<bool> bools; 
+   Parameters<int> ints; 
+   Parameters<double> doubles; 
+   Parameters<std::string> strings; 
+   
+   void read_from_pugixml( pugi::xml_node parent_node );
+}; 
+\end{verbatim}
 
 \TOClink 
 
@@ -4559,6 +4815,21 @@ All outlines match the corresponding fill colors.
 % \red{Lambert-Beer Law} 
 
 % \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4976978/}{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4976978/}
+
+\item
+\smallcode{false\_cell\_coloring\_cycling\_quiescent} colors quiescent and cycling cells as Blue and Green, 
+respectively, for use in the \texttt{cycling\_quiescent} cell cycle model. 
+
+\item
+\smallcode{false\_cell\_coloring\_cytometry} supports all the various flow cytometry-based cell 
+cycle models.  As other coloring funcitons, apoptotic cells are red, and necrotic cells are brown. 
+
+G0/G1 cells, or G1 cells, are colored light blue. (0,80,255). \\
+G0 cells are colored pale blue . (40,200,255). \\
+S cells are colored magenta. (255,0,255). \\
+G2 cells are colored yellow. (255,255,0). \\
+G2/M and M cells are colored green. (0,255,0). 
+
 
 \end{enumerate}
 
@@ -5347,6 +5618,12 @@ static double phenotype_dt = 6.0;
 
 \TOClink 
 
+\subsection{User Parameters}
+\label{sec:global_user_parameters}
+As detailed in Section \ref{sec:XML_user_parameters}, PhysiCell has a global 
+\v|User_Parameters| data struture called \v|parameters|. 
+\TOClink 
+
 \section{Standard models \DONE}
 \label{sec:Standard_Models}
 PhysiCell includes several models for easier out-of-the-box simulation. 
@@ -5661,6 +5938,63 @@ volume) and reference parameter values can be found in \cite{ref:PhysiCell}.
 \TOClink 
 
 
+\subsubsection{Cycling-Quiescent (\texttt{cycling\_quiescent})\\
+(Code: \texttt{PhysiCell\_constants::cycling\_quiescent\_model})}
+\label{sec:Standard_Models:cycling_quiescent}
+This \v|Cycle_Mode| has the following \v|Phase|s: 
+\begin{enumerate}
+\item 
+\textbf{Phase 0:} Named \v|Quiescent| with code \v|PhysiCell_constants::quiescent|. 
+
+\item 
+\textbf{Phase 1:} Named \v|Cycling| with code \v|PhysiCell_constants::cycling|. 
+\end{enumerate}
+
+In this model, Quiescent cells can enter the cell cycle to 
+become Cycling cells, at transition rate $r_{01}$. Cycling cells 
+divide into two Quiescent cells at rate $r_{10}$. 
+See Fig. \ref{fig:cycle_model:cycling_quiescent}. The 
+population-scale model is given by: 
+\beqa
+\frac{d\t{Quiescent}}{dt} & = & -r_{01} \t{Ki67-} + 2 r_{10} \t{Cycling} \\
+\frac{d\t{Cycling}}{dt} & = &  r_{01} \t{Quiescent} -r_{10} \t{Cycling} 
+\eeqa
+Further details on the \emph{biology} of this model (including 
+details the placement of daughter cells and changes in cell 
+volume) and reference parameter values can be found in \cite{ref:PhysiCell}. 
+
+\begin{figure}
+\begin{mdframed}[style=mystyle]
+% \begin{centering}
+% \begin{tikzpicture}
+% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1cm}}
+% \tikzset{edge/.style = {->,> = latex'}}
+% vertices
+% \node[vertex] (L) at (0,0) {Live};
+%edges
+% \draw[edge] (L) to[loop right] (L) {};
+% \end{tikzpicture}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,thick]
+\tikzstyle{every state}=[fill=lightgray,draw=black,text=black,minimum size=2.5cm]
+% \node[initial,state] (L) {Live}; 
+\node[initial,state] (A) {Quiescent}; 
+\node[state] (B) [right of=A]{Cycling}; 
+\path 
+(A) edge [bend left] node {$r_{01}$} (B)
+(B) edge [bend left] node {$r_{10}$ (divides)} (A);
+\end{tikzpicture}
+% \end{centering}
+\caption{The graph structure of the Cycling-Quiescent cell cycle model. The default phase is marked 
+``start.''}
+\label{fig:cycle_model:cycling_quiescent}
+\end{mdframed}
+\end{figure}
+
+\TOClink 
+
+
+
+
 
 
 
@@ -5946,6 +6280,60 @@ Section \ref{sec:Standard_Models:Death} on standard death models, and
 Section \ref{sec:Standard_Models:Cycle} on standard cell cycle models. 
 See \cite{ref:PhysiCell} for more on the biology of these 
 models. 
+
+\TOClink 
+
+\section{Functions for Random Events}
+\label{sec:random_functions}
+PhysiCell provides several functions for working with random variables and events. All this functionality is based upon C++11 standard, cross-platform functions, using the 64-bit Mersenne Twister for generating random longs. The following functions simplify using random numbers: 
+\begin{enumerate}
+
+\item 
+\smallcode{long SeedRandom( long input )} seeds the pseudo-random number generator with the supplied seed.   
+
+\item 
+\smallcode{long SeedRandom( void )} seeds the pseudo-random number generator based upon the system time. 
+
+
+\item 
+\smallcode{double UniformRandom( void )} returns a uniformly distributed random number between 0 and 1. 
+
+\item 
+\smallcode{double NormalRandom( double mean, double standard\_deviation ) } provides a random number from a Gaussian distribution with mean \v|mean| and standard deviation \v|standard_deviation|. 
+
+\item 
+\smallcode{int choose\_event( std::vector<double>\& probabilities ) } helps choose a random event based upon the supplied probabilities in the vector \v|probabilities| (which must sum to 1). For example, suppose we have 
+events \v|{0, 1, 2, 3}| with probabilities \v|{0.01, 0.82, 0.14, 0.03}|. Then this code will (on average) 
+return 0 with probability 0.01, return 1 with probability 0.82, and so forth. 
+
+\begin{verbatim}
+std::vector<double> probabilities = {0.01, 0.82, 0.14, 0.03}; 
+
+int number_of_samples = 100000; 
+std::vector<int> events( number_of_samples , 0 ); 
+
+//this is thread-safe 
+#pragma omp parallel for 
+for( int i=0 ; i < number_of_samples ; i++ )
+{ events[i] = choose_event( probabilities ); }
+
+std::vector<int> counts( probabilities.size() , 0 ); 
+//this is not thread-safe 
+for( int i=0 ; i < number_of_samples ; i++ )
+{ counts[ events[i] ]++; }
+
+// display counts vs. 
+ 
+std::cout << "Summary: fraction vs correct fraction " << std::endl; 
+for( int i=0; i < counts.size(); i++)
+{
+   std::cout << i << " : " << (double) counts[i] / (double) number_of_samples 
+             << " vs " << probs[i] << std::endl;
+} 
+\end{verbatim}
+
+
+\end{enumerate}
 
 \TOClink 
 

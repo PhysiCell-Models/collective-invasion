@@ -3,17 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
@@ -22,8 +26,8 @@
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
-#    llelized diffusive transport solver for 3-D biological simulations,      #
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -376,8 +380,8 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 			// custom vector variables 
 			for( int i=0; i < (*all_cells)[0]->custom_data.vector_variables.size(); i++ )
 			{
-				size = 3; 
-				char szTemp [1024]; 
+				size = (*all_cells)[0]->custom_data.vector_variables[i].value.size(); 
+;				char szTemp [1024]; 
 				strcpy( szTemp, (*all_cells)[0]->custom_data.vector_variables[i].name.c_str() ); 
 				node_temp1 = node_temp1.append_child( "label" );
 				node_temp1.append_child( pugi::node_pcdata ).set_value( szTemp ); 
@@ -402,13 +406,22 @@ void add_PhysiCell_cells_to_open_xml_pugi( pugi::xml_document& xml_dom, std::str
 		char filename [1024]; 
 		sprintf( filename , "%s_cells_physicell.mat" , filename_base.c_str() ); 
 		
+		/* store filename without the relative pathing (if any) */ 
+		char filename_without_pathing [1024];
+		char* filename_start = strrchr( filename , '/' ); 
+		if( filename_start == NULL )
+		{ filename_start = filename; }
+		else	
+		{ filename_start++; } 
+		strcpy( filename_without_pathing , filename_start );  
+		
 		if( !node.first_child() )
 		{
-			node.append_child( pugi::node_pcdata ).set_value( filename ); 
+			node.append_child( pugi::node_pcdata ).set_value( filename_without_pathing ); // filename ); 
 		}
 		else
 		{
-			node.first_child().set_value( filename ); 
+			node.first_child().set_value( filename_without_pathing ); // filename ); 
 		}
 		
 		// next, create a matlab structure and save it!
