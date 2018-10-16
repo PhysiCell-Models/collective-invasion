@@ -103,8 +103,8 @@ class Options
 // set the tumor cell properties, then call the function 
 // to set up the tumor cells 
 void create_cell_types( void ); // done 
-void ECM_setup(double numvox, double radius);
-void setup_tissue(double radius); // done 
+void ECM_setup(double numvox);
+void setup_tissue(void); // done 
 
 // set up the microenvironment to include the immunostimulatory factor 
 void setup_microenvironment( void );  // done 
