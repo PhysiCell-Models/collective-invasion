@@ -100,6 +100,7 @@ void create_cell_types( void )
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
 	cell_defaults.parameters.o2_reference = 38.0;
 	
+	
 	// set default uptake and secretion 
 	// oxygen 
 	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
@@ -126,7 +127,7 @@ void create_cell_types( void )
 	
 	cell_defaults.phenotype.motility.is_motile = true;
 	cell_defaults.phenotype.motility.persistence_time = 15.0; 
-	cell_defaults.phenotype.motility.migration_speed = 1.0; 
+	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed"); 
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 0.90;
 	
@@ -151,10 +152,7 @@ void create_cell_types( void )
 	leader_cell.phenotype.motility.is_motile = true; 
 	
 	// reduce adhesion 
-
-//    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
-    
-//    leader_cell.phenotype.mechanics.cell_cell_adhesion_strength *= 0.1;
+    leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
     
 //    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal
     
@@ -180,12 +178,11 @@ void create_cell_types( void )
     
     follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
 
-//    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
+	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
     
 //    follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
     
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
-	
 	return; 
 }
 
@@ -240,8 +237,12 @@ void setup_microenvironment( void )
 	return; 
 }	
 
-void ECM_setup(double numvox, double tumor_radius)
+void ECM_setup(double numvox)
 {
+	//Save initial parameters from XML file once so we don't have to call fxn repeatedly
+	double initial_density = parameters.doubles("initial_density_ecm");
+	double tumor_radius = parameters.doubles("tumor_radius");
+	
     ecm.sync_to_BioFVM();
     ecm.ecm_data.resize(numvox);
 //    std::cout<<"Hi! 1"<<std::endl;
@@ -264,14 +265,19 @@ void ECM_setup(double numvox, double tumor_radius)
 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 		
 		double buffer_region = 20;
+		
+		ecm.ecm_data[i].density = initial_density;
 		//if sqrt(x^2 + y^2) > (tumor rad + buf region)
 		//get coord from ecm.mesh.voxels[i].center[0] -x ecm.mesh.voxels[i].center[1]
-		double x = ecm.mesh.voxels[i].center[0];
+		
+		//This block of code is used to create an initial density field that is different what the
+		//default ECM constructor instantiates
+		/*double x = ecm.mesh.voxels[i].center[0];
 		double y = ecm.mesh.voxels[i].center[1];
 		if((sqrt((x*x) + (y*y)) > (tumor_radius + 20)))
 		{
 			ecm.ecm_data[i].density = 1.0;
-		}
+		}*/
 		
 	//This block of code is used for orienting the ecm fibers radially outward from the origin
         /*double epsilon = 1E-6;
@@ -288,8 +294,6 @@ void ECM_setup(double numvox, double tumor_radius)
         
         
     }
-    
-    
     return;
 }
 
@@ -326,7 +330,7 @@ void run_biotransport( double t_max )
 	return; 
 }
 
-void setup_tissue( double tumor_radius )
+void setup_tissue( void )
 {
 	// place a cluster of tumor cells at the center 
 	
@@ -336,6 +340,8 @@ void setup_tissue( double tumor_radius )
 //    if( pCell->custom_data[0] > 2.0 )
 //    { pCell->custom_data[0] = .0; }
     
+	//Get tumor radius from XML parameters
+	double tumor_radius = parameters.doubles("tumor_radius");
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	

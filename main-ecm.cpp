@@ -82,28 +82,33 @@ using namespace PhysiCell;
 
 
 // set number of threads for OpenMP (parallel computing)
-int omp_num_threads = 12; // set this to # of CPU cores x 2 (for hyperthreading)
+
 void ecm_update(void);
 
 int main( int argc, char* argv[] )
 {
+	// load and parse settings file(s)
+ 
+	bool XML_status = false; 
+	if( argc > 1 )
+	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	else
+	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	if( !XML_status )
+	{ exit(-1); }
+
 	// OpenMP setup
-	omp_set_num_threads(omp_num_threads);
+	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
 	SeedRandom(); 
 	
 	// time setup 
 	std::string time_units = "min"; 
-	double t = 0.0; // current simulation time 
 	
-	double t_output_interval = 10; // output once per hour WHY ISN'T THE CONFIG FILE WORKING??
-	double t_max = 60*24*2;  // 1 days 
-	double t_next_output_time = t; 
-	int output_index = 0; // used for creating unique output filenames 
+	double t_max = PhysiCell_settings.max_time;  // 1 days 
 
 	/* Microenvironment setup */ 
-	
 	setup_microenvironment();
 
 	/* PhysiCell setup */ 
@@ -112,13 +117,10 @@ int main( int argc, char* argv[] )
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
-	/*tumor_radius for setup_tissue and ECM_setup*/
-	double tumor_radius = 175.0;
-	
 	create_cell_types();
-	setup_tissue(tumor_radius);
-	ECM_setup(microenvironment.number_of_voxels(), tumor_radius);
-	
+	setup_tissue();
+	ECM_setup(microenvironment.number_of_voxels());
+ 
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -131,8 +133,10 @@ int main( int argc, char* argv[] )
 	set_save_biofvm_cell_data_as_custom_matlab( true );
 	
 	// save a simulation snapshot 
-
-	save_PhysiCell_to_MultiCellDS_xml_pugi( "initial" , microenvironment , t ); 
+	
+	char filename[1024];
+	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
+	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -143,10 +147,11 @@ int main( int argc, char* argv[] )
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
 	
-	SVG_plot( "initial.svg" , microenvironment, 0.0 , t, cell_coloring_function );
+	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
-// Is this to initialize the uE with the leader and follower signals?
-    
+	display_citations(); 
+	
 	run_biotransport( 5.0 ); 
 	
 	// set the performance timers 
@@ -154,47 +159,64 @@ int main( int argc, char* argv[] )
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
 	
-	std::ofstream report_file ("simulation_report.txt"); 	// create the data log file 
-	report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
+	std::ofstream report_file;
 
 	// main loop 
+	if( PhysiCell_settings.enable_legacy_saves == true )
+	{	
+		sprintf( filename , "%s/simulation_report.txt" , PhysiCell_settings.folder.c_str() ); 
+		
+		report_file.open(filename); 	// create the data log file 
+		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
+	}
 	
 	try 
 	{	
-		while( t < t_max + 0.1*diffusion_dt )
+		while( PhysiCell_globals.current_time < t_max + 0.1*diffusion_dt )
 		{
 			// save data if it's time. 
-            if(  fabs( t - t_next_output_time ) < 0.01 * diffusion_dt )
+            if(  fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_full_save_time ) < 0.01 * diffusion_dt )
             {
-                log_output(t, output_index, microenvironment, report_file);
-                
-                char filename[1024];
-                sprintf( filename , "Output/output%08u" , output_index );
-                
-//                                sprintf( filename , "output%08u_ECM.mat" , output_index);
-                
-                save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , t );
-                
-                sprintf( filename , "Output/output%08u_ECM.mat" , output_index);
-                
-                
-                write_ECM_Data_matlab( filename );
-                
-                sprintf( filename , "SVG/snapshot%08u.svg" , output_index );
-                
-                SVG_plot( filename , microenvironment, 0.0 , t, cell_coloring_function );
-                
-                
-                output_index++;
-                t_next_output_time += t_output_interval;
-            }
+				
+				display_simulation_status( std::cout ); 
+				if( PhysiCell_settings.enable_legacy_saves == true )
+				{	
+					log_output( PhysiCell_globals.current_time , PhysiCell_globals.full_output_index, microenvironment, report_file);
+				}
+				
+				if( PhysiCell_settings.enable_full_saves == true )
+				{	
+					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
+					
+					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+				}
+				if( parameters.bools("enable_ecm_outputs") == true)
+				{
+					sprintf( filename , "output/output%08u_ECM.mat" , PhysiCell_globals.full_output_index);
+					write_ECM_Data_matlab( filename );
+				}
+				PhysiCell_globals.full_output_index++; 
+				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
+			}
+			
+			// save SVG plot if it's time
+			if( fabs( PhysiCell_globals.current_time - PhysiCell_globals.next_SVG_save_time  ) < 0.01 * diffusion_dt )
+			{
+				if( PhysiCell_settings.enable_SVG_saves == true )
+				{	
+					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
+					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+					
+					PhysiCell_globals.SVG_output_index++; 
+					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
+				}
+			}
+		
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
-			if( default_microenvironment_options.calculate_gradients )
-			{ microenvironment.compute_all_gradient_vectors(); }
 			
 			// run PhysiCell 
-			((Cell_Container *)microenvironment.agent_container)->update_all_cells(t);
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
 			//add ECM update here!
             
@@ -203,12 +225,15 @@ int main( int argc, char* argv[] )
             
             // Need somethign that specifics that only followers do this. Maybe put that into the custom stuff ... Not sure how to do that. Will need somethign similar for the ECM realignment.
             
-            cell_update_from_ecm();
+            cell_update_from_ecm(); 
+			PhysiCell_globals.current_time += diffusion_dt;
 			
-			t += diffusion_dt; 
+			if( PhysiCell_settings.enable_legacy_saves == true )
+			{			
+			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
+			report_file.close();
+			}
 		}
-		log_output(t, output_index, microenvironment, report_file);
-		report_file.close();
 	}
 	catch( const std::exception& e )
 	{ // reference to the base of a polymorphic object
@@ -217,8 +242,11 @@ int main( int argc, char* argv[] )
 	
 	// save a final simulation snapshot 
 	
-	save_PhysiCell_to_MultiCellDS_xml_pugi( "final" , microenvironment , t ); 
-	SVG_plot( "final.svg" , microenvironment, 0.0 , t, cell_coloring_function );
+	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
+	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+	
+	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
+	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	// timer 
 	
