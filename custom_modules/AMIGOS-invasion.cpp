@@ -104,6 +104,10 @@ void create_cell_types(void)
 =======
 	
 	
+<<<<<<< HEAD
+>>>>>>> master
+=======
+	
 >>>>>>> master
 	// set default uptake and secretion 
 	// oxygen 
@@ -163,6 +167,7 @@ void create_cell_types(void)
 
 	// reduce adhesion 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 	//    For SIAM LS18 Motility presentation - eliminating leader/follower signal/differencse in adhesion/etc
 
@@ -182,6 +187,8 @@ void create_cell_types(void)
 
 	leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
 =======
+=======
+>>>>>>> master
     leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
     
 //    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal
@@ -196,6 +203,7 @@ void create_cell_types(void)
 	follower_cell.type = 2;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm;
 
 	follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
@@ -208,6 +216,8 @@ void create_cell_types(void)
 
 	return;
 =======
+=======
+>>>>>>> master
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
     
 //    follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
@@ -271,6 +281,7 @@ void setup_microenvironment(void)
 void ECM_setup(double numvox)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	ecm.sync_to_BioFVM();
 	ecm.ecm_data.resize(numvox);
 	//    std::cout<<"Hi! 1"<<std::endl;
@@ -313,6 +324,8 @@ void ECM_setup(double numvox)
 
 	return;
 =======
+=======
+>>>>>>> master
 	//Save initial parameters from XML file once so we don't have to call fxn repeatedly
 	double initial_density = parameters.doubles("initial_density_ecm");
 	double tumor_radius = parameters.doubles("tumor_radius");
@@ -896,6 +909,7 @@ void ecm_update_from_cell(Cell* pCell, Phenotype& phenotype, double dt) // NOTE 
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
     }*/
 <<<<<<< HEAD
+<<<<<<< HEAD
 	std::vector<double> f_minus_d;
 	f_minus_d.resize(3,0.0);
 	for(int i = 0; i < 3; i++)
@@ -904,6 +918,8 @@ void ecm_update_from_cell(Cell* pCell, Phenotype& phenotype, double dt) // NOTE 
 		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
 		ecm.ecm_data[ecm_index].ECM_orientation[i] += dt * r_realignment * f_minus_d[i];
 	}
+=======
+>>>>>>> master
 =======
 >>>>>>> master
 	double ddotf;
