@@ -3,17 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
@@ -22,8 +26,8 @@
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
-#    llelized diffusive transport solver for 3-D biological simulations,      #
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -90,6 +94,18 @@ int xml_get_int_value( pugi::xml_node& parent_node , std::string find_me ); // d
 
 // get the Boolean value in <parent_node> <find_me>int_value</find_me> </parent_node> 
 bool xml_get_bool_value( pugi::xml_node& parent_node , std::string find_me );// done 
+
+
+// get the name of the element in <my_node> (the name would be my_node) 
+std::string xml_get_my_name( pugi::xml_node node ); 
+
+
+bool xml_get_my_bool_value( pugi::xml_node node ); 
+int xml_get_my_int_value( pugi::xml_node node ); 
+double xml_get_my_double_value( pugi::xml_node node ); 
+std::string xml_get_my_string_value( pugi::xml_node node ); 
+
+
 
 
 

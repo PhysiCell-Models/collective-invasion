@@ -258,7 +258,7 @@ if( strcmp( datatype, 'matlab' ) )
    % voxels are stored in a mat file 
    filename = node.getElementsByTagName( 'filename' ).item(0).getTextContent;
    % MAT = struct2array( load( char(filename) ) ); 
-   filename = sprintf( '%s/%s', directory , char(filename));   
+   filename = sprintf( '%s', char(filename));   
    MAT = load(filename); % load(char(filename)); 
    MAT = MAT.multiscale_microenvironment; 
    [m,n] = size(MAT);
@@ -406,7 +406,7 @@ if( isempty( mylist ) == false )
             if( isempty( filename ) == false )
                 % load the matlab file, and determine the number of cells 
                 % MAT = struct2array( load( filename ) ); 
-                filename = sprintf( '%s/%s', directory , char(filename));   
+                filename = sprintf( '%s', char(filename));   
                 MAT = load(filename); % load(char(filename)); 
                 MAT = MAT.basic_agents; % use this instead of struct2array for better octave compatibility 
                 
@@ -455,7 +455,7 @@ if( isempty( mylist ) == false )
                 disp( filename ) 
                 % load the matlab file, and determine the number of cells 
                 % MAT = struct2array( load( filename ) ); 
-                filename = sprintf( '%s/%s', directory , char(filename));   
+                filename = sprintf( '%s', char(filename));   
                 MAT = load(filename); % load(char(filename)); 
                 MAT = MAT.cells; % use this instead of struct2array for better octave compatibility 
                 

@@ -16,7 +16,7 @@ for i = 0:135
     scaled_X_fiber = ECM.data{1,1} .* ECM.data{1,3};
     scaled_Y_fiber = ECM.data{1,1} .* ECM.data{1,4};
     
-    quiver(ECM.X, ECM.Y, scaled_X_fiber, scaled_Y_fiber)
+    quiver(ECM.X, ECM.Y, scaled_X_fiber', scaled_Y_fiber')
 %     hold on
 %     contourf(ECM.X,ECM.Y,ECM.data{1,1}) ;
 %     colorbar ;
