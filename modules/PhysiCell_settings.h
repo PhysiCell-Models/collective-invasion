@@ -3,17 +3,21 @@
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1].    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
 #     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
 #     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
 # Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
 #     as below:                                                               #
 #                                                                             #
-# We implemented and solved the model using PhysiCell (Version 1.3.0) [1],    #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
 # with BioFVM [2] to solve the transport equations.                           #
 #                                                                             #
 # [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
@@ -22,8 +26,8 @@
 #     DOI: 10.1371/journal.pcbi.1005991                                       #
 #                                                                             #
 # [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
-#    llelized diffusive transport solver for 3-D biological simulations,      #
-#    Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730   #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -71,8 +75,12 @@
 #include <vector>
 #include <random>
 #include <chrono>
+#include <unordered_map>
 
 #include "./PhysiCell_pugixml.h"
+#include "../BioFVM/BioFVM.h"
+
+using namespace BioFVM; 
 
 namespace PhysiCell{
  	
@@ -104,9 +112,6 @@ class PhysiCell_Settings
 	double SVG_save_interval = 60; 
 	bool enable_SVG_saves = true; 
 	
-	
-	
-	
 	PhysiCell_Settings();
 	
 	void read_from_pugixml( void ); 
@@ -123,12 +128,82 @@ class PhysiCell_Globals
 	int SVG_output_index = 0; 
 };
 
+template <class T> 
+class Parameter
+{
+ private:
+	template <class Y>
+	friend std::ostream& operator<<(std::ostream& os, const Parameter<Y>& param); 
+
+ public: 
+	std::string name; 
+	std::string units; 
+	T value; 
+	
+	Parameter();
+	Parameter( std::string my_name ); 
+	
+	void operator=( T& rhs ); 
+	void operator=( T rhs ); 
+	void operator=( Parameter& p ); 
+};
+
+template <class T>
+class Parameters
+{
+ private:
+	std::unordered_map<std::string,int> name_to_index_map; 
+	
+	template <class Y>
+	friend std::ostream& operator<<( std::ostream& os , const Parameters<Y>& params ); 
+
+ public: 
+	Parameters(); 
+ 
+	std::vector< Parameter<T> > parameters; 
+	
+	void add_parameter( std::string my_name ); 
+	void add_parameter( std::string my_name , T my_value ); 
+//	void add_parameter( std::string my_name , T my_value ); 
+	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
+//	void add_parameter( std::string my_name , T my_value , std::string my_units ); 
+	
+	void add_parameter( Parameter<T> param );
+	
+	int find_index( std::string search_name ); 
+	
+	// these access the values 
+	T& operator()( int i );
+	T& operator()( std::string str ); 
+
+	// these access the full, raw parameters 
+	Parameter<T>& operator[]( int i );
+	Parameter<T>& operator[]( std::string str ); 
+	
+	int size( void ) const; 
+};
+
+class User_Parameters
+{
+ private:
+	friend std::ostream& operator<<( std::ostream& os , const User_Parameters up ); 
+ 
+ public:
+	Parameters<bool> bools; 
+	Parameters<int> ints; 
+	Parameters<double> doubles; 
+	Parameters<std::string> strings; 
+	
+	void read_from_pugixml( pugi::xml_node parent_node );
+}; 
+
 extern PhysiCell_Globals PhysiCell_globals; 
 
 extern PhysiCell_Settings PhysiCell_settings; 
 
+extern User_Parameters parameters; 
 
-} 
+}
 
 #endif 
 
