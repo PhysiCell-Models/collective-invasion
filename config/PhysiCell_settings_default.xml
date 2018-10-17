@@ -72,7 +72,7 @@
 <user_details />
 -->
 
-<PhysiCell_settings version="1.3.3">
+<PhysiCell_settings version="1.4.1">
 	<domain>
 		<x_min>-1000</x_min>
 		<x_max>1000</x_max>
@@ -87,13 +87,13 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">64800</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">1440</max_time> <!-- 1 day * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -103,9 +103,9 @@
 			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
-		 
+		 <!-- output an svg every other time we output data-->
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">120</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -122,6 +122,13 @@
 		<birth_rate type="double" units="1/min">0.01</birth_rate>
 		<chemoresistant type="bool">false</chemoresistant> 
 	-->
+		<tumor_radius type = "double">175.0</tumor_radius>
+		<enable_ecm_outputs type = "bool">true</enable_ecm_outputs>
+		<initial_density_ecm type = "double">0.5</initial_density_ecm>
+		<leader_adhesion type = "double">1.0</leader_adhesion>
+		<follower_adhesion type = "double">1.0</follower_adhesion>
+		<default_cell_speed type = "double">1.0</default_cell_speed>
+		
 	</user_parameters>
 	
 </PhysiCell_settings>

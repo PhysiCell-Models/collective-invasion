@@ -1,0 +1,4 @@
+userName:default
+resetTime:172800
+numOfRuns:1
+lastTest:None

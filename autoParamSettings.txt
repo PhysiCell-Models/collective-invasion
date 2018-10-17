@@ -1,0 +1,13 @@
+id:1
+status:in progress
+start time:2018-10-16 23:59:18
+end time:
+performed by:default
+comments:default
+./overall/max_time:1440
+./user_parameters/tumor_radius:175
+./user_parameters/enable_ecm_outputs:true
+./user_parameters/initial_density_ecm:0.5
+./user_parameters/leader_adhesion:1.0
+./user_parameters/follower_adhesion:1.0
+./user_parameters/default_cell_speed:1.0
