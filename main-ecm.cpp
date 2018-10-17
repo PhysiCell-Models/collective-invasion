@@ -106,14 +106,7 @@ int main( int argc, char* argv[] )
 	// time setup 
 	std::string time_units = "min"; 
 	
-<<<<<<< HEAD
-	double t_output_interval = 60; // output once per hour WHY ISN'T THE CONFIG FILE WORKING??
-	double t_max = 1440*10;  // 1 days
-	double t_next_output_time = t; 
-	int output_index = 0; // used for creating unique output filenames 
-=======
-	double t_max = PhysiCell_settings.max_time;  // 1 days 
->>>>>>> master
+	double t_max = PhysiCell_settings.max_time;  // 1 days
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();
