@@ -98,7 +98,8 @@ class autoParam:
         records = sheet.getRecords()
 
         for i in range(0, len(records)):
-            if records[i]["status"] == "in progress" and len(records[i]["start time"]) > 0 and ((datetime.datetime.now()-datetime.datetime.strptime(records[i]["start time"], '%Y-%m-%d %H:%M:%S')).total_seconds() > int(self.config["resetTime"])):
+            # or records[i]["status"] == "run" or records[i]["status"] == "matlab" or records[i]["status"] == "ffmpeg" or records[i]["status"] == "zip" or records[i]["status"] == ""
+            if (records[i]["status"] == "in progress") and len(records[i]["start time"]) > 0 and ((datetime.datetime.now()-datetime.datetime.strptime(records[i]["start time"], '%Y-%m-%d %H:%M:%S')).total_seconds() > int(self.config["resetTime"])):
                 print("\"", records[i]["id"], "\" hasn't been marked as complete after running for: ", int((datetime.datetime.now()-datetime.datetime.strptime(records[i]["start time"], '%Y-%m-%d %H:%M:%S')).total_seconds()), " seconds. It has been marked as still needing to be ran.")
 
                 records[i]["comments"] += "test possibly crashed"
