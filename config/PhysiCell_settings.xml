@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time> <!-- 1 day * 24 h * 60 min -->
+		<max_time units="min">14440</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -105,7 +105,7 @@
 		</full_data>
 		 <!-- output an svg every other time we output data-->
 		<SVG>
-			<interval units="min">120</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -127,7 +127,9 @@
 		<initial_density_ecm type = "double">0.5</initial_density_ecm>
 		<leader_adhesion type = "double">1.0</leader_adhesion>
 		<follower_adhesion type = "double">1.0</follower_adhesion>
-		<default_cell_speed type = "double">1.0</default_cell_speed>
+		<default_cell_speed type = "double">0.5</default_cell_speed>
+		<leader_motility_mode type = "bool">true</leader_motility_mode>
+		<follower_motility_mode type = "bool">false</follower_motility_mode>
 		
 	</user_parameters>
 	
