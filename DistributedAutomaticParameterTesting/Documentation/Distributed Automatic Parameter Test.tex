@@ -28,12 +28,15 @@ The Google Sheet can be have any name you wish.  The first 6 columns are set but
 \end{itemize}
 After the first six columns you can add settings.  The `PhysiCell\_settings.xml` file is created from `PhysiCell\_settings\_default.xml` and the XML structure must already be present.  The column names are the path to get to the XML variable and the value is what should be set.  There are problems with Google Sheets formating so it's best to set the columns to plain text.
 
+\subsection{Python dependencies}
+The python code uses gspread oauth2client and matlab.  You can install them using `pip install gspread oauth2client matlab`.
+
 \subsection{sheet.py}
 Using the \href{https://developers.google.com/sheets/api/quickstart/python}{Google Sheets API Python Startup Guide} and  \href{https://www.twilio.com/blog/2017/02/an-easy-way-to-read-and-write-to-a-google-spreadsheet-in-python.html?utm_source=youtube&utm_medium=video&utm_campaign=youtube_python_google_sheets}{Google Spreadsheets and Python} guide written by Greg Baugues.\\
 
 Follow the following steps:\\
 \begin{enumerate}
-	\item Run "pip install gspread oauth2client" to install the required libraries.\\
+	\item Ensure that the dependencies are installed.\\
 	\item Create the credentials (this is only needed to create a new set of parameters).
 	\begin{enumerate}
 		\item Go to \href{https://console.developers.google.com/}{https://console.developers.google.com/}.

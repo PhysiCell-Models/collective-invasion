@@ -1,29 +1,18 @@
+from __future__ import print_function
 import os
-import zipfile
-from datetime import datetime
+import shutil
+#import matlab.engine
 
-def createZip(parameters):
-    # Create the zip
-    #datetime.utcnow().isoformat()
-    zip = zipfile.ZipFile(str(parameters['id']) + '_test_' + "d" +'.zip', 'w')
+def reprintline(line):
+    print('\r', line, end='')
 
-    # Add individual files
-    zip.write('autoParamSettings.txt', compress_type=zipfile.ZIP_DEFLATED)
-
-    # Add files in SVG
-    for folder, subfolders, files in os.walk('SVG/'):
-        for file in files:
-            zip.write(os.path.join(folder, file), 'SVG/'+file, compress_type = zipfile.ZIP_DEFLATED)
-
-    # Add files in output
-    for folder, subfolders, files in os.walk('output/'):
-        for file in files:
-            zip.write(os.path.join(folder, file), 'output/'+file, compress_type = zipfile.ZIP_DEFLATED)
-
-    zip.close()
+def runTests(tests):
+    # Copy matlab scripts into output
+    for file_name in os.listdir("matlab"):
+        shutil.copy(os.getcwd()+"\\matlab\\"+file_name, "output")
 
 if __name__ == '__main__':
     os.chdir("../")
-    #os.system("AMIGOS-invasion.exe")
-    #createZip({"id":8})
-    print(datetime.utcnow().isoformat())
+    print("main")
+
+    #runTests([])

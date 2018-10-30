@@ -1,10 +1,11 @@
-id:1
+id:5
 status:in progress
-start time:2018-10-16 23:59:18
+start time:2018-10-30 15:16:29
 end time:
-performed by:default
-comments:default
-./overall/max_time:1440
+performed by:bendugga
+comments:
+tasks:clean,xml,sim,zip,upload
+./overall/max_time:120
 ./user_parameters/tumor_radius:175
 ./user_parameters/enable_ecm_outputs:true
 ./user_parameters/initial_density_ecm:0.5

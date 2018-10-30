@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min" /> 
+		<max_time units="min">120</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -43,12 +43,12 @@
 	<user_parameters>
 	 
 	
-		<tumor_radius type="double" />
-		<enable_ecm_outputs type="bool" />
-		<initial_density_ecm type="double" />
-		<leader_adhesion type="double" />
-		<follower_adhesion type="double" />
-		<default_cell_speed type="double" />
+		<tumor_radius type="double">175</tumor_radius>
+		<enable_ecm_outputs type="bool">true</enable_ecm_outputs>
+		<initial_density_ecm type="double">0.5</initial_density_ecm>
+		<leader_adhesion type="double">1.0</leader_adhesion>
+		<follower_adhesion type="double">1.0</follower_adhesion>
+		<default_cell_speed type="double">1.0</default_cell_speed>
 		
 	</user_parameters>
 	

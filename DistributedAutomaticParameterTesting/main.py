@@ -2,15 +2,15 @@
 # 10/21/18
 # Main script to run distributed parameter testing
 
-from __future__ import print_function
 import xml.etree.ElementTree as ET
 from autoParam import *
 import os
+import platform
 import zipfile
 import datetime
-
-def reprintline(line):
-    print('\r', line, end='')
+import time
+#import matlab.engine
+from box import *
 
 def createXML(parameters, offLimits=[]):
     parameters = dict(parameters)
@@ -29,21 +29,10 @@ def createXML(parameters, offLimits=[]):
 
     tree.write("config/PhysiCell_settings.xml")
 
-def dataCleanup():
-    '''
-    Emulating make data-cleanup
-        rm -f *.mat
-        rm -f *.xml
-        rm -f *.svg
-        rm -f *.txt
-        rm -f *.pov
-        rm -f ./Output/*
-        rm -f ./SVG/*
-    '''
-
-    # remove .mat, .xml, .svg, .txt, .pov
+def dataCleanup(config):
+    # Emulating make data-cleanup: remove .mat, .xml, .svg, .txt, .pov
     for file in os.listdir("."):
-        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or (config['removeZip']=='True' and file.endswith('.zip')):
             os.remove(file)
 
     for file in os.listdir("SVG/"):
@@ -53,7 +42,6 @@ def dataCleanup():
     for file in os.listdir("output/"):
         if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
             os.remove("output/" + file)
-
 
 def createSettingsFile(parameters):
     data = ""
@@ -65,8 +53,9 @@ def createSettingsFile(parameters):
         file.writelines(data)
 
 def createZip(parameters):
+    fileName = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + '.zip'
     # Create the zip
-    zip = zipfile.ZipFile(str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + '.zip', 'w')
+    zip = zipfile.ZipFile(fileName, 'w')
 
     # Add individual files
     zip.write('autoParamSettings.txt', compress_type=zipfile.ZIP_DEFLATED)
@@ -83,9 +72,31 @@ def createZip(parameters):
 
     zip.close()
 
+    return fileName
+
+def manageBoxConnection(config):
+    if len(config['accessToken']) != 0:
+        pass
+    '''
+    email = getClient().user(user_id='me').get()['login']
+    ap.changeConfigLine('userName:'+ap.config['userName'], 'userName:'+email[0:email.index('@')])
+    if ap.config['saveToken'] == 'True':
+        ap.changeConfigLine('accessToken:'+ap.config['accessToken'], 'accessToken:'+getAccess())
+        ap.changeConfigLine('refreshToken:'+ap.config['refreshToken'], 'refreshToken:'+getRefresh())
+        ap.changeConfigLine('refreshTime:'+ap.config['refreshTime'], 'refreshTime:'+str(time.time()))
+    '''
+
 def main():
     ap = autoParam()
     count = 0
+
+    useBox = None
+    while(useBox != "Y" and useBox != "y" and useBox != "n" and useBox != "N"):
+        useBox = input("Do you want to use box (y/n): ")
+    if useBox == "Y" or useBox == "y":
+        useBox = True
+        startServer()
+    print("Starting main script")
 
     while count < int(ap.config["numOfRuns"]) or int(ap.config["numOfRuns"]) == -1:
         # Check the sheet for any trials that didn't run successfully
@@ -100,26 +111,47 @@ def main():
         print(parameters)
 
         try:
-            # Reset from the previous run
-            print("Cleaning up folder")
-            dataCleanup()
+            if 'clean' in parameters['tasks']:
+                # Reset from the previous run
+                print("Cleaning up folder")
+                dataCleanup(ap.config)
+                ap.updateStatus(parameters['id'], 'clean')
 
-            # Create the parameters
-            print("Creating parameters xml and autoParamSettings.txt")
-            createXML(parameters)
-            createSettingsFile(parameters)
+            if 'xml' in parameters['tasks']:
+                # Create the parameters
+                print("Creating parameters xml and autoParamSettings.txt")
+                createXML(parameters)
+                createSettingsFile(parameters)
+                ap.updateStatus(parameters['id'], 'xml')
 
-            # Run PhysiCell
-            print("Running test")
-            os.system("AMIGOS-invasion.exe")
+            if 'sim' in parameters['tasks']:
+                # Run PhysiCell
+                print("Running test")
+                if platform.system() == 'Windows':
+                    os.system("AMIGOS-invasion.exe")
+                else:
+                    os.system("./AMIGOS-invasion")
+                ap.updateStatus(parameters['id'], 'sim')
 
-            # Zip Run output
-            print("Zipping SVG and outputs")
-            createZip(parameters)
+            if 'zip' in parameters['tasks']:
+                # Zip Run output
+                print("Zipping SVG and outputs")
+                fileName = createZip(parameters)
+                ap.updateStatus(parameters['id'], 'zip')
+
+            if 'upload' in parameters['tasks']:
+                # Upload zip to box
+                if useBox:
+                    print("Uploading zip to box")
+                    uploadFile('\\', fileName)
+                    ap.updateStatus(parameters['id'], 'upload')
+                else:
+                    print("Cannot upload to box")
 
             # End tests
-        except:
+        except ValueError:
             # Test failed
+            print(ValueError)
             print("Test failed")
             ap.parameterFailed(parameters["id"])
 
@@ -133,6 +165,10 @@ if __name__ == '__main__':
     print("Current working directory: ", os.getcwd())
 
     main()
+
+
+
+
 
     '''
     ap = autoParam()

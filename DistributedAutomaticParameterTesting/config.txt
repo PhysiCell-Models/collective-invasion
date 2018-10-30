@@ -1,4 +1,9 @@
-userName:default
+userName:bendugga
 resetTime:172800
 numOfRuns:1
+removeZip:True
 lastTest:None
+saveToken:True
+accessToken:UEKXombcePRoueiYtfA3HudyiwjO53gZ
+refreshToken:P3FmWXG4uf9qAxvcUk6S3qbKP4a4V1R0OUSHpiblthMgM2ZxlJZw8TCJlZU1AVA8
+refreshTime:test

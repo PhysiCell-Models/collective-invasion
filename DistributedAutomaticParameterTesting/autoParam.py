@@ -50,6 +50,25 @@ class autoParam:
 
         return None
 
+    def updateStatus(self, id, status):
+        records = sheet.getRecords()
+        index = -1
+
+        # Remove id from local cache
+
+        for i in range(0, len(records)):
+            if records[i]["id"] == id:
+                index = i
+
+        if index == -1:
+            return None
+
+        records[index]["status"] = status
+
+        sheet.sheet.update_cell(index+2, 2, status)
+
+        return records[index]
+
     def parameterSuccessful(self, id):
         records = sheet.getRecords()
         index = -1
