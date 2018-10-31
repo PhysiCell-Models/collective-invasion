@@ -2,20 +2,55 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5f86384b-02dc-494a-918f-6e02ac138467" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../AMIGOS-invasion.exe" beforeDir="false" afterPath="$PROJECT_DIR$/../AMIGOS-invasion.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ALL_CITATIONS.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.aux" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.aux" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.log" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.out" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.synctex.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.synctex.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.tex" beforeDir="false" afterPath="$PROJECT_DIR$/Documentation/Distributed Automatic Parameter Test.tex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/autoParam.py" beforeDir="false" afterPath="$PROJECT_DIR$/autoParam.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/box.py" beforeDir="false" afterPath="$PROJECT_DIR$/box.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.txt" beforeDir="false" afterPath="$PROJECT_DIR$/config.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../autoParamSettings.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../autoParamSettings.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../config/PhysiCell_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../config/PhysiCell_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/composite_cutaway_plot.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_contour_plots_ECM_anisotropy.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_contourf_with_cell_overlay_anisotropy.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_contourf_with_cell_overlay_density.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_heat_map_density.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_heat_maps.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_quiver_plots_fiber_alignment.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/create_quiver_plots_fiber_alignment_svg.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/cross_section_colormap.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/cross_section_contour.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/cross_section_surface.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/final.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../output/final.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/final.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../output/final.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/final_cells.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/final_cells.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/final_cells_physicell.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/final_cells_physicell.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/final_microenvironment0.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/final_microenvironment0.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/initial.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../output/initial.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/initial.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../output/initial.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/my_immune_plot.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000000.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000000.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000000_cells.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000000_cells.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000000_microenvironment0.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000000_microenvironment0.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000001.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000001.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000001_ECM.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000001_ECM.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000001_cells.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000001_cells.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000001_cells_physicell.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000001_cells_physicell.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000001_microenvironment0.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000001_microenvironment0.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000002.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000002.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000002_ECM.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000002_ECM.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000002_cells.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000002_cells.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000002_cells_physicell.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000002_cells_physicell.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/output00000002_microenvironment0.mat" beforeDir="false" afterPath="$PROJECT_DIR$/../output/output00000002_microenvironment0.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/plot_microenvironment.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/read_MultiCellDS_xml.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/read_MultiCellDS_xml_old.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/read_ecm_data.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/read_microenvironment.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/set_MCDS_constants.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/simple_cutaway_plot.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/simple_plot.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/snapshot00000000.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../output/snapshot00000000.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../output/snapshot00000001.svg" beforeDir="false" afterPath="$PROJECT_DIR$/../output/snapshot00000001.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../simulation_report.txt" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -129,27 +164,27 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="json" value="2" />
-          <entry key="py" value="6110" />
-          <entry key="txt" value="89" />
+          <entry key="py" value="6509" />
+          <entry key="txt" value="106" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="JSON" value="2" />
-          <entry key="PLAIN_TEXT" value="89" />
-          <entry key="Python" value="6110" />
+          <entry key="PLAIN_TEXT" value="106" />
+          <entry key="Python" value="6509" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="json" value="2" />
+          <entry key="json" value="3" />
           <entry key="py" value="4" />
           <entry key="txt" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JSON" value="2" />
+          <entry key="JSON" value="3" />
           <entry key="PLAIN_TEXT" value="7" />
           <entry key="Python" value="4" />
         </counts>
@@ -161,14 +196,15 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="111" lean-forward="true" selection-start-line="111" selection-end-line="111" />
+            <state relative-caret-position="1916">
+              <caret line="169" lean-forward="true" selection-start-line="169" selection-end-line="169" />
               <folding>
-                <element signature="e#76#110#0" expanded="true" />
+                <element signature="e#78#112#0" expanded="true" />
                 <element signature="e#259#642#0" />
+                <element signature="e#667#1350#0" />
                 <element signature="e#1392#1574#0" />
                 <element signature="e#1626#2361#0" />
-                <marker date="1540926945033" expanded="true" signature="2533:3040" ph="..." />
+                <marker date="1540944249436" expanded="true" signature="2448:2450" ph="..." />
               </folding>
             </state>
           </provider>
@@ -177,18 +213,19 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/box.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="38">
-              <caret line="67" column="31" selection-start-line="67" selection-start-column="31" selection-end-line="67" selection-end-column="31" />
+            <state relative-caret-position="68">
+              <caret line="4" column="3" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#97#106#0" expanded="true" />
                 <element signature="e#184#344#0" />
                 <element signature="e#755#1141#0" />
+                <element signature="e#1498#1915#0" />
                 <element signature="e#816#870#0" />
                 <element signature="e#2900#3076#0" />
-                <marker date="1540926656461" expanded="true" signature="247:447" ph="..." />
-                <marker date="1540926656461" expanded="true" signature="1048:2100" ph="..." />
-                <marker date="1540926656461" expanded="true" signature="2129:3308" ph="..." />
-                <marker date="1540926656461" expanded="true" signature="3252:3272" ph="..." />
+                <marker date="1540942396996" expanded="true" signature="344:544" ph="..." />
+                <marker date="1540942396996" expanded="true" signature="1145:2197" ph="..." />
+                <marker date="1540942396996" expanded="true" signature="2226:3095" ph="..." />
+                <marker date="1540942396996" expanded="true" signature="3039:3059" ph="..." />
               </folding>
             </state>
           </provider>
@@ -197,17 +234,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/autoParam.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
-              <caret line="127" lean-forward="true" selection-start-line="127" selection-end-line="127" />
+            <state relative-caret-position="34">
+              <caret line="2" column="9" selection-start-line="2" selection-start-column="9" selection-end-line="2" selection-end-column="9" />
               <folding>
-                <element signature="e#73#85#0" expanded="true" />
-                <marker date="1540922519882" expanded="true" signature="119:124" ph="..." />
-                <marker date="1540922519882" expanded="true" signature="517:526" ph="..." />
-                <marker date="1540922519882" expanded="true" signature="1956:2339" ph="..." />
-                <marker date="1540922519882" expanded="true" signature="2373:2382" ph="..." />
-                <marker date="1540922519882" expanded="true" signature="3025:3034" ph="..." />
-                <marker date="1540922519882" expanded="true" signature="3665:3674" ph="..." />
-                <marker date="1540922519882" expanded="true" signature="4750:4759" ph="..." />
+                <element signature="e#75#87#0" expanded="true" />
+                <marker date="1540942448662" expanded="true" signature="133:138" ph="..." />
+                <marker date="1540942448662" expanded="true" signature="531:540" ph="..." />
+                <marker date="1540942448662" expanded="true" signature="1970:2353" ph="..." />
+                <marker date="1540942448662" expanded="true" signature="2387:2396" ph="..." />
+                <marker date="1540942448662" expanded="true" signature="3039:3048" ph="..." />
+                <marker date="1540942448662" expanded="true" signature="3679:3688" ph="..." />
+                <marker date="1540942448662" expanded="true" signature="4764:4773" ph="..." />
               </folding>
             </state>
           </provider>
@@ -216,8 +253,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="9" selection-start-line="3" selection-end-line="3" selection-end-column="9" />
+            <state relative-caret-position="102">
+              <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
             </state>
           </provider>
         </entry>
@@ -241,9 +278,9 @@
         <option value="$PROJECT_DIR$/boxKeys.json" />
         <option value="$PROJECT_DIR$/privateKey.txt" />
         <option value="$PROJECT_DIR$/test.py" />
-        <option value="$PROJECT_DIR$/autoParam.py" />
-        <option value="$PROJECT_DIR$/box.py" />
         <option value="$PROJECT_DIR$/config.txt" />
+        <option value="$PROJECT_DIR$/box.py" />
+        <option value="$PROJECT_DIR$/autoParam.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -278,7 +315,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1540926973698" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1540945202537" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
@@ -465,13 +502,13 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.47659576" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49932885" visible="true" weight="0.529078" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32907802" />
-      <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50067115" side_tool="true" weight="0.529078" />
       <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -527,13 +564,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/boxKeys.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="1" lean-forward="true" selection-start-column="1" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sheet.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -544,58 +574,67 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/autoParam.py">
+    <entry file="file://$PROJECT_DIR$/boxKeys.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="127" lean-forward="true" selection-start-line="127" selection-end-line="127" />
-          <folding>
-            <element signature="e#73#85#0" expanded="true" />
-            <marker date="1540922519882" expanded="true" signature="119:124" ph="..." />
-            <marker date="1540922519882" expanded="true" signature="517:526" ph="..." />
-            <marker date="1540922519882" expanded="true" signature="1956:2339" ph="..." />
-            <marker date="1540922519882" expanded="true" signature="2373:2382" ph="..." />
-            <marker date="1540922519882" expanded="true" signature="3025:3034" ph="..." />
-            <marker date="1540922519882" expanded="true" signature="3665:3674" ph="..." />
-            <marker date="1540922519882" expanded="true" signature="4750:4759" ph="..." />
-          </folding>
+        <state relative-caret-position="85">
+          <caret line="5" column="32" lean-forward="true" selection-start-line="5" selection-start-column="32" selection-end-line="5" selection-end-column="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/box.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="67" column="31" selection-start-line="67" selection-start-column="31" selection-end-line="67" selection-end-column="31" />
+        <state relative-caret-position="68">
+          <caret line="4" column="3" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#97#106#0" expanded="true" />
             <element signature="e#184#344#0" />
             <element signature="e#755#1141#0" />
+            <element signature="e#1498#1915#0" />
             <element signature="e#816#870#0" />
             <element signature="e#2900#3076#0" />
-            <marker date="1540926656461" expanded="true" signature="247:447" ph="..." />
-            <marker date="1540926656461" expanded="true" signature="1048:2100" ph="..." />
-            <marker date="1540926656461" expanded="true" signature="2129:3308" ph="..." />
-            <marker date="1540926656461" expanded="true" signature="3252:3272" ph="..." />
+            <marker date="1540942396996" expanded="true" signature="344:544" ph="..." />
+            <marker date="1540942396996" expanded="true" signature="1145:2197" ph="..." />
+            <marker date="1540942396996" expanded="true" signature="2226:3095" ph="..." />
+            <marker date="1540942396996" expanded="true" signature="3039:3059" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/autoParam.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="9" selection-start-line="2" selection-start-column="9" selection-end-line="2" selection-end-column="9" />
+          <folding>
+            <element signature="e#75#87#0" expanded="true" />
+            <marker date="1540942448662" expanded="true" signature="133:138" ph="..." />
+            <marker date="1540942448662" expanded="true" signature="531:540" ph="..." />
+            <marker date="1540942448662" expanded="true" signature="1970:2353" ph="..." />
+            <marker date="1540942448662" expanded="true" signature="2387:2396" ph="..." />
+            <marker date="1540942448662" expanded="true" signature="3039:3048" ph="..." />
+            <marker date="1540942448662" expanded="true" signature="3679:3688" ph="..." />
+            <marker date="1540942448662" expanded="true" signature="4764:4773" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="9" selection-start-line="3" selection-end-line="3" selection-end-column="9" />
+        <state relative-caret-position="102">
+          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="111" lean-forward="true" selection-start-line="111" selection-end-line="111" />
+        <state relative-caret-position="1916">
+          <caret line="169" lean-forward="true" selection-start-line="169" selection-end-line="169" />
           <folding>
-            <element signature="e#76#110#0" expanded="true" />
+            <element signature="e#78#112#0" expanded="true" />
             <element signature="e#259#642#0" />
+            <element signature="e#667#1350#0" />
             <element signature="e#1392#1574#0" />
             <element signature="e#1626#2361#0" />
-            <marker date="1540926945033" expanded="true" signature="2533:3040" ph="..." />
+            <marker date="1540944249436" expanded="true" signature="2448:2450" ph="..." />
           </folding>
         </state>
       </provider>

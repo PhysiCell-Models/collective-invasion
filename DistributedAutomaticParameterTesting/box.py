@@ -1,3 +1,9 @@
+'''
+    Ben Duggan
+    10/30/18
+    Script for getting box access token and uploading files
+'''
+
 import os
 from boxsdk import *
 from flask import *
@@ -64,15 +70,10 @@ def end():
 ''' END - Flask web server used for auth'''
 
 ''' START - Box upload functions '''
-def uploadFile(path, file):
-    if refreshTime < time.time() - 5:
+def uploadFile(folderID, path, file):
+    if refreshTime < time.time() + 5:
         updateTokens(access_token)
-
-    mainFolderID = '53180384940' # The folder ID of our main box folder, this doesn't change
-    destinationFolderID = '56956464062' # The folder ID of the destination for the file, this doesn't change
-    #items = client.folder(folder_id=mainFolderID).get_items(limit=100, offset=0)
-    box_file = client.folder(destinationFolderID).upload(os.getcwd()+path+file, file)
-    print(box_file)
+    print(client.folder(folderID).upload(os.getcwd()+path+file, file))
 
 def updateTokens(access):
     global access_token, refresh_token, client, refreshTime
@@ -93,15 +94,10 @@ if __name__ == '__main__':
     os.chdir("../")
     app.run()
 
-    print("og")
-    print(client.user(user_id='me').get()['login'])
-    print(access_token)
-    print(refresh_token)
-    updateTokens(access_token)
-    print("New")
-    print(client.user(user_id='me').get()['login'])
-    print(access_token)
-    print(refresh_token)
+    items = client.folder(folder_id='0').get_items(limit=100, offset=0)
+
+    for i in items:
+        print(i)
 
 
     #uploadFile('\\DistributedAutomaticParameterTesting\\', "testPayload.zip")

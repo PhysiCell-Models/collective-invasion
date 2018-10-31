@@ -1,6 +1,8 @@
-# Ben Duggan
-# 10/16/18
-# Script for requesting and managing parameters
+'''
+    Ben Duggan
+    10/30/18
+    Script for requesting and managing parameters
+'''
 
 import sheet
 import datetime

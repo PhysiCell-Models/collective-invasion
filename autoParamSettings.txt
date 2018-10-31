@@ -1,10 +1,10 @@
-id:5
+id:6
 status:in progress
-start time:2018-10-30 15:16:29
+start time:2018-10-30 20:03:52
 end time:
-performed by:bendugga
+performed by:ben
 comments:
-tasks:clean,xml,sim,zip,upload
+tasks:clean,xml,sim,imgProc,zip,upload
 ./overall/max_time:120
 ./user_parameters/tumor_radius:175
 ./user_parameters/enable_ecm_outputs:true
