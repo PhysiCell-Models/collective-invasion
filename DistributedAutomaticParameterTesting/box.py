@@ -18,6 +18,7 @@ def startServer():
     print("Starting server.  Go to 127.0.0.1:5000 to authenticate box.  It can only be ended by completing authentification or going to 127.0.0.1:5000/end")
     app.run()
     print("Server stoped")
+    return client.user(user_id='me').get()['login']
 
 # This is the index of the web server and serves as the start point for authentication
 @app.route('/')

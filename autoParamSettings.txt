@@ -1,8 +1,8 @@
-id:6
+id:8
 status:in progress
-start time:2018-10-30 20:03:52
+start time:2018-10-31 20:23:39
 end time:
-performed by:ben
+performed by:bendugga@iu.edu
 comments:
 tasks:clean,xml,sim,imgProc,zip,upload
 ./overall/max_time:120

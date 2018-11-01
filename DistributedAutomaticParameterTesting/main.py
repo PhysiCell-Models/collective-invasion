@@ -86,7 +86,9 @@ def main():
         useBox = input("Do you want to use box (y/n): ")
     if useBox == "Y" or useBox == "y":
         useBox = True
-        startServer()
+        username = startServer()
+        ap.config['userName'] = username
+        ap.changeConfig()
     print("Starting main script")
 
     while count < int(ap.config["numOfRuns"]) or int(ap.config["numOfRuns"]) == -1:

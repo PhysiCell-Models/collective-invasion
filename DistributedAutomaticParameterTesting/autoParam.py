@@ -138,3 +138,11 @@ class autoParam:
 
         with open(self.path+'config.txt', 'w') as file:
             file.writelines(data)
+    def changeConfig(self):
+        f = open(self.path+'config.txt', 'r').readlines()
+        data = ""
+        for i in self.config:
+            data += i + ':' + self.config[i] + '\n'
+
+        with open(self.path+'config.txt', 'w') as file:
+            file.writelines(data)

@@ -1,4 +1,4 @@
-userName:ben
+userName:bendugga@iu.edu
 resetTime:172800
 numOfRuns:1
 removeZip:True
