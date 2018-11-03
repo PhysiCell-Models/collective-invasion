@@ -151,7 +151,6 @@ void create_cell_types( void )
 	// turn on motility 
 	leader_cell.phenotype.motility.is_motile = parameters.bools("leader_motility_mode"); 
 	
-	// reduce adhesion 
     leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
     
 //    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal

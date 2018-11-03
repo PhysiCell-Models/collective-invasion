@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">14440</max_time> <!-- 10 days * 24 h * 60 min -->
+		<max_time units="min">11520</max_time> <!-- 10 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -103,9 +103,9 @@
 			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
-		 <!-- output an svg every other time we output data-->
+		 <!-- output an svg every 10 minutes-->
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -123,7 +123,7 @@
 		<chemoresistant type="bool">false</chemoresistant> 
 	-->
 		<tumor_radius type = "double">175.0</tumor_radius>
-		<enable_ecm_outputs type = "bool">true</enable_ecm_outputs>
+		<enable_ecm_outputs type = "bool">false</enable_ecm_outputs>
 		<initial_density_ecm type = "double">0.5</initial_density_ecm>
 		<leader_adhesion type = "double">1.0</leader_adhesion>
 		<follower_adhesion type = "double">1.0</follower_adhesion>
