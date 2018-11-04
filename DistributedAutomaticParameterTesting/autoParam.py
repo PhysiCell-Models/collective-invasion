@@ -1,6 +1,8 @@
-# Ben Duggan
-# 10/16/18
-# Script for requesting and managing parameters
+'''
+    Ben Duggan
+    10/30/18
+    Script for requesting and managing parameters
+'''
 
 import sheet
 import datetime
@@ -133,6 +135,14 @@ class autoParam:
             if f[i] == original+"\n":
                 f[i] = new+"\n"
             data += f[i]
+
+        with open(self.path+'config.txt', 'w') as file:
+            file.writelines(data)
+    def changeConfig(self):
+        f = open(self.path+'config.txt', 'r').readlines()
+        data = ""
+        for i in self.config:
+            data += i + ':' + self.config[i] + '\n'
 
         with open(self.path+'config.txt', 'w') as file:
             file.writelines(data)

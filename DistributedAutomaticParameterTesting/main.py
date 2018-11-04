@@ -1,6 +1,8 @@
-# Ben Duggan
-# 10/21/18
-# Main script to run distributed parameter testing
+'''
+    Ben Duggan
+    10/30/18
+    Main script to run distributed parameter testing
+'''
 
 import xml.etree.ElementTree as ET
 from autoParam import *
@@ -36,12 +38,12 @@ def dataCleanup(config):
             os.remove(file)
 
     for file in os.listdir("SVG/"):
-        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
-            os.remove("SVG/" + file)
+        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
+        os.remove("SVG/" + file)
 
     for file in os.listdir("output/"):
-        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
-            os.remove("output/" + file)
+        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
+         os.remove("output/" + file)
 
 def createSettingsFile(parameters):
     data = ""
@@ -74,17 +76,6 @@ def createZip(parameters):
 
     return fileName
 
-def manageBoxConnection(config):
-    if len(config['accessToken']) != 0:
-        pass
-    '''
-    email = getClient().user(user_id='me').get()['login']
-    ap.changeConfigLine('userName:'+ap.config['userName'], 'userName:'+email[0:email.index('@')])
-    if ap.config['saveToken'] == 'True':
-        ap.changeConfigLine('accessToken:'+ap.config['accessToken'], 'accessToken:'+getAccess())
-        ap.changeConfigLine('refreshToken:'+ap.config['refreshToken'], 'refreshToken:'+getRefresh())
-        ap.changeConfigLine('refreshTime:'+ap.config['refreshTime'], 'refreshTime:'+str(time.time()))
-    '''
 
 def main():
     ap = autoParam()
@@ -95,7 +86,9 @@ def main():
         useBox = input("Do you want to use box (y/n): ")
     if useBox == "Y" or useBox == "y":
         useBox = True
-        startServer()
+        username = startServer()
+        ap.config['userName'] = username
+        ap.changeConfig()
     print("Starting main script")
 
     while count < int(ap.config["numOfRuns"]) or int(ap.config["numOfRuns"]) == -1:
@@ -133,6 +126,19 @@ def main():
                     os.system("./AMIGOS-invasion")
                 ap.updateStatus(parameters['id'], 'sim')
 
+            if 'matlab' in parameters['tasks']:
+                # Run matlab scripts
+                print("Run matlab scripts")
+                print("^^ not implimented ^^")
+
+            if 'imgProc' in parameters['tasks']:
+                # Run image processing
+                print("Run image processing")
+                os.chdir('output/')
+                os.system('mogrify -format png *.svg')
+                os.system('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" output.mp4')
+                os.chdir('../')
+
             if 'zip' in parameters['tasks']:
                 # Zip Run output
                 print("Zipping SVG and outputs")
@@ -143,7 +149,11 @@ def main():
                 # Upload zip to box
                 if useBox:
                     print("Uploading zip to box")
-                    uploadFile('\\', fileName)
+                    if platform.system() == 'Windows':
+                        uploadFile(ap.config['boxFolderID'], '\\', fileName)
+                    else:
+                        uploadFile(ap.config['boxFolderID'], '/', fileName)
+
                     ap.updateStatus(parameters['id'], 'upload')
                 else:
                     print("Cannot upload to box")
@@ -165,16 +175,3 @@ if __name__ == '__main__':
     print("Current working directory: ", os.getcwd())
 
     main()
-
-
-
-
-
-    '''
-    ap = autoParam()
-    count = 0
-
-    parameters = ap.requestParameters()
-    createXML(parameters)
-    createSettingsFile(parameters)
-    '''
