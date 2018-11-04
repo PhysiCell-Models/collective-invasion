@@ -1,0 +1,6 @@
+userName:bfisch9@iu.edu
+resetTime:172800
+numOfRuns:3
+removeZip:True
+lastTest:2
+boxFolderID:56956464062
