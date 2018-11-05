@@ -1,3 +1,9 @@
+'''
+    Ben Duggan
+    10/30/18
+    Script for getting box access token and uploading files
+'''
+
 import os
 from boxsdk import *
 from flask import *
@@ -12,14 +18,15 @@ def startServer():
     print("Starting server.  Go to 127.0.0.1:5000 to authenticate box.  It can only be ended by completing authentification or going to 127.0.0.1:5000/end")
     app.run()
     print("Server stoped")
+    return client.user(user_id='me').get()['login']
 
 # This is the index of the web server and serves as the start point for authentication
 @app.route('/')
 def index():
     global oauth
     oauth = OAuth2(
-        client_id='zxgemq9mq26su60nlmp9uybkjzuljnxy',
-        client_secret='gzdrtOwb2UYNgPsfBCJahQtY151S4ip0'
+        client_id=config['client_id'],
+        client_secret=config['client_secret']
     )
 
     global csrf_token
@@ -64,15 +71,19 @@ def end():
 ''' END - Flask web server used for auth'''
 
 ''' START - Box upload functions '''
-def uploadFile(path, file):
-    if refreshTime < time.time() - 5:
-        updateTokens(access_token)
+f = open(''+'config.txt', 'r').readlines()
+global config
+config = {}
 
-    mainFolderID = '53180384940' # The folder ID of our main box folder, this doesn't change
-    destinationFolderID = '56956464062' # The folder ID of the destination for the file, this doesn't change
-    #items = client.folder(folder_id=mainFolderID).get_items(limit=100, offset=0)
-    box_file = client.folder(destinationFolderID).upload(os.getcwd()+path+file, file)
-    print(box_file)
+for i in range(0, len(f)):
+    f[i] = f[i].replace("\n", "")
+    config[f[i].split(":")[0]] = f[i].split(":")[1]
+
+
+def uploadFile(folderID, path, file):
+    if refreshTime < time.time() + 5:
+        updateTokens(access_token)
+    print(client.folder(folderID).upload(os.getcwd()+path+file, file))
 
 def updateTokens(access):
     global access_token, refresh_token, client, refreshTime
@@ -92,16 +103,11 @@ def getClient():
 if __name__ == '__main__':
     os.chdir("../")
     app.run()
+    
+    items = client.folder(folder_id='0').get_items(limit=100, offset=0)
 
-    print("og")
-    print(client.user(user_id='me').get()['login'])
-    print(access_token)
-    print(refresh_token)
-    updateTokens(access_token)
-    print("New")
-    print(client.user(user_id='me').get()['login'])
-    print(access_token)
-    print(refresh_token)
+    for i in items:
+        print(i)
 
 
     #uploadFile('\\DistributedAutomaticParameterTesting\\', "testPayload.zip")
