@@ -25,8 +25,8 @@ def startServer():
 def index():
     global oauth
     oauth = OAuth2(
-        client_id='zxgemq9mq26su60nlmp9uybkjzuljnxy',
-        client_secret='gzdrtOwb2UYNgPsfBCJahQtY151S4ip0'
+        client_id=config['client_id'],
+        client_secret=config['client_secret']
     )
 
     global csrf_token
@@ -71,6 +71,15 @@ def end():
 ''' END - Flask web server used for auth'''
 
 ''' START - Box upload functions '''
+f = open(''+'config.txt', 'r').readlines()
+global config
+config = {}
+
+for i in range(0, len(f)):
+    f[i] = f[i].replace("\n", "")
+    config[f[i].split(":")[0]] = f[i].split(":")[1]
+
+
 def uploadFile(folderID, path, file):
     if refreshTime < time.time() + 5:
         updateTokens(access_token)
