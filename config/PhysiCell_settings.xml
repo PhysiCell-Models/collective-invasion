@@ -44,11 +44,11 @@
 	 
 	
 		<tumor_radius type="double">175</tumor_radius>
-		<enable_ecm_outputs type="bool">true</enable_ecm_outputs>
+		<enable_ecm_outputs type="bool">false</enable_ecm_outputs>
 		<initial_density_ecm type="double">0.5</initial_density_ecm>
 		<leader_adhesion type="double">1.0</leader_adhesion>
 		<follower_adhesion type="double">1.0</follower_adhesion>
-		<default_cell_speed type="double">1.0</default_cell_speed>
+		<default_cell_speed type="double">0.1</default_cell_speed>
 		
 	</user_parameters>
 	

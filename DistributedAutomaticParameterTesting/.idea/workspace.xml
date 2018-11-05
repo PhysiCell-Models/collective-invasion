@@ -2,36 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5f86384b-02dc-494a-918f-6e02ac138467" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../output/empty.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../6_test_2018-10-31_00-03-56.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../8_test_2018-11-01_00-23-43.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../AMIGOS-invasion.exe" beforeDir="false" afterPath="$PROJECT_DIR$/../AMIGOS-invasion.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../AMIGOS-invasion.o" beforeDir="false" afterPath="$PROJECT_DIR$/../AMIGOS-invasion.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_MultiCellDS.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_agent_container.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_basic_agent.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_matlab.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_mesh.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_microenvironment.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_solvers.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_utilities.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BioFVM_vector.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_MultiCellDS.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_SVG.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_cell.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_cell_container.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_custom.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_pathology.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_phenotype.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_pugixml.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_settings.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_standard_models.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_utilities.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PhysiCell_various_outputs.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../custom_modules/AMIGOS-invasion.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../custom_modules/AMIGOS-invasion.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pugixml.o" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../simulation_report.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -286,7 +257,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1541438717954" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1541448049218" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../School/CSCI-B 363/Lab" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
@@ -461,8 +432,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
-    <editor active="true" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14563759" />
       <window_info id="Structure" order="1" weight="0.24966443" />
