@@ -107,13 +107,13 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.uptake_rates[0] = 10; 
 	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
 
-	cell_defaults.phenotype.secretion.secretion_rates[1] = 0; 
+	/*cell_defaults.phenotype.secretion.secretion_rates[1] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[1] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
 
 	cell_defaults.phenotype.secretion.secretion_rates[2] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[2] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; 
+	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; */
 
 
 	// set the default cell type to no phenotype updates 
@@ -637,7 +637,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
     return;
 }
 
-void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
+/*void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
 {
 	static int hypoxic_i = pCell->custom_data.find_variable_index( "hypoxic switch value" ); 	
 	static int oxygen_i = pCell->get_microenvironment()->find_density_index( "oxygen" ); 
@@ -669,7 +669,7 @@ void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
 	}	
 	
 	return; 
-}
+}*/
 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
 {

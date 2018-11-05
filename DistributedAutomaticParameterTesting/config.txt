@@ -1,6 +1,8 @@
-userName:bfisch9@iu.edu
+client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
+lastTest:None
+numOfRuns:1
+client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
 resetTime:172800
-numOfRuns:3
-removeZip:True
-lastTest:2
 boxFolderID:56956464062
+removeZip:True
+userName:bfisch9@iu.edu
