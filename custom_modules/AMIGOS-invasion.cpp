@@ -152,7 +152,7 @@ void create_cell_types( void )
 	leader_cell.phenotype.motility.is_motile = parameters.bools("leader_motility_mode"); 
 	
     leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
-    
+    leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("leader_repulsion");
 //    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal
     
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
@@ -178,6 +178,7 @@ void create_cell_types( void )
     follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
+	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
 	
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode"); 
     
