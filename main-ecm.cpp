@@ -106,7 +106,7 @@ int main( int argc, char* argv[] )
 	// time setup 
 	std::string time_units = "min"; 
 	
-	double t_max = PhysiCell_settings.max_time;  // 1 days 
+	double t_max = PhysiCell_settings.max_time;  // 8 days 
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();
@@ -144,18 +144,16 @@ int main( int argc, char* argv[] )
 	PhysiCell_SVG_options.length_bar = 200; 
 
 	// for simplicity, set a pathology coloring function 
-	
+
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	//SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );//ERROR HERE
 	
 	display_citations(); 
-	
 	run_biotransport( 5.0 ); 
 	
 	// set the performance timers 
-
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
 	
@@ -169,7 +167,6 @@ int main( int argc, char* argv[] )
 		report_file.open(filename); 	// create the data log file 
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
-	
 	try 
 	{	
 		while( PhysiCell_globals.current_time < t_max + 0.1*diffusion_dt )

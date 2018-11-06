@@ -107,13 +107,13 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.uptake_rates[0] = 10; 
 	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
 
-	cell_defaults.phenotype.secretion.secretion_rates[1] = 0; 
+	/*cell_defaults.phenotype.secretion.secretion_rates[1] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[1] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[1] = 1; 
 
 	cell_defaults.phenotype.secretion.secretion_rates[2] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[2] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; 
+	cell_defaults.phenotype.secretion.saturation_densities[2] = 1; */
 
 
 	// set the default cell type to no phenotype updates 
@@ -149,11 +149,10 @@ void create_cell_types( void )
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
 	
 	// turn on motility 
-	leader_cell.phenotype.motility.is_motile = true; 
+	leader_cell.phenotype.motility.is_motile = parameters.bools("leader_motility_mode"); 
 	
-	// reduce adhesion 
     leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
-    
+    leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("leader_repulsion");
 //    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal
     
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
@@ -174,11 +173,14 @@ void create_cell_types( void )
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
     
-    follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm;
+    //follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm;
     
     follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
+	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
+	
+	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode"); 
     
 //    follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
     
@@ -636,7 +638,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
     return;
 }
 
-void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
+/*void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
 {
 	static int hypoxic_i = pCell->custom_data.find_variable_index( "hypoxic switch value" ); 	
 	static int oxygen_i = pCell->get_microenvironment()->find_density_index( "oxygen" ); 
@@ -668,7 +670,7 @@ void switching_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
 	}	
 	
 	return; 
-}
+}*/
 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
 {
