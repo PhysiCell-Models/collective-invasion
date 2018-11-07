@@ -202,8 +202,8 @@ void setup_microenvironment( void )
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
 	// 50 micron length scale 
-//    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
-//    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
