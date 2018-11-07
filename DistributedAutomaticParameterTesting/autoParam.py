@@ -28,7 +28,6 @@ class autoParam:
                     records[i]["status"] = "in progress"
                     records[i]["start time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     records[i]["performed by"] = self.config["userName"]
-
                     sheet.sheet.update_cell(i+2, 2, "in progress")
                     sheet.sheet.update_cell(i+2, 3, records[i]["start time"])
                     sheet.sheet.update_cell(i+2, 5, self.config["userName"])
@@ -66,8 +65,7 @@ class autoParam:
             return None
 
         records[index]["status"] = status
-
-        sheet.sheet.update_cell(index+2, 2, status)
+        sheet.sheet().update_cell(index+2, 2, status)
 
         return records[index]
 
@@ -109,9 +107,9 @@ class autoParam:
         records[index]["performed by"] = self.config["userName"]
         records[index]["comments"] += " failed;"
 
-        sheet.sheet.update_cell(index+2, 2, '')
-        sheet.sheet.update_cell(index+2, 3, '')
-        sheet.sheet.update_cell(index+2, 6, records[index]["comments"])
+        sheet.sheet().update_cell(index+2, 2, '')
+        sheet.sheet().update_cell(index+2, 3, '')
+        sheet.sheet().update_cell(index+2, 6, records[index]["comments"])
 
         return records[index]
 
@@ -124,9 +122,10 @@ class autoParam:
                 print("\"", records[i]["id"], "\" hasn't been marked as complete after running for: ", int((datetime.datetime.now()-datetime.datetime.strptime(records[i]["start time"], '%Y-%m-%d %H:%M:%S')).total_seconds()), " seconds. It has been marked as still needing to be ran.")
 
                 records[i]["comments"] += "test possibly crashed"
-                sheet.sheet.update_cell(i+2, 2, '')
-                sheet.sheet.update_cell(i+2, 3, '')
-                sheet.sheet.update_cell(i+2, 6, records[i]["comments"])
+                sheet.sheet().update_cell(i+2, 2, '')
+                sheet.sheet().update_cell(i+2, 3, '')
+                sheet.sheet().update_cell(i+2, 6, records[i]["comments"])
+
 
     def changeConfigLine(self, original, new):
         f = open(self.path+'config.txt', 'r').readlines()
@@ -146,3 +145,6 @@ class autoParam:
 
         with open(self.path+'config.txt', 'w') as file:
             file.writelines(data)
+
+if __name__ == '__main__':
+    print(sheet.getRecords())

@@ -3,7 +3,6 @@
 namespace PhysiCell{
 	
 ECM ecm;
-//ECM_DATA ecm_data;
 
 ECM_DATA::ECM_DATA()
 {
@@ -41,36 +40,22 @@ void ECM::sync_to_BioFVM(void)
 	return;
 }
 
-//void ECM_setup(double numvox)
-//{
-//    ecm.sync_to_BioFVM();
-//    ecm.ecm_data.resize(numvox);
-//    
-//    return; 
-//}
-
 void cell_update_from_ecm( void )
 {
 	for(int i = 0; i < (*all_cells).size(); i++)
 	{
 		Cell* pCell = (*all_cells)[i];
         
-        // Ensures that leader cells are not influenced by ECM
-        
-        if( pCell->type == 1)
-        {
-//            std::cout<<"Migration bias for type 1 "<<pCell->phenotype.motility.migration_bias << std::endl;
-            return;
-            std::cout<<"didn't return!"<<std::endl;
-        }
-        
-        // Modifies the follower cells
-//        std::cout<<"Did modifying cell!"<<pCell->type << std::endl;
-//        change_bias_ecm(pCell);
-        
-//        std::cout<<"Migration bias for type 2 "<<pCell->phenotype.motility.migration_bias << std::endl;
+		//Test 1: Non-motile follower cells. In this case paramaters.bools("follower_motility_mode") will be false
+		if(parameters.bools("follower_motility_mode") == false)
+		{
+			if(pCell->type == 2)
+				continue;
+		}
+		//followers don't respond to cues from ecm
         change_speed_ecm(pCell); // As long as density is set to 0.5, this will have no impact on cell speed.
-//        change_migration_bias_vector_ecm(pCell);
+        change_migration_bias_vector_ecm(pCell);
+		change_bias_ecm(pCell);
 	}
 	return;
 }
@@ -149,56 +134,6 @@ void change_migration_bias_vector_ecm(Cell* pCell)
      return;
 }
 
-//void change_migration_bias_vector_ecm(Cell* pCell)
-//{
-//    //change bias
-//
-//    //    std::vector<double> migration bias direction is the 3-D vector giving the cell's preferred
-//    //    direction of motility for biased Brownian motion. If the user modies this vector, they must ensure
-//    //    it is a unit vector :
-//    //    jjmigration bias directionjj = 1: (14)
-//    //    54
-//    //    5. double migration bias (with a value in [0,1]) sets the degree to which cell motility is biased
-//    //    along migration_bias_direction. If 0, then motion is completely Brownian. If 1, it is completely
-//    //    deterministc along the bias direction.
-//
-//    int ecm_index =  pCell->get_current_voxel_index();
-//    double a = ecm.ecm_data[ecm_index].anisotropy;
-//    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector); ////// Changed to motility_vector instead of bias - so the blending is of the actual velocity instead of just the direction it wants to go in
-////    d = norm(d);
-//    std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
-//    double ddotf = 0.0;
-//
-//    normalize(d);
-//    normalize(f);
-//
-//    //     pCell->phenotype.motility.migration_bias = a;
-//
-//    //change bias direction
-//    for( int i=0; i < d.size() ; i++ )
-//    {
-//        //         double temp = d[i] * f[i];
-//        ddotf += d[i] * f[i];
-//    }
-//
-//    if(ddotf < 0.0)
-//    {
-//        for( int i=0; i< f.size(); i++)
-//        {
-//            f[i] *= -1.0;
-//            //            ecm.ecm_data[ecm_index].ECM_orientation[i] = -1.0 * f[i];
-//        }
-//    }
-//
-//    for( int i=0; i < d.size() ; i++ )
-//    {
-//        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
-//    }
-//
-//    normalize(pCell->phenotype.motility.migration_bias_direction);
-//
-//    return;
-//}
     
 void write_ECM_Data_matlab( std::string filename )
 

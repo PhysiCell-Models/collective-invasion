@@ -89,6 +89,7 @@ def main():
         username = startServer()
         ap.config['userName'] = username
         ap.changeConfig()
+
     print("Starting main script")
 
     while count < int(ap.config["numOfRuns"]) or int(ap.config["numOfRuns"]) == -1:
@@ -149,6 +150,7 @@ def main():
                 # Upload zip to box
                 if useBox:
                     print("Uploading zip to box")
+
                     if platform.system() == 'Windows':
                         uploadFile(ap.config['boxFolderID'], '\\', fileName)
                     else:
