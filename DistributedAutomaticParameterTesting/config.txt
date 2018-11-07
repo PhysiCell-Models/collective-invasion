@@ -1,4 +1,4 @@
-client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0s
+client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
 lastTest:None
 numOfRuns:-1
 client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
