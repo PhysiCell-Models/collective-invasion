@@ -79,6 +79,8 @@ for i in range(0, len(f)):
     f[i] = f[i].replace("\n", "")
     config[f[i].split(":")[0]] = f[i].split(":")[1]
 
+print(config)
+
 
 def uploadFile(folderID, path, file):
     if refreshTime < time.time() + 5:
