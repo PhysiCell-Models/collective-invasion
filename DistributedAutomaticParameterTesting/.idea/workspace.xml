@@ -2,18 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5f86384b-02dc-494a-918f-6e02ac138467" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/boxKeys.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../6_test_2018-10-31_00-03-56.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../8_test_2018-11-01_00-23-43.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/autoParam.py" beforeDir="false" afterPath="$PROJECT_DIR$/autoParam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/box.py" beforeDir="false" afterPath="$PROJECT_DIR$/box.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.txt" beforeDir="false" afterPath="$PROJECT_DIR$/config.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sheet.py" beforeDir="false" afterPath="$PROJECT_DIR$/sheet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../autoParamSettings.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../autoParamSettings.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../config/PhysiCell_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../config/PhysiCell_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../config/PhysiCell_settings_default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../config/PhysiCell_settings_default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../custom_modules/AMIGOS-invasion.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../custom_modules/AMIGOS-invasion.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../custom_modules/ECM.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../custom_modules/ECM.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../simulation_report.txt" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -116,19 +112,19 @@
     <session id="40673941">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="7" />
-          <entry key="project.open.time.0" value="4" />
+          <entry key="project.closed" value="8" />
+          <entry key="project.open.time.0" value="6" />
           <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.6" value="1" />
           <entry key="project.open.time.7" value="1" />
           <entry key="project.open.time.8" value="1" />
-          <entry key="project.opened" value="8" />
+          <entry key="project.opened" value="10" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="json" value="2" />
-          <entry key="py" value="6677" />
+          <entry key="py" value="6693" />
           <entry key="txt" value="123" />
         </counts>
       </usages-collector>
@@ -136,7 +132,7 @@
         <counts>
           <entry key="JSON" value="2" />
           <entry key="PLAIN_TEXT" value="123" />
-          <entry key="Python" value="6677" />
+          <entry key="Python" value="6693" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -160,10 +156,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="524">
-              <caret line="178" column="10" selection-start-line="178" selection-start-column="10" selection-end-line="178" selection-end-column="10" />
+            <state relative-caret-position="198">
+              <caret line="137" column="35" lean-forward="true" selection-start-line="137" selection-start-column="35" selection-end-line="137" selection-end-column="35" />
               <folding>
-                <marker date="1541631767988" expanded="true" signature="2448:2450" ph="..." />
+                <marker date="1541665341079" expanded="true" signature="2448:2450" ph="..." />
               </folding>
             </state>
           </provider>
@@ -172,15 +168,15 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/box.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="105" selection-start-line="105" selection-end-line="105" />
+            <state relative-caret-position="1309">
+              <caret line="81" column="12" selection-start-line="81" selection-start-column="12" selection-end-line="81" selection-end-column="12" />
               <folding>
                 <element signature="e#97#106#0" expanded="true" />
                 <element signature="e#349#594#0" />
-                <marker date="1541631767964" expanded="true" signature="344:596" ph="..." />
-                <marker date="1541631767964" expanded="true" signature="1171:2223" ph="..." />
-                <marker date="1541631767964" expanded="true" signature="2252:3306" ph="..." />
-                <marker date="1541631767964" expanded="true" signature="3250:3270" ph="..." />
+                <marker date="1541633631601" expanded="true" signature="344:596" ph="..." />
+                <marker date="1541633631601" expanded="true" signature="1171:2223" ph="..." />
+                <marker date="1541633631601" expanded="true" signature="2252:3321" ph="..." />
+                <marker date="1541633631601" expanded="true" signature="3265:3285" ph="..." />
               </folding>
             </state>
           </provider>
@@ -189,12 +185,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/autoParam.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2482">
-              <caret line="143" column="39" selection-start-line="143" selection-start-column="39" selection-end-line="143" selection-end-column="39" />
+            <state relative-caret-position="2550">
+              <caret line="150" column="39" selection-start-line="150" selection-start-column="39" selection-end-line="150" selection-end-column="39" />
               <folding>
                 <element signature="e#87#99#0" expanded="true" />
-                <marker date="1541631731055" expanded="true" signature="133:138" ph="..." />
-                <marker date="1541631731055" expanded="true" signature="531:540" ph="..." />
+                <marker date="1541665341067" expanded="true" signature="133:138" ph="..." />
               </folding>
             </state>
           </provider>
@@ -203,8 +198,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sheet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+            <state relative-caret-position="306">
+              <caret line="18" selection-start-line="18" selection-end-line="18" />
             </state>
           </provider>
         </entry>
@@ -212,8 +207,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="12" lean-forward="true" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+            <state>
+              <caret column="14" selection-start-column="14" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -237,14 +232,14 @@
         <option value="$PROJECT_DIR$/privateKey.txt" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/sheet.py" />
-        <option value="$PROJECT_DIR$/config.txt" />
         <option value="$PROJECT_DIR$/autoParam.py" />
-        <option value="$PROJECT_DIR$/box.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/box.py" />
+        <option value="$PROJECT_DIR$/config.txt" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="950" />
     <option name="width" value="980" />
     <option name="height" value="1040" />
@@ -268,13 +263,13 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1541448049218" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../School/CSCI-B 363/Lab" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -300,7 +295,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.box">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
@@ -428,8 +423,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
         <item itemvalue="Python.box" />
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
@@ -448,10 +443,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.147651" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15167785" />
       <window_info id="Structure" order="1" weight="0.24966443" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -460,7 +455,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49932885" visible="true" weight="0.3858156" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49932885" weight="0.3858156" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -520,53 +515,52 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/box.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1309">
+          <caret line="81" column="12" selection-start-line="81" selection-start-column="12" selection-end-line="81" selection-end-column="12" />
+          <folding>
+            <element signature="e#97#106#0" expanded="true" />
+            <element signature="e#349#594#0" />
+            <marker date="1541633631601" expanded="true" signature="344:596" ph="..." />
+            <marker date="1541633631601" expanded="true" signature="1171:2223" ph="..." />
+            <marker date="1541633631601" expanded="true" signature="2252:3321" ph="..." />
+            <marker date="1541633631601" expanded="true" signature="3265:3285" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/autoParam.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2482">
-          <caret line="143" column="39" selection-start-line="143" selection-start-column="39" selection-end-line="143" selection-end-column="39" />
+        <state relative-caret-position="2550">
+          <caret line="150" column="39" selection-start-line="150" selection-start-column="39" selection-end-line="150" selection-end-column="39" />
           <folding>
             <element signature="e#87#99#0" expanded="true" />
-            <marker date="1541631731055" expanded="true" signature="133:138" ph="..." />
-            <marker date="1541631731055" expanded="true" signature="531:540" ph="..." />
+            <marker date="1541665341067" expanded="true" signature="133:138" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sheet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+        <state relative-caret-position="306">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/config.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="12" lean-forward="true" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/box.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="105" selection-start-line="105" selection-end-line="105" />
-          <folding>
-            <element signature="e#97#106#0" expanded="true" />
-            <element signature="e#349#594#0" />
-            <marker date="1541631767964" expanded="true" signature="344:596" ph="..." />
-            <marker date="1541631767964" expanded="true" signature="1171:2223" ph="..." />
-            <marker date="1541631767964" expanded="true" signature="2252:3306" ph="..." />
-            <marker date="1541631767964" expanded="true" signature="3250:3270" ph="..." />
-          </folding>
+        <state>
+          <caret column="14" selection-start-column="14" selection-end-column="14" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="524">
-          <caret line="178" column="10" selection-start-line="178" selection-start-column="10" selection-end-line="178" selection-end-column="10" />
+        <state relative-caret-position="198">
+          <caret line="137" column="35" lean-forward="true" selection-start-line="137" selection-start-column="35" selection-end-line="137" selection-end-column="35" />
           <folding>
-            <marker date="1541631767988" expanded="true" signature="2448:2450" ph="..." />
+            <marker date="1541665341079" expanded="true" signature="2448:2450" ph="..." />
           </folding>
         </state>
       </provider>

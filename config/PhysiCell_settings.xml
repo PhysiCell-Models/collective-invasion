@@ -41,15 +41,16 @@
 	</save>
 	
 	<user_parameters>
+	 
+	
 		<tumor_radius type="double">175</tumor_radius>
 		<enable_ecm_outputs type="bool">false</enable_ecm_outputs>
 		<initial_density_ecm type="double">0.5</initial_density_ecm>
-		<leader_adhesion type="double">1.0</leader_adhesion>
+		<leader_adhesion type="double">10.0</leader_adhesion>
 		<follower_adhesion type="double">1.0</follower_adhesion>
 		<default_cell_speed type="double">0.1</default_cell_speed>
-		<default_cell_speed type="double">0.25</default_cell_speed>
 		<leader_motility_mode type="bool">true</leader_motility_mode>
-		<follower_motility_mode type="bool">false</follower_motility_mode>
+		<follower_motility_mode type="bool">false</follower_motility_mode>		
 	</user_parameters>
 	
 </PhysiCell_settings>
