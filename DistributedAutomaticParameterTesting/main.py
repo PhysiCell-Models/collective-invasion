@@ -136,7 +136,7 @@ def main():
                 # Run image processing
                 print("Run image processing")
                 os.chdir('output/')
-                os.system('mogrify -format png *.svg')
+                os.system('magick mogrify -format png *.svg')
                 os.system('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" output.mp4')
                 os.chdir('../')
 
@@ -160,15 +160,15 @@ def main():
                 else:
                     print("Cannot upload to box")
 
+            # Update sheets to mark the test is finished
+            ap.parameterSuccessful(parameters["id"]) #Test completed successfully so we need to mark it as such
+
             # End tests
         except ValueError:
             # Test failed
             print(ValueError)
             print("Test failed")
             ap.parameterFailed(parameters["id"])
-
-        # Update sheets to mark the test is finished
-        ap.parameterSuccessful(parameters["id"]) #Test completed successfully so we need to mark it as such
 
         count += 1
 
@@ -177,4 +177,3 @@ if __name__ == '__main__':
     print("Current working directory: ", os.getcwd())
 
     main()
-

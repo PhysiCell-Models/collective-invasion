@@ -79,6 +79,8 @@ for i in range(0, len(f)):
     f[i] = f[i].replace("\n", "")
     config[f[i].split(":")[0]] = f[i].split(":")[1]
 
+print(config)
+
 
 def uploadFile(folderID, path, file):
     if refreshTime < time.time() + 5:
@@ -103,7 +105,7 @@ def getClient():
 if __name__ == '__main__':
     os.chdir("../")
     app.run()
-    
+
     items = client.folder(folder_id='0').get_items(limit=100, offset=0)
 
     for i in items:

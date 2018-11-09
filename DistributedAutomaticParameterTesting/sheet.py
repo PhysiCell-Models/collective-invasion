@@ -6,11 +6,11 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 spreedsheetID = "17QJFFXto0MbOX5dH9GFP3NevNHiuxj7eZf7Pevcg96U"
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
 
 # use creds to create a client to interact with the Google Drive API
 def sheet():
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
     client = gspread.authorize(creds)
 
     return client.open_by_key(spreedsheetID).sheet1

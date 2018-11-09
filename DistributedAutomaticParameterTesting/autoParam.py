@@ -11,24 +11,28 @@ class autoParam:
     def __init__(self):
         self.path = "DistributedAutomaticParameterTesting/"
 
+        self.makeConfig()
+
+    def makeConfig(self):
         f = open(self.path+'config.txt', 'r').readlines()
         self.config = {}
 
         for i in range(0, len(f)):
             f[i] = f[i].replace("\n", "")
             self.config[f[i].split(":")[0]] = f[i].split(":")[1]
-        print(self.path+"config.txt: ", self.config)
+        print(self.path+"config.txt: ", self.config)   
 
     def requestParameters(self):
         records = sheet.getRecords()
 
         if self.config["lastTest"] != "None":
+            print("Using lastTest from config.txt")
+            print(self.config)
             for i in range(0, len(records)):
                 if int(self.config["lastTest"]) == records[i]["id"]:
                     records[i]["status"] = "in progress"
                     records[i]["start time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     records[i]["performed by"] = self.config["userName"]
-
                     sheet.sheet().update_cell(i+2, 2, "in progress")
                     sheet.sheet().update_cell(i+2, 3, records[i]["start time"])
                     sheet.sheet().update_cell(i+2, 5, self.config["userName"])
@@ -66,7 +70,6 @@ class autoParam:
             return None
 
         records[index]["status"] = status
-
         sheet.sheet().update_cell(index+2, 2, status)
 
         return records[index]
@@ -128,6 +131,7 @@ class autoParam:
                 sheet.sheet().update_cell(i+2, 3, '')
                 sheet.sheet().update_cell(i+2, 6, records[i]["comments"])
 
+
     def changeConfigLine(self, original, new):
         f = open(self.path+'config.txt', 'r').readlines()
         data = ""
@@ -138,6 +142,8 @@ class autoParam:
 
         with open(self.path+'config.txt', 'w') as file:
             file.writelines(data)
+
+        self.makeConfig()
     def changeConfig(self):
         f = open(self.path+'config.txt', 'r').readlines()
         data = ""
@@ -146,6 +152,7 @@ class autoParam:
 
         with open(self.path+'config.txt', 'w') as file:
             file.writelines(data)
+        self.makeConfig()
 
 if __name__ == '__main__':
     print(sheet.getRecords())

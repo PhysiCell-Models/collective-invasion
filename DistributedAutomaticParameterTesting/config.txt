@@ -1,8 +1,8 @@
-client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
-lastTest:2
-numOfRuns:-1
-client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
 resetTime:172800
 boxFolderID:56956464062
-removeZip:True
+client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
 userName:bendugga@iu.edu
+removeZip:True
+lastTest:None
+numOfRuns:-1
+client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
