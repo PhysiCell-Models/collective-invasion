@@ -1,6 +1,6 @@
 '''
-    Ben Duggan
-    10/30/18
+    Ben Duggan modified by John Metzcar
+    11/10/18
     Main script to run distributed parameter testing
 '''
 
@@ -34,7 +34,7 @@ def createXML(parameters, offLimits=[]):
 def dataCleanup(config):
     # Emulating make data-cleanup: remove .mat, .xml, .svg, .txt, .pov
     for file in os.listdir("."):
-        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or (config['removeZip']=='True' and file.endswith('.zip')):
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')):
             os.remove(file)
 
     for file in os.listdir("SVG/"):
@@ -135,10 +135,15 @@ def main():
             if 'imgProc' in parameters['tasks']:
                 # Run image processing
                 print("Run image processing")
+                filename = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + str('.mp4')
                 os.chdir('output/')
                 os.system('magick mogrify -format png *.svg')
-                os.system('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" output.mp4')
+                movie_run_command_str = str('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" ../')
+                movie_run_command_str = movie_run_command_str + filename
+                os.system(movie_run_command_str)
                 os.chdir('../')
+#                dataCleanup(ap.config)
+#                ap.updateStatus(parameters['id'], 'clean')
 
             if 'zip' in parameters['tasks']:
                 # Zip Run output
