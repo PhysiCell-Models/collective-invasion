@@ -127,7 +127,11 @@ void create_cell_types( void )
 	
 	cell_defaults.phenotype.motility.is_motile = true;
 	cell_defaults.phenotype.motility.persistence_time = 15.0; 
-	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed"); 
+	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed
+                                                                          
+                                                                          
+                                                                          
+                                                                          ");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 0.90;
 	

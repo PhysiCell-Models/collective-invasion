@@ -135,28 +135,28 @@ def main():
             if 'imgProc' in parameters['tasks']:
                 # Run image processing
                 print("Run image processing")
-                filename = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + str('.mp4')
-                print(filename)
+                fileName = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + str('.mp4')
+                print(fileName)
                 os.chdir('output/')
                 os.system('magick mogrify -format png *.svg')
                 movie_run_command_str = str('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" ../')
-                movie_run_command_str = movie_run_command_str + filename
+                movie_run_command_str = movie_run_command_str + fileName
                 os.system(movie_run_command_str)
                 os.chdir('../')
 #                dataCleanup(ap.config)
 #                ap.updateStatus(parameters['id'], 'clean')
 
-            if 'zip' in parameters['tasks']:
-                # Zip Run output
-                print("Zipping SVG and outputs")
-                fileName = createZip(parameters)
-                ap.updateStatus(parameters['id'], 'zip')
+#            if 'zip' in parameters['tasks']:
+#                # Zip Run output
+#                print("Zipping SVG and outputs")
+#                fileName = createZip(parameters)
+#                ap.updateStatus(parameters['id'], 'zip')
 
             if 'upload' in parameters['tasks']:
                 # Upload zip to box
                 if useBox:
                     print("Uploading zip to box")
-                    print(filename)
+                    print(fileName)
                     if platform.system() == 'Windows':
                         uploadFile(ap.config['boxFolderID'], '\\', fileName)
                     else:
