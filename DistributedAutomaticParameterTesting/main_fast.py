@@ -136,6 +136,7 @@ def main():
                 # Run image processing
                 print("Run image processing")
                 filename = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + str('.mp4')
+                print(filename)
                 os.chdir('output/')
                 os.system('magick mogrify -format png *.svg')
                 movie_run_command_str = str('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" ../')
@@ -155,7 +156,7 @@ def main():
                 # Upload zip to box
                 if useBox:
                     print("Uploading zip to box")
-
+                    print(filename)
                     if platform.system() == 'Windows':
                         uploadFile(ap.config['boxFolderID'], '\\', fileName)
                     else:
