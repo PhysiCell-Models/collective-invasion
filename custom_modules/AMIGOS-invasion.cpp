@@ -127,7 +127,7 @@ void create_cell_types( void )
 	
 	cell_defaults.phenotype.motility.is_motile = true;
 	cell_defaults.phenotype.motility.persistence_time = 15.0; 
-	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed"); 
+	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 0.90;
 	
@@ -202,8 +202,8 @@ void setup_microenvironment( void )
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
 	// 50 micron length scale 
-//    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
-//    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     

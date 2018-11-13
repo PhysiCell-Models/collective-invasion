@@ -70,7 +70,8 @@ void change_bias_ecm(Cell* pCell)
     
 void change_speed_ecm(Cell* pCell)
 {
-	double vmax = 1.0;
+	double vmax = parameters.doubles("default_cell_speed");
+    
 	int ecm_index =  pCell->get_current_voxel_index();
 	double density = ecm.ecm_data[ecm_index].density;
 	

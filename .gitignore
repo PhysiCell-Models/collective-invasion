@@ -1,9 +1,8 @@
 *.o
-*.xml
-*.mat
+out*.xml
+out*.mat
 *.mp4
 AMIGOS-invasion
-*.txt
 *.pov
 *.xcworkspace
 *.avi

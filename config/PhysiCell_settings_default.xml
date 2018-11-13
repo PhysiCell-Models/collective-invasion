@@ -101,7 +101,7 @@
 
 		<full_data>
 			<interval units="min">60</interval>
-			<enable>true</enable>
+			<enable>false</enable>
 		</full_data>
 		 <!-- output an svg every 10 minutes-->
 		<SVG>
