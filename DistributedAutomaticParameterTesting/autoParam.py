@@ -131,7 +131,6 @@ class autoParam:
                 sheet.sheet().update_cell(i+2, 3, '')
                 sheet.sheet().update_cell(i+2, 6, records[i]["comments"])
 
-
     def changeConfigLine(self, original, new):
         f = open(self.path+'config.txt', 'r').readlines()
         data = ""
@@ -144,6 +143,7 @@ class autoParam:
             file.writelines(data)
 
         self.makeConfig()
+    
     def changeConfig(self):
         f = open(self.path+'config.txt', 'r').readlines()
         data = ""

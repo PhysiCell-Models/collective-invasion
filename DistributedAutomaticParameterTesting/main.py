@@ -6,6 +6,7 @@
 
 import xml.etree.ElementTree as ET
 from autoParam import *
+import sys
 import os
 import platform
 import zipfile
@@ -175,5 +176,17 @@ def main():
 if __name__ == '__main__':
     os.chdir("../")
     print("Current working directory: ", os.getcwd())
+
+    # Look at command line arguments
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'reset':
+            # Reset config.txt
+            print("Reseting config file...")
+            ap = autoParam()
+            ap.config['userName'] = 'default'
+            ap.config['numOfRuns'] = '1'
+            ap.config['lastTest'] = 'None'
+            ap.changeConfig()
+            exit()
 
     main()
