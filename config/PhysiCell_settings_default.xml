@@ -126,7 +126,9 @@
 		<enable_ecm_outputs type = "bool">false</enable_ecm_outputs>
 		<initial_density_ecm type = "double">0.5</initial_density_ecm>
 		<leader_adhesion type = "double">1.0</leader_adhesion>
+		<leader_repulsion type = "double">1.0</leader_repulsion>
 		<follower_adhesion type = "double">1.0</follower_adhesion>
+		<follower_repulsion type ="double">1.0</follower_repulsion>
 		<default_cell_speed type = "double">0.5</default_cell_speed>
 		<leader_motility_mode type = "bool">true</leader_motility_mode>
 		<follower_motility_mode type = "bool">false</follower_motility_mode>
