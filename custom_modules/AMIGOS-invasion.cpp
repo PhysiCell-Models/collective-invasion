@@ -161,11 +161,14 @@ void create_cell_types( void )
 
     // modify ECM
     
-    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, so this shoudl autoamtically make it so that followers can't modfiy ECM ...
+    // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, 
+	//so this shoudl autoamtically make it so that followers can't modfiy ECM ...
+	leader_cell.functions.custom_cell_rule = ecm_update_from_cell; 
 	
 	// set functions
 	
-	leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
+	//Ignore chemotaxis for now
+	//leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
 	
     leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
 	
@@ -206,8 +209,8 @@ void setup_microenvironment( void )
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
 	// 50 micron length scale 
-    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
-    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+    //microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+    //microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
@@ -617,11 +620,6 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
     
     // set death and birth
     update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
-    
-    // ALWAYS MOTILE
-    
-    phenotype.motility.is_motile = true;
-//    phenotype.motility.migration_bias = 1.0;
     
     //    if( pO2 > pCell->custom_data[hypoxic_i] )
     //    {
