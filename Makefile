@@ -152,7 +152,6 @@ data-cleanup:
 	rm -f *.mat
 	rm -f *.xml
 	rm -f *.svg
-	rm -f *.txt
 	rm -f *.pov
 	rm -f ./Output/*
 	rm -f ./SVG/*
