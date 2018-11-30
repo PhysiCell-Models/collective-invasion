@@ -162,7 +162,7 @@ void create_cell_types( void )
 
     // modify ECM
     
-//    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, so this shoudl autoamtically make it so that followers can't modfiy ECM ...
+    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, so this shoudl autoamtically make it so that followers can't modfiy ECM ...
 	
 	// set functions
 	
@@ -681,7 +681,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 //    return;
 //}
 
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) 
 {
 //    Cell* pCell = (*all_cells)[i];
     int ecm_index = pCell->get_current_voxel_index();
@@ -706,14 +706,14 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 
     std::vector<double> ECM_orientation = ecm.ecm_data[ecm_index].ECM_orientation;
     
-    double motility_vector_norm = norm( phenotype.motility.motility_vector );
-    if( motility_vector_norm < 1e-12 )
-    { return; }
-    else
-        
-        // FIX ME!!!!
-        
-    { phenotype.motility.motility_vector /= motility_vector_norm; }
+//    double motility_vector_norm = norm( phenotype.motility.motility_vector );
+//    if( motility_vector_norm < 1e-12 )
+//    { return; }
+//    else
+//        
+//        // FIX ME!!!!
+//        
+//    { phenotype.motility.motility_vector /= motility_vector_norm; } // Why is this here???????? Seems weird to normalize the motility vector when we don't change it.
 //    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector);
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
