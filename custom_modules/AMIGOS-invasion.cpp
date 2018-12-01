@@ -175,17 +175,17 @@ void create_cell_types( void )
 	follower_cell = cell_defaults;
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
-    
+//    follower_cell.phenotype.motility.migration_speed = 0.15;
 //    follower_cell.functions.update_migration_bias = chemotaxis_oxygen;
     
     follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
-    std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
-    std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
-    std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
-    std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
     
 //    follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
@@ -359,7 +359,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 1.0;
+	double leader_cell_fraction = 0.20;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -428,7 +428,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	phenotype.motility.is_motile = true; 
 	phenotype.motility.migration_bias = 0.95;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
-    std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+//    std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 	
 	return; 
 }
@@ -681,7 +681,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 //    return;
 //}
 
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) 
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
 //    Cell* pCell = (*all_cells)[i];
     int ecm_index = pCell->get_current_voxel_index();
@@ -710,9 +710,9 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 //    if( motility_vector_norm < 1e-12 )
 //    { return; }
 //    else
-//        
+//
 //        // FIX ME!!!!
-//        
+//
 //    { phenotype.motility.motility_vector /= motility_vector_norm; } // Why is this here???????? Seems weird to normalize the motility vector when we don't change it.
 //    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector);
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
