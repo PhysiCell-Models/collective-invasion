@@ -87,11 +87,7 @@
 	</domain>
 	
 	<overall>
-<<<<<<< HEAD
-		<max_time units="min">11520</max_time> 
-=======
 		<max_time units="min">11520</max_time> <!-- 10 days * 24 h * 60 min -->
->>>>>>> bcc046712e7fad4f7979d3f29123512855e661f4
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
