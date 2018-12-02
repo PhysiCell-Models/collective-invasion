@@ -1,8 +1,8 @@
-lastTest:1
+lastTest:None
 userName:jpmetzca@indiana.edu
 client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
 removeZip:True
 resetTime:172800
 client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
-numOfRuns:1
+numOfRuns:-1
 boxFolderID:59831501628
