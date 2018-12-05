@@ -129,9 +129,9 @@
 		<leader_repulsion type = "double">1.0</leader_repulsion>
 		<follower_adhesion type = "double">1.0</follower_adhesion>
 		<follower_repulsion type ="double">1.0</follower_repulsion>
-		<default_cell_speed type = "double">0.5</default_cell_speed>
+		<default_cell_speed type = "double">0.0</default_cell_speed>
 		<leader_motility_mode type = "bool">true</leader_motility_mode>
-		<follower_motility_mode type = "bool">false</follower_motility_mode>
+		<follower_motility_mode type = "bool">true</follower_motility_mode>
 		
 	</user_parameters>
 	

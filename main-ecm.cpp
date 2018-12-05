@@ -106,7 +106,7 @@ int main( int argc, char* argv[] )
 	// time setup 
 	std::string time_units = "min"; 
 	
-	double t_max = PhysiCell_settings.max_time;  // 1 days 
+	double t_max = PhysiCell_settings.max_time;  // 1 days
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();
@@ -226,6 +226,7 @@ int main( int argc, char* argv[] )
             // Need somethign that specifics that only followers do this. Maybe put that into the custom stuff ... Not sure how to do that. Will need somethign similar for the ECM realignment.
             
             cell_update_from_ecm();
+            
 			PhysiCell_globals.current_time += diffusion_dt;
 			
 			if( PhysiCell_settings.enable_legacy_saves == true )

@@ -46,14 +46,26 @@ void cell_update_from_ecm( void )
 	{
 		Cell* pCell = (*all_cells)[i];
         
+        
+        
 		//Test 1: Non-motile follower cells. In this case paramaters.bools("follower_motility_mode") will be false
-		if(parameters.bools("follower_motility_mode") == false)
-		{
-			if(pCell->type == 2)
-				continue;
-		}
+        if(parameters.bools("follower_motility_mode") == false)
+        {
+            if(pCell->type == 2)
+                continue;
+        }
 		//followers don't respond to cues from ecm
+//        if(pCell->type == 2)
+//        {
+//            continue;
+//            std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+//        }
         change_speed_ecm(pCell); // As long as density is set to 0.5, this will have no impact on cell speed.
+//        if(pCell->type == 2)
+//        {
+//
+//            std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+//        }
         change_migration_bias_vector_ecm(pCell);
 		change_bias_ecm(pCell);
 	}

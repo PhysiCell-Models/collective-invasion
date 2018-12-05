@@ -126,7 +126,7 @@ void create_cell_types( void )
 	// set default motility parameters (even for when off)
 	
 	cell_defaults.phenotype.motility.is_motile = true;
-	cell_defaults.phenotype.motility.persistence_time = 15.0; 
+	cell_defaults.phenotype.motility.persistence_time = 15.0;
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 0.90;
@@ -152,23 +152,21 @@ void create_cell_types( void )
 	leader_cell.phenotype.motility.is_motile = parameters.bools("leader_motility_mode"); 
 	
     leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
-	
-	leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_repulsion");
+	std::cout<<leader_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
     
+	leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("leader_repulsion");
+    std::cout<<leader_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 //    leader_cell.phenotype.secretion.secretion_rates[1] = 50; // leader signal
     
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
 
     // modify ECM
     
-    // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, 
-	//so this shoudl autoamtically make it so that followers can't modfiy ECM ...
-	leader_cell.functions.custom_cell_rule = ecm_update_from_cell; 
+    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // this meas that ... only leaders have this, right? So, it is only accessed when leaders are updated, so this shoudl autoamtically make it so that followers can't modfiy ECM ...
 	
 	// set functions
 	
-	//Ignore chemotaxis for now
-	//leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
+	leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
 	
     leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
 	
@@ -177,16 +175,18 @@ void create_cell_types( void )
 	follower_cell = cell_defaults;
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
-    
-    //follower_cell.functions.update_migration_bias = change_migration_bias_vector_ecm;
+//    follower_cell.phenotype.motility.migration_speed = 0.15;
+//    follower_cell.functions.update_migration_bias = chemotaxis_oxygen;
     
     follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
-	
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
-	
-	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode"); 
+//    std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
+	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
     
 //    follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
     
@@ -209,8 +209,8 @@ void setup_microenvironment( void )
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
 	// 50 micron length scale 
-    //microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
-    //microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 //    For SIAM LS18 Motility presentation - eliminating leader/follower signal
     
@@ -359,7 +359,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.2;
+	double leader_cell_fraction = 0.20;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -427,7 +427,8 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	
 	phenotype.motility.is_motile = true; 
 	phenotype.motility.migration_bias = 0.95;
-	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);	
+	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
+//    std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 	
 	return; 
 }
@@ -621,6 +622,11 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
     // set death and birth
     update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
     
+    // ALWAYS MOTILE
+    
+    phenotype.motility.is_motile = true;
+//    phenotype.motility.migration_bias = 1.0;
+    
     //    if( pO2 > pCell->custom_data[hypoxic_i] )
     //    {
     //        // proliferate (don't overwrite)
@@ -675,7 +681,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 //    return;
 //}
 
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
 //    Cell* pCell = (*all_cells)[i];
     int ecm_index = pCell->get_current_voxel_index();
@@ -700,19 +706,20 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 
     std::vector<double> ECM_orientation = ecm.ecm_data[ecm_index].ECM_orientation;
     
-    double motility_vector_norm = norm( phenotype.motility.motility_vector );
-    if( motility_vector_norm < 1e-12 )
-    { return; }
-    else
-        
-        // FIX ME!!!!
-        
-    { phenotype.motility.motility_vector /= motility_vector_norm; }
+//    double motility_vector_norm = norm( phenotype.motility.motility_vector );
+//    if( motility_vector_norm < 1e-12 )
+//    { return; }
+//    else
+//
+//        // FIX ME!!!!
+//
+//    { phenotype.motility.motility_vector /= motility_vector_norm; } // Why is this here???????? Seems weird to normalize the motility vector when we don't change it.
 //    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector);
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
+//    std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 
-    double r_0 = 1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+    double r_0 = 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 
     double r_realignment = r_0 * (1-anisotropy);
     
@@ -729,6 +736,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
     }*/
+
 	double ddotf;
 	std::vector<double> temp;
 	temp.resize(3,0.0);

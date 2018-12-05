@@ -1,13 +1,13 @@
 VERSION := 1.4.1
 PROGRAM_NAME := AMIGOS-invasion
 
- CC := g++
+# CC := g++
 # CC := g++-mp-7 # typical macports compiler name
-# CC := g++-7 # typical homebrew compiler name
+CC := g++ # typical homebrew compiler name
 
 # Check for environment definitions of compiler 
 # e.g., on CC = g++-7 on OSX
-ifdef PHYSICELL_CPP 
+ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
 
@@ -152,7 +152,6 @@ data-cleanup:
 	rm -f *.mat
 	rm -f *.xml
 	rm -f *.svg
-	rm -f *.txt
 	rm -f *.pov
 	rm -f ./Output/*
 	rm -f ./SVG/*

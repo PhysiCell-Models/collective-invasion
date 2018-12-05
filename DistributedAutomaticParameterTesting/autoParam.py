@@ -40,7 +40,7 @@ class autoParam:
                     return records[i]
 
         for i in range(0, len(records)):
-            if len(records[i]["status"]) == 0:
+            if len(records[i]["status"]) == 0 and int(self.config['computerStrength']) >= int(records[i]["computerStrength"]):
                 records[i]["status"] = "in progress"
                 records[i]["start time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 records[i]["performed by"] = self.config["userName"]
