@@ -133,6 +133,10 @@
 		<leader_motility_mode type = "bool">true</leader_motility_mode>
 		<follower_motility_mode type = "bool">true</follower_motility_mode>
 		
+		<r_density type="double">1.0</r_density>
+		<r0_fiber type="double">1.0</r0_fiber>
+		<r_anisotropy type="double">0.01</r_anisotropy>
+		
 	</user_parameters>
 	
 </PhysiCell_settings>

@@ -696,7 +696,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     // Cell-ECM density interaction
     
     double density = ecm.ecm_data[ecm_index].density;
-    double r = 1.0;
+    double r = parameters.doubles("r_density");
     
     ecm.ecm_data[ecm_index].density = density + r * dt  * (0.5 - density);
     
@@ -719,7 +719,9 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     double migration_speed = pCell->phenotype.motility.migration_speed;
 //    std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 
-    double r_0 = 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+    double r_0 = parameters.doubles("r0_fiber");
+	
+	//= 1/1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 
     double r_realignment = r_0 * (1-anisotropy);
     
@@ -770,8 +772,10 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     
     // Cell-ECM Anisotrophy Modification
     
-    double r_a0 = 1.0/100.0; // min-1 - changes on same time scale as fiber realignment????
-    double r_anisotropy = r_a0 * migration_speed; // What is a typical cell speed????
+    double r_a0 = parameters.doubles("r_anisotropy");	
+	//1.0/100.0; // min-1 - changes on same time scale as fiber realignment????
+    
+	double r_anisotropy = r_a0 * migration_speed; // What is a typical cell speed????
 //    std::cout<<migration_speed<<std::endl;
     ecm.ecm_data[ecm_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
     
