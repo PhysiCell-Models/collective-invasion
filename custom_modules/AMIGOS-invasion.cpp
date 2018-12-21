@@ -350,9 +350,17 @@ void setup_tissue( void )
     
 	//Get tumor radius from XML parameters
 	double tumor_radius = parameters.doubles("tumor_radius");
-	double cell_radius = cell_defaults.phenotype.geometry.radius; 
-	double cell_spacing = 0.95 * 2.0 * cell_radius; 
+	double cell_radius = cell_defaults.phenotype.geometry.radius;
+    double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
+    double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+    
+    double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
+    cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
 	
+    std::cout<<2*cell_radius<<std::endl;
+    std::cout<<cell_spacing<<std::endl;
+    std::cout<<cell_spacing/(2*cell_radius)<<std::endl;
+    
 	Cell* pCell = NULL; 
 	
 	double x = 0.0;
