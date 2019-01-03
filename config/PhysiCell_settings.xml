@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time>
+		<max_time units="min">120</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -31,7 +31,7 @@
 		</full_data>
 		 
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -46,11 +46,11 @@
 		<tumor_radius type="double">175</tumor_radius>
 		<enable_ecm_outputs type="bool">false</enable_ecm_outputs>
 		<initial_density_ecm type="double">0.5</initial_density_ecm>
-		<leader_adhesion type="double">10.0</leader_adhesion>
-		<leader_repulsion type="double">25.0</leader_repulsion>
-		<follower_adhesion type="double">10.0</follower_adhesion>
-		<follower_repulsion type="double">25.0</follower_repulsion>
-		<default_cell_speed type="double">0.5</default_cell_speed>
+		<leader_adhesion type="double">1.25</leader_adhesion>
+		<leader_repulsion type="double">25</leader_repulsion>
+		<follower_adhesion type="double">1.25</follower_adhesion>
+		<follower_repulsion type="double">25</follower_repulsion>
+		<default_cell_speed type="double">0.05</default_cell_speed>
 		<leader_motility_mode type="bool">true</leader_motility_mode>
 		<follower_motility_mode type="bool">true</follower_motility_mode>
 		
