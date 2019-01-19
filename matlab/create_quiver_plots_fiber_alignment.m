@@ -2,7 +2,7 @@
 %output...ECM.mat files are
 
 clear all
-for i = 0:135
+for i = 0:960
     filename1 = sprintf('output%08u_ECM.mat', i) ;
     ECM = read_ecm_data(filename1);
 %     filename2 = sprintf('output%08u.xml',i) ;
