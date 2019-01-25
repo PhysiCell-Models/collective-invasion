@@ -367,7 +367,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.20;
+	double leader_cell_fraction = 0.0;
 	
 	int n = 0; 
 	while( y < tumor_radius )
