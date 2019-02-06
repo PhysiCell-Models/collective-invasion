@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.11.8)  22 OCT 2018 17:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.11.8)  28 JAN 2019 01:43
 entering extended mode
 **"./Distributed Automatic Parameter Test.tex"
 ("Distributed Automatic Parameter Test.tex"
@@ -362,24 +362,16 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 70.
  ("Distributed Automatic Parameter Test.aux")
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 70.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 70.
-
-
-Package rerunfilecheck Warning: File `"Distributed Automatic Parameter Test".ou
-t' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `"Distributed Automatic Parameter Te
-st".out':
-(rerunfilecheck)             Before: 3100296D9528FB72D4A2EF443B7FB466;265
-(rerunfilecheck)             After:  F5239B19D7BA8491C9027B8C0EF564DA;382.
+Package rerunfilecheck Info: File `"Distributed Automatic Parameter Test".out' 
+has not changed.
+(rerunfilecheck)             Checksum: F5239B19D7BA8491C9027B8C0EF564DA;382.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 70.
  ) 
 Here is how much of TeX's memory you used:
- 5800 strings out of 493323
- 85980 string characters out of 3139066
+ 5802 strings out of 493323
+ 86007 string characters out of 3139066
  180413 words of memory out of 3000000
- 9276 multiletter control sequences out of 15000+200000
+ 9278 multiletter control sequences out of 15000+200000
  8977 words of font info for 32 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  28i,6n,31p,487b,476s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -388,10 +380,10 @@ ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Fil
 es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fon
 ts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on "Distributed Automatic Parameter Test.pdf" (3 pages, 77998 by
+Output written on "Distributed Automatic Parameter Test.pdf" (3 pages, 79104 by
 tes).
 PDF statistics:
- 83 PDF objects out of 1000 (max. 8388607)
+ 89 PDF objects out of 1000 (max. 8388607)
  21 named destinations out of 1000 (max. 500000)
- 41 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 57 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,37 +1,25 @@
 '''
     Ben Duggan
-    10/30/18
+    2/1/19
     Main script to run distributed parameter testing
 '''
 
-import xml.etree.ElementTree as ET
-from autoParam import *
-import sys
-import os
-import platform
-import zipfile
-import datetime
-import time
-#import matlab.engine
-from box import *
+import dap
+import os, sys
 
 
 def main():
-    ap = autoParam()
-    count = 0
+    conf = dap.config.Config('config.txt')
+    sheet = dap.sheet.Sheet(conf.config['spreedsheetID'])
+    ap = dap.param.Param(conf, sheet)
+    boxy = dap.box.Box(conf)
+    boxy.connect()
 
-    useBox = None
-    while(useBox != "Y" and useBox != "y" and useBox != "n" and useBox != "N"):
-        useBox = input("Do you want to use box (y/n): ")
-    if useBox == "Y" or useBox == "y":
-        useBox = True
-        username = startServer()
-        ap.config['userName'] = username
-        ap.changeConfig()
+    #boxy.startServer() # Start the Flask server to get box access token
 
     print("Starting main script")
 
-    while count < int(ap.config["numOfRuns"]) or int(ap.config["numOfRuns"]) == -1:
+    while True:
         # Check the sheet for any trials that didn't run successfully
         ap.checkForDBErrors()
 
@@ -43,18 +31,31 @@ def main():
         print("Request parameters: ")
         print(parameters)
 
+        file_name = 'dap_test_' + str(parameters['id']) + '.txt'
+
+        f = open(file_name, 'w+')
+        f.write(str(parameters))
+        f.close()
+
+        boxy.uploadFile(conf.config['boxFolderID'], '/', file_name)
+
+        ap.parameterSuccessful(parameters["id"])
+
+        exit()
+
         try:
+            pass
             if 'clean' in parameters['tasks']:
                 # Reset from the previous run
                 print("Cleaning up folder")
-                dataCleanup(ap.config)
+                dap.tools.dataCleanup(conf.config)
                 ap.updateStatus(parameters['id'], 'clean')
 
             if 'xml' in parameters['tasks']:
                 # Create the parameters
                 print("Creating parameters xml and autoParamSettings.txt")
-                createXML(parameters)
-                createSettingsFile(parameters)
+                dap.tools.createXML(parameters)
+                dap.tools.createSettingsFile(parameters)
                 ap.updateStatus(parameters['id'], 'xml')
 
             if 'sim' in parameters['tasks']:
@@ -82,22 +83,17 @@ def main():
             if 'zip' in parameters['tasks']:
                 # Zip Run output
                 print("Zipping SVG and outputs")
-                fileName = createZip(parameters)
+                fileName = dap.tools.createZip(parameters)
                 ap.updateStatus(parameters['id'], 'zip')
 
             if 'upload' in parameters['tasks']:
                 # Upload zip to box
-                if useBox:
-                    print("Uploading zip to box")
-
-                    if platform.system() == 'Windows':
-                        uploadFile(ap.config['boxFolderID'], '\\', fileName)
-                    else:
-                        uploadFile(ap.config['boxFolderID'], '/', fileName)
-
-                    ap.updateStatus(parameters['id'], 'upload')
+                if platform.system() == 'Windows':
+                    uploadFile(ap.config['boxFolderID'], '\\', fileName)
                 else:
-                    print("Cannot upload to box")
+                    uploadFile(ap.config['boxFolderID'], '/', fileName)
+
+                ap.updateStatus(parameters['id'], 'upload')
 
             # Update sheets to mark the test is finished
             ap.parameterSuccessful(parameters["id"]) #Test completed successfully so we need to mark it as such
@@ -109,11 +105,9 @@ def main():
             print("Test failed")
             ap.parameterFailed(parameters["id"])
 
-        count += 1
-
 if __name__ == '__main__':
-    os.chdir("../")
-    print("Current working directory: ", os.getcwd())
+    #os.chdir("../")
+    #print("Current working directory: ", os.getcwd())
 
     # Look at command line arguments
     if len(sys.argv) > 1:

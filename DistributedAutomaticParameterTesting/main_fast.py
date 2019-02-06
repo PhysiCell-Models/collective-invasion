@@ -1,6 +1,6 @@
 '''
-    Ben Duggan
-    10/30/18
+    Ben Duggan modified by John Metzcar
+    11/10/18
     Main script to run distributed parameter testing
 '''
 
@@ -14,6 +14,68 @@ import datetime
 import time
 #import matlab.engine
 from box import *
+
+def createXML(parameters, offLimits=[]):
+    parameters = dict(parameters)
+    tree = ET.parse("config/PhysiCell_settings_default.xml")
+    root = tree.getroot()
+
+    for key in parameters:
+        if key in offLimits:
+            del parameters[key]
+
+    for key in parameters:
+        node = root.find(key)
+
+        if node != None:
+            node.text = str(parameters[key])
+
+    tree.write("config/PhysiCell_settings.xml")
+
+def dataCleanup(config):
+    # Emulating make data-cleanup: remove .mat, .xml, .svg, .txt, .pov
+    for file in os.listdir("."):
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')):
+            os.remove(file)
+
+    for file in os.listdir("SVG/"):
+        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
+        os.remove("SVG/" + file)
+
+    for file in os.listdir("output/"):
+        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
+         os.remove("output/" + file)
+
+def createSettingsFile(parameters):
+    data = ""
+
+    for key in parameters:
+        data += str(key) + ":" + str(parameters[key]) + "\n"
+
+    with open('autoParamSettings.txt', 'w') as file:
+        file.writelines(data)
+
+def createZip(parameters):
+    fileName = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + '.zip'
+    # Create the zip
+    zip = zipfile.ZipFile(fileName, 'w')
+
+    # Add individual files
+    zip.write('autoParamSettings.txt', compress_type=zipfile.ZIP_DEFLATED)
+
+    # Add files in SVG
+    for folder, subfolders, files in os.walk('SVG/'):
+        for file in files:
+            zip.write(os.path.join(folder, file), 'SVG/'+file, compress_type = zipfile.ZIP_DEFLATED)
+
+    # Add files in output
+    for folder, subfolders, files in os.walk('output/'):
+        for file in files:
+            zip.write(os.path.join(folder, file), 'output/'+file, compress_type = zipfile.ZIP_DEFLATED)
+
+    zip.close()
+
+    return fileName
 
 
 def main():
@@ -74,22 +136,28 @@ def main():
             if 'imgProc' in parameters['tasks']:
                 # Run image processing
                 print("Run image processing")
+                fileName = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + str('.mp4')
+                print(fileName)
                 os.chdir('output/')
                 os.system('magick mogrify -format png *.svg')
-                os.system('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" output.mp4')
+                movie_run_command_str = str('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" ../')
+                movie_run_command_str = movie_run_command_str + fileName
+                os.system(movie_run_command_str)
                 os.chdir('../')
+#                dataCleanup(ap.config)
+#                ap.updateStatus(parameters['id'], 'clean')
 
-            if 'zip' in parameters['tasks']:
-                # Zip Run output
-                print("Zipping SVG and outputs")
-                fileName = createZip(parameters)
-                ap.updateStatus(parameters['id'], 'zip')
+#            if 'zip' in parameters['tasks']:
+#                # Zip Run output
+#                print("Zipping SVG and outputs")
+#                fileName = createZip(parameters)
+#                ap.updateStatus(parameters['id'], 'zip')
 
             if 'upload' in parameters['tasks']:
                 # Upload zip to box
                 if useBox:
                     print("Uploading zip to box")
-
+                    print(fileName)
                     if platform.system() == 'Windows':
                         uploadFile(ap.config['boxFolderID'], '\\', fileName)
                     else:
