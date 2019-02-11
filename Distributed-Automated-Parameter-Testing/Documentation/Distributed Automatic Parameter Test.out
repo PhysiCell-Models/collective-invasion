@@ -1,0 +1,21 @@
+\BOOKMARK [1][-]{section.1}{Preface}{}% 1
+\BOOKMARK [1][-]{section.2}{Setup}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Python dependencies}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{config.txt}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Google Sheet}{section.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Create credentials}{subsection.2.3}% 6
+\BOOKMARK [3][-]{subsubsection.2.3.2}{How to use Sheet}{subsection.2.3}% 7
+\BOOKMARK [2][-]{subsection.2.4}{Box}{section.2}% 8
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Create credentials}{subsection.2.4}% 9
+\BOOKMARK [3][-]{subsubsection.2.4.2}{How to use Box}{subsection.2.4}% 10
+\BOOKMARK [1][-]{section.3}{Usage}{}% 11
+\BOOKMARK [2][-]{subsection.3.1}{Command line arguments}{section.3}% 12
+\BOOKMARK [1][-]{section.4}{How it works}{}% 13
+\BOOKMARK [1][-]{section.5}{DAP Documentation}{}% 14
+\BOOKMARK [2][-]{subsection.5.1}{\137\137init\137\137}{section.5}% 15
+\BOOKMARK [2][-]{subsection.5.2}{box}{section.5}% 16
+\BOOKMARK [2][-]{subsection.5.3}{config}{section.5}% 17
+\BOOKMARK [2][-]{subsection.5.4}{csv}{section.5}% 18
+\BOOKMARK [2][-]{subsection.5.5}{param}{section.5}% 19
+\BOOKMARK [2][-]{subsection.5.6}{sheet}{section.5}% 20
+\BOOKMARK [2][-]{subsection.5.7}{tools}{section.5}% 21
