@@ -71,46 +71,62 @@ extern Cell_Definition leader_cell;
 extern Cell_Definition follower_cell; 
 
 // overall rules 
-
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) ;// done 
 void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt ); // done 
-//void change_speed_ecm(Cell* pCell);
 
 // follower cell rules 
-
 void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double dt ); 
 
 // leader cell rules
-
 void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt ); 
-
 void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt ); 
-
 void leader_cell_motility_model0( Cell* pCell , Phenotype& phenotype , double dt ); 
-
 void switching_phenotype_model( Cell* pCell, Phenotype& phenotype, double dt ); 
 
-class Options 
-{
- public: 
-	int model = 0; 	
-};
-
-
-
-// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
-
-// set the tumor cell properties, then call the function 
-// to set up the tumor cells 
-void create_cell_types( void ); // done 
+// set the tumor cell properties, then call the function to set up the tumor cells 
+void create_cell_types( void );
 void ECM_setup(double numvox);
-void setup_tissue(void); // done 
+void setup_tissue(void);
 
-// set up the microenvironment to include the immunostimulatory factor 
-void setup_microenvironment( void );  // done 
+void setup_microenvironment( void ); // set up the microenvironment to include the immunostimulatory factor 
 
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
 std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!!
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
+
+namespace PhysiCell{
+class ECM_DATA
+{
+	private:
+	public:
+	   double density, anisotropy;
+	   std::vector<double> ECM_orientation;
+	   ECM_DATA();
+};//close ECM_DATA
+
+class ECM
+{
+ private:
+ public: 
+	std::vector<ECM_DATA> ecm_data;
+	Cartesian_Mesh mesh;
+	Microenvironment* pMicroenvironment; 
+	ECM();
+	
+	void sync_to_BioFVM( void );
+};//close ECM
+
+extern ECM ecm;
+extern ECM_DATA ecm_data;
+
+void cell_update_from_ecm(void);
+void change_speed_ecm(Cell* pCell);
+void change_migration_bias_vector_ecm(Cell* pCell);
+void change_bias_ecm(Cell* pCell);
+void ecm_update_from_cell(double numvox, double dt);
+void change_ecm_density(int ecm_index, double dt);
+void write_ECM_Data_matlab( std::string filename );
+
+};//close namespace
