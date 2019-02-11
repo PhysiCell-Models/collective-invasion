@@ -1,9 +1,9 @@
 id:1
-status:in progress
-start time:2019-01-03 14:16:00
-end time:
-performed by:jpmetzca@indiana.edu
-comments:ECM influence OFF
+status:finished
+startTime:2019-02-10 21:55:16
+endTime:2019-02-10 21:55:15
+performedBy:bendugga@iu.edu
+comments:
 tasks:clean,xml,sim,imgProc,upload
 computerStrength:1
 ./overall/max_time:120
