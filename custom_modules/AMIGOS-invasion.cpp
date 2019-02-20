@@ -107,7 +107,7 @@ void create_cell_types( void )
 	
 	// set default motility parameters (even for when off)
 	cell_defaults.phenotype.motility.is_motile = true;
-	cell_defaults.phenotype.motility.persistence_time = 15.0; 
+	cell_defaults.phenotype.motility.persistence_time = 0.01; 
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed"); 
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 0.90;
@@ -520,7 +520,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
 
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
-    double r_0 = 1.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+    double r_0 = 1/10.0*migration_speed; // min-1 // data from 02.20.19 on collected with rate = 1/10.0
     double r_realignment = r_0 * (1-anisotropy);
 
 	double ddotf;
@@ -552,7 +552,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
     // End Cell-ECM Fiber realingment
     
     // Cell-ECM Anisotrophy Modification
-    double r_a0 = 1.0/100.0; // min-1 - changes on same time scale as fiber realignment????
+    double r_a0 = 1.0/1000.0; // min-1 - data from 02.20.19 on collected with rate = 1/1000.0
     double r_anisotropy = r_a0 * migration_speed; // What is a typical cell speed????
     ecm.ecm_data[ecm_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
     
