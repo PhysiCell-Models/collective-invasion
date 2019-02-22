@@ -1,19 +1,19 @@
-status:in progress
 endTime:
-./overall/max_time:120
-./user_parameters/initial_density_ecm:0.5
-performedBy:bendugga@iu.edu
-./user_parameters/follower_repulsion:25
-computerStrength:1
-./user_parameters/follower_motility_mode:true
-id:3
-comments:
-startTime:2019-02-11 16:09:31
-./user_parameters/follower_adhesion:5
-./user_parameters/leader_repulsion:25
-./user_parameters/leader_motility_mode:true
-./user_parameters/enable_ecm_outputs:false
-./user_parameters/leader_adhesion:5
+./user_parameters/follower_adhesion:7.5
 ./user_parameters/default_cell_speed:0.05
+comments:
+startTime:2019-02-20 16:13:30
+id:d
+./user_parameters/enable_ecm_outputs:false
+./user_parameters/initial_density_ecm:0.5
+./user_parameters/follower_motility_mode:true
 ./user_parameters/tumor_radius:175
-tasks:clean,xml,sim,imgProc,upload
+./user_parameters/follower_repulsion:25
+status:in progress
+./user_parameters/leader_motility_mode:true
+./overall/max_time:30
+tasks:clean,xml,sim,imgProc,zip,upload
+computerStrength:1
+./user_parameters/leader_adhesion:7.5
+./user_parameters/leader_repulsion:25
+performedBy:bendugga@iu.edu
