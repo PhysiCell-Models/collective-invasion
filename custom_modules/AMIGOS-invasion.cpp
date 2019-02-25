@@ -512,11 +512,11 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt) // NOT
     // Cell-ECM Fiber realingment
     std::vector<double> ECM_orientation = ecm.ecm_data[ecm_index].ECM_orientation;
     
-    double motility_vector_norm = norm( phenotype.motility.motility_vector );
-    if( motility_vector_norm < 1e-12 )
-    { return; }
-    else        
-    { phenotype.motility.motility_vector /= motility_vector_norm; }
+    // double motility_vector_norm = norm( phenotype.motility.motility_vector );
+    // if( motility_vector_norm < 1e-12 )
+    // { return; }
+    // else        
+    // { phenotype.motility.motility_vector /= motility_vector_norm; }
 
     double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
