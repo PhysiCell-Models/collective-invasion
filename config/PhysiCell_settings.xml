@@ -15,7 +15,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">30</max_time> 
+		<max_time units="min">1200</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>

@@ -10,10 +10,10 @@
 			<user />
 		</software>
 		<citation />
-		<current_time units="min">30.010000</current_time>
-		<current_runtime units="sec">2.996736</current_runtime>
-		<created>2019-02-20T21:13:39Z</created>
-		<last_modified>2019-02-20T21:13:39Z</last_modified>
+		<current_time units="min">1200.010000</current_time>
+		<current_runtime units="sec">214.472602</current_runtime>
+		<created>2019-02-26T22:07:29Z</created>
+		<last_modified>2019-02-26T22:07:29Z</last_modified>
 	</metadata>
 	<microenvironment>
 		<domain name="microenvironment">
@@ -32,6 +32,20 @@
 						<conditions />
 						<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
 						<decay_rate units="1/min">0.100000</decay_rate>
+					</physical_parameter_set>
+				</variable>
+				<variable name="leader signal" units="dimensionless" ID="1">
+					<physical_parameter_set>
+						<conditions />
+						<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
+						<decay_rate units="1/min">1.000000</decay_rate>
+					</physical_parameter_set>
+				</variable>
+				<variable name="follower signal" units="dimensionless" ID="2">
+					<physical_parameter_set>
+						<conditions />
+						<diffusion_coefficient units="micron^2/min">100000.000000</diffusion_coefficient>
+						<decay_rate units="1/min">1.000000</decay_rate>
 					</physical_parameter_set>
 				</variable>
 			</variables>
