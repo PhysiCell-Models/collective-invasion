@@ -367,7 +367,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.0;
+	double leader_cell_fraction = 0.2;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -436,7 +436,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	phenotype.motility.is_motile = true; 
 	phenotype.motility.migration_bias = 0.95;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
-//    std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 	
 	return; 
 }
