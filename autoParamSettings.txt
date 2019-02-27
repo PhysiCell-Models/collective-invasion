@@ -1,41 +1,19 @@
-<<<<<<< HEAD
-id:1
-status:finished
-startTime:2019-02-10 21:55:16
-endTime:2019-02-10 21:55:15
-performedBy:bendugga@iu.edu
-comments:
-tasks:clean,xml,sim,imgProc,upload
-computerStrength:1
-./overall/max_time:120
-./user_parameters/tumor_radius:175
-./user_parameters/enable_ecm_outputs:false
-./user_parameters/initial_density_ecm:0.5
-./user_parameters/leader_adhesion:1.25
-./user_parameters/follower_adhesion:1.25
-./user_parameters/default_cell_speed:0.05
-./user_parameters/leader_motility_mode:true
-./user_parameters/follower_motility_mode:true
-./user_parameters/follower_repulsion:25
-./user_parameters/leader_repulsion:25
-=======
-endTime:
-./user_parameters/follower_adhesion:7.5
-./user_parameters/default_cell_speed:0.05
-comments:
-startTime:2019-02-20 16:13:30
-id:d
-./user_parameters/enable_ecm_outputs:false
-./user_parameters/initial_density_ecm:0.5
-./user_parameters/follower_motility_mode:true
-./user_parameters/tumor_radius:175
-./user_parameters/follower_repulsion:25
+id:5_full_model
 status:in progress
-./user_parameters/leader_motility_mode:true
-./overall/max_time:30
-tasks:clean,xml,sim,imgProc,zip,upload
+startTime:2019-02-26 20:31:23
+endTime:2019-02-23 6:56:29
+performedBy:jpmetzca@iu.edu
+comments:With full model - leaders and ECM ontest possibly crashed
+tasks:clean,xml,sim,imgProc,upload,zip
 computerStrength:1
-./user_parameters/leader_adhesion:7.5
+./overall/max_time:7200
+./user_parameters/tumor_radius:175
+./user_parameters/enable_ecm_outputs:true
+./user_parameters/initial_density_ecm:0.5
+./user_parameters/leader_adhesion:2.5
+./user_parameters/follower_adhesion:2.5
+./user_parameters/default_cell_speed:0.05
+./user_parameters/leader_motility_mode:true
+./user_parameters/follower_motility_mode:true
+./user_parameters/follower_repulsion:25
 ./user_parameters/leader_repulsion:25
-performedBy:bendugga@iu.edu
->>>>>>> 51de266... getting ready for tests
