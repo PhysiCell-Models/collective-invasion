@@ -7,7 +7,7 @@ boxFolderID:68205708427
 boxFolderZipID:68205648241
 removeZip:True
 resetTime:172800
-numOfRuns:1
+numOfRuns:-1
 computerStrength:1
 accessToken:
 refressToken:
