@@ -18,6 +18,7 @@ class Param:
 
         if self.conf['numOfRuns']:
             self.count = 0
+        self.lastParam = None
 
     def requestParameters(self):
         if self.conf['numOfRuns']:
@@ -39,10 +40,12 @@ class Param:
                         records[i]["performedBy"] = self.conf["userName"]
                         self.sheet.update_cell(i, 'performedBy', self.conf["userName"])
 
+                    self.lastParam = records[i]["id"]
+
                     return records[i]
 
         for i in range(0, len(records)):
-            if len(records[i]["status"]) == 0:
+            if len(records[i]["status"]) == 0 and (self.lastParam == None or (not str(records[i]["id"]) == str(self.lastParam))):
                 try:
                     if int(self.conf['computerStrength']) < int(records[i]["computerStrength"]):
                         continue
@@ -58,6 +61,8 @@ class Param:
                 if "performedBy" in records[i]:
                     records[i]["performedBy"] = self.conf["userName"]
                     self.sheet.update_cell(i, 'performedBy', self.conf["userName"])
+
+                self.lastParam = records[i]["id"]
 
                 # Save id to local cache
                 self.config.change_config("lastTest", str(records[i]["id"]))
