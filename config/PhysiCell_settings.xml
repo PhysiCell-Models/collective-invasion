@@ -26,8 +26,8 @@
 		<folder>output</folder>  
 
 		<full_data>
-			<interval units="min">6</interval>
-			<enable>false</enable>
+			<interval units="min">60</interval>
+			<enable>true</enable>
 		</full_data>
 		 
 		<SVG>
@@ -47,9 +47,9 @@
         <tumor_radius type="double">175</tumor_radius>
         <enable_ecm_outputs type="bool">true</enable_ecm_outputs>
         <initial_density_ecm type="double">0.5</initial_density_ecm>
-        <leader_adhesion type="double">2.5</leader_adhesion>
+        <leader_adhesion type="double">1.25</leader_adhesion>
         <leader_repulsion type="double">25</leader_repulsion>
-        <follower_adhesion type="double">2.5</follower_adhesion>
+        <follower_adhesion type="double">1.25</follower_adhesion>
         <follower_repulsion type="double">25</follower_repulsion>
         <default_cell_speed type="double">0.05</default_cell_speed>
         <leader_motility_mode type="bool">true</leader_motility_mode>
