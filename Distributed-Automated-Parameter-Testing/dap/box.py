@@ -112,6 +112,10 @@ class Box:
         self.access_token, self.refresh_token = self.oauth.refresh(access)
         self.client = Client(self.oauth)
         self.refreshTime = time.time() + 60*60
+        if self.config:
+                    self.config.change_config('userName',self.client.user(user_id='me').get()['login']) #Save username to config
+                    self.config.change_config('accessToken',self.access_token) #Save access token to config
+                    self.config.change_config('refressToken',self.refresh_token) #Save refresn token to config
     ''' END - Box upload functions '''
 
 if __name__ == '__main__':
