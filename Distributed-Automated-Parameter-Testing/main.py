@@ -80,7 +80,7 @@ def main():
 
     while True:
         # Check the sheet for any trials that didn't run successfully
-        ap.checkForDBErrors()
+        #ap.checkForDBErrors()
 
         parameters = ap.requestParameters() #Get the next parameter
         if parameters == None:
