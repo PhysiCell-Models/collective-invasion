@@ -5,8 +5,15 @@
 '''
 
 import xml.etree.ElementTree as ET
-import sys,os,platform,zipfile,datetime, time
-import dap
+from autoParam import *
+import sys
+import os
+import platform
+import zipfile
+import datetime
+import time
+#import matlab.engine
+from box import *
 
 def createXML(parameters, offLimits=[]):
     parameters = dict(parameters)
@@ -31,6 +38,10 @@ def dataCleanup(config):
         if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')):
             os.remove(file)
 
+    for file in os.listdir("SVG/"):
+        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
+        os.remove("SVG/" + file)
+
     for file in os.listdir("output/"):
         #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
          os.remove("output/" + file)
@@ -52,6 +63,11 @@ def createZip(parameters):
     # Add individual files
     zip.write('autoParamSettings.txt', compress_type=zipfile.ZIP_DEFLATED)
 
+    # Add files in SVG
+    for folder, subfolders, files in os.walk('SVG/'):
+        for file in files:
+            zip.write(os.path.join(folder, file), 'SVG/'+file, compress_type = zipfile.ZIP_DEFLATED)
+
     # Add files in output
     for folder, subfolders, files in os.walk('output/'):
         for file in files:
@@ -63,15 +79,21 @@ def createZip(parameters):
 
 
 def main():
-    conf = dap.config.Config('Distributed-Automated-Parameter-Testing/config.txt')
-    sheet = dap.sheet.Sheet(conf.config['spreedsheetID'], 'Distributed-Automated-Parameter-Testing/credentials.json')
-    ap = dap.param.Param(conf, sheet)
-    boxy = dap.box.Box(conf)
-    boxy.connect()
+    ap = autoParam()
+    count = 0
+
+    useBox = None
+    while(useBox != "Y" and useBox != "y" and useBox != "n" and useBox != "N"):
+        useBox = input("Do you want to use box (y/n): ")
+    if useBox == "Y" or useBox == "y":
+        useBox = True
+        username = startServer()
+        ap.config['userName'] = username
+        ap.changeConfig()
 
     print("Starting main script")
 
-    while True:
+    while count < int(ap.config["numOfRuns"]) or int(ap.config["numOfRuns"]) == -1:
         # Check the sheet for any trials that didn't run successfully
         ap.checkForDBErrors()
 
@@ -87,7 +109,7 @@ def main():
             if 'clean' in parameters['tasks']:
                 # Reset from the previous run
                 print("Cleaning up folder")
-                dataCleanup(conf.config)
+                dataCleanup(ap.config)
                 ap.updateStatus(parameters['id'], 'clean')
 
             if 'xml' in parameters['tasks']:
@@ -117,7 +139,7 @@ def main():
                 fileName = str(parameters['id']) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + str('.mp4')
                 print(fileName)
                 os.chdir('output/')
-                os.system('mogrify -format png *.svg')
+                os.system('magick mogrify -format png *.svg')
                 movie_run_command_str = str('ffmpeg -framerate 24 -i snapshot%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" ../')
                 movie_run_command_str = movie_run_command_str + fileName
                 os.system(movie_run_command_str)
@@ -133,24 +155,29 @@ def main():
 
             if 'upload' in parameters['tasks']:
                 # Upload zip to box
-                print("Uploading zip to box")
-                print(fileName)
-                if platform.system() == 'Windows':
-                    boxy.uploadFile(conf.config['boxFolderID'], '\\', fileName)
-                else:
-                    boxy.uploadFile(conf.config['boxFolderID'], '/', fileName)
+                if useBox:
+                    print("Uploading zip to box")
+                    print(fileName)
+                    if platform.system() == 'Windows':
+                        uploadFile(ap.config['boxFolderID'], '\\', fileName)
+                    else:
+                        uploadFile(ap.config['boxFolderID'], '/', fileName)
 
-                ap.updateStatus(parameters['id'], 'upload')
+                    ap.updateStatus(parameters['id'], 'upload')
+                else:
+                    print("Cannot upload to box")
 
             # Update sheets to mark the test is finished
             ap.parameterSuccessful(parameters["id"]) #Test completed successfully so we need to mark it as such
-            
+
             # End tests
         except ValueError:
             # Test failed
             print(ValueError)
             print("Test failed")
             ap.parameterFailed(parameters["id"])
+
+        count += 1
 
 if __name__ == '__main__':
     os.chdir("../")

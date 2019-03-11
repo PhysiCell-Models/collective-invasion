@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">120</max_time> 
+		<max_time units="min">5761</max_time>
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -43,17 +43,16 @@
 	<user_parameters>
 	 
 	
-        
-        <tumor_radius type="double">175</tumor_radius>
-        <enable_ecm_outputs type="bool">false</enable_ecm_outputs>
-        <initial_density_ecm type="double">0.5</initial_density_ecm>
-        <leader_adhesion type="double">5</leader_adhesion>
-        <leader_repulsion type="double">25</leader_repulsion>
-        <follower_adhesion type="double">5</follower_adhesion>
-        <follower_repulsion type="double">25</follower_repulsion>
-        <default_cell_speed type="double">0.05</default_cell_speed>
-        <leader_motility_mode type="bool">true</leader_motility_mode>
-        <follower_motility_mode type="bool">true</follower_motility_mode>
+		<tumor_radius type="double">175</tumor_radius>
+		<enable_ecm_outputs type="bool">true</enable_ecm_outputs>
+		<initial_density_ecm type="double">0.5</initial_density_ecm>
+		<leader_adhesion type="double">7.5</leader_adhesion>
+		<leader_repulsion type="double">25</leader_repulsion>
+		<follower_adhesion type="double">7.5</follower_adhesion>
+		<follower_repulsion type="double">25</follower_repulsion>
+		<default_cell_speed type="double">0.25</default_cell_speed>
+		<leader_motility_mode type="bool">true</leader_motility_mode>
+		<follower_motility_mode type="bool">true</follower_motility_mode>
 		
 	</user_parameters>
 	
