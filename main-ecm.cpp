@@ -223,7 +223,7 @@ int main( int argc, char* argv[] )
             // This changes the cell speed and bias as based on the ECM. It is the funciton that makes teh cells "see" the ECM and react to it with changes in their dynamics.
             // In this current LS18 implementation, that means that only follower cells will see the ECM.
             
-            // Need somethign that specifics that only followers do this. Maybe put that into the custom stuff ... Not sure how to do that. Will need somethign similar for the ECM realignment.
+            // May need something that specifics that only followers do this (fixed with test on cell type). Could perhaps put that into the custom stuff. Would need something similar for the ECM realignment. Would like to move this out of diffusion loop so we can specify how frequently it updates.
             
             cell_update_from_ecm();
             
