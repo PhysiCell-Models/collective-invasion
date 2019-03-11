@@ -126,7 +126,7 @@ void create_cell_types( void )
 	// set default motility parameters (even for when off)
 	
 	cell_defaults.phenotype.motility.is_motile = true;
-	cell_defaults.phenotype.motility.persistence_time = 15.0;
+	cell_defaults.phenotype.motility.persistence_time = 0.01;
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 0.90;
@@ -367,7 +367,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.0;
+	double leader_cell_fraction = 0.2;
 	
 	int n = 0; 
 	while( y < tumor_radius )

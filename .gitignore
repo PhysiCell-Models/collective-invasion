@@ -1,6 +1,10 @@
 *.o
 out*.xml
 out*.mat
+final*.xml
+final*.mat
+initial*.xml
+initial*.mat
 *.mp4
 AMIGOS-invasion
 *.pov
