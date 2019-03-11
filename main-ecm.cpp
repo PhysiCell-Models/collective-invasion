@@ -75,7 +75,7 @@
 // custom user modules 
 
 #include "./custom_modules/AMIGOS-invasion.h" 
-#include "./custom_modules/ECM.cpp"
+#include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
 using namespace PhysiCell;
