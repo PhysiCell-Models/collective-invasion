@@ -1,10 +1,10 @@
 id:test_for_cleaning_3
 status:in progress
-startTime:2019-03-11 16:09:41
+startTime:2019-03-11 23:19:32
 endTime:
 performedBy:jpmetzca@indiana.edu
 comments:This ist just a test!!
-tasks:clean,xml,sim
+tasks:clean,xml,sim,imgProc,upload,zip
 computerStrength:1
 ./overall/max_time:720
 ./user_parameters/tumor_radius:175
