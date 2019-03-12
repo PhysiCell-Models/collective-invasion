@@ -456,10 +456,10 @@ void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , doubl
     std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
 
     double ddotf = 0.0;
-	
-	// These two normalizations may not be needed for but the sake of not changing things while gathering data, not eliminating.
 
     normalize(d);
+
+	// may not need normalized
     normalize(f);
 
     // change bias direction
@@ -693,7 +693,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     // Cell-ECM density interaction
     
     double density = ecm.ecm_data[ecm_index].density;
-    double r = 0.0;
+    double r = 1.0;
     
     ecm.ecm_data[ecm_index].density = density + r * dt  * (0.5 - density);
     
