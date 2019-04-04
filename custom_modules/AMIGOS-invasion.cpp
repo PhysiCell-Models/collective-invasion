@@ -268,13 +268,12 @@ void ECM_setup(double numvox)  /// long term - move to ECM.cpp
         
 		// This block of code is to randomly orient the ecm fibers using vector randomization from BioFVM_vector.cpp, line 262
 		//   Pick a random angle from 0 to 2pi and then set components equal to sin(theta) and cos(theta)
-		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
-		ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
-		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
-		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+		// double theta = 6.2831853071795864769252867665590 * random();
+		// // ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+		// // ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+		// // ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 		
-		double buffer_region = 20;
-		
+		// double buffer_region = 20;
 		ecm.ecm_data[i].density = initial_density;
 		
 		// This block of code is used to create an initial density field that is different what the
@@ -292,14 +291,14 @@ void ECM_setup(double numvox)  /// long term - move to ECM.cpp
 		
 		// This block of code is used for orienting the ecm fibers radially outward from the origin
 
-        /* double epsilon = 1E-6;
+        double epsilon = 1E-6;
         double ECM_radius = sqrt(ecm.mesh.voxels[i].center.at(0) * ecm.mesh.voxels[i].center.at(0)
-                                 +ecm.mesh.voxels[i].center.at(1) * ecm.mesh.voxels[i].center.at(1)
+                                 + ecm.mesh.voxels[i].center.at(1) * ecm.mesh.voxels[i].center.at(1)
                                  + ecm.mesh.voxels[i].center.at(2) * ecm.mesh.voxels[i].center.at(2));
 
-        ecm.ecm_data[i].ECM_orientation[0] = ecm.mesh.voxels[i].center[0]/(ECM_radius + epsilon);
-        ecm.ecm_data[i].ECM_orientation[1] = ecm.mesh.voxels[i].center[1]/(ECM_radius + epsilon);
-        ecm.ecm_data[i].ECM_orientation[2] = ecm.mesh.voxels[i].center[2]/(ECM_radius + epsilon); */
+        ecm.ecm_data[i].ECM_orientation[0] = ecm.mesh.voxels[i].center[1]/(ECM_radius + epsilon);
+        ecm.ecm_data[i].ECM_orientation[1] = -1 * ecm.mesh.voxels[i].center[0]/(ECM_radius + epsilon);
+        ecm.ecm_data[i].ECM_orientation[2] = ecm.mesh.voxels[i].center[2]/(ECM_radius + epsilon); 
 
         normalize(ecm.ecm_data[i].ECM_orientation);
         
@@ -374,7 +373,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.2;
+	double leader_cell_fraction = 1.0;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -789,7 +788,7 @@ ECM_DATA::ECM_DATA()
 {
 	density = 0.5;
 	ECM_orientation.resize(3,0.0);
-	anisotropy = 0.0;
+	anisotropy = 1.0;
 	return;
 }
 
