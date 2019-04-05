@@ -177,7 +177,7 @@ void create_cell_types( void )
 
 	// set functions
 	
-	leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
+	leader_cell.functions.update_migration_bias = change_migration_bias_vector_ecm; 
 	
     leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
 	
@@ -375,57 +375,12 @@ void setup_tissue( void )
 	
 	double leader_cell_fraction = 1.0;
 	
-	int n = 0; 
-	while( y < tumor_radius )
+	int n = 0.0; 
+	while( n <= 1000.0 )
 	{
-		x = 0.0; 
-		if( n % 2 == 1 )
-		{ x = 0.5*cell_spacing; }
-		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
-		
-		while( x < x_outer )
-		{
-			if( UniformRandom() < leader_cell_fraction )
-			{ pCell = create_cell(leader_cell); }
-			else
-			{ pCell = create_cell(follower_cell); }
-				
-			pCell->assign_position( x , y , 0.0 );
-
-			
-			if( fabs( y ) > 0.01 )
-			{
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( x , -y , 0.0 );
-			}
-			
-			if( fabs( x ) > 0.01 )
-			{ 
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( -x , y , 0.0 );
-				
-				if( fabs( y ) > 0.01 )
-				{
-					if( UniformRandom() < leader_cell_fraction )
-					{ pCell = create_cell(leader_cell); }
-					else
-					{ pCell = create_cell(follower_cell); }
-                   	
-					pCell->assign_position( -x , -y , 0.0 );
-				}
-			}
-			x += cell_spacing; 
-			
-		}
-		
-		y += cell_spacing * sqrt(3.0)/2.0; 
-		n++; 
+		pCell = create_cell(leader_cell); 
+		pCell->assign_position( n , 0.0 , 0.0 );
+		n = n + 50,0;
 	}
 		
 	return; 
@@ -437,7 +392,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	
 	phenotype.motility.is_motile = true; 
-	phenotype.motility.migration_bias = 0.95;
+	phenotype.motility.migration_bias = 1.0;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
 
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
