@@ -177,7 +177,7 @@ void create_cell_types( void )
 
 	// set functions
 	
-	leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
+	leader_cell.functions.update_migration_bias = change_migration_bias_vector_ecm; 
 	
     leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
 	
@@ -374,59 +374,14 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.2;
+	double leader_cell_fraction = 1.0;
 	
-	int n = 0; 
-	while( y < tumor_radius )
+	int n = -1500.0; 
+	while( n < 1500.0 )
 	{
-		x = 0.0; 
-		if( n % 2 == 1 )
-		{ x = 0.5*cell_spacing; }
-		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
-		
-		while( x < x_outer )
-		{
-			if( UniformRandom() < leader_cell_fraction )
-			{ pCell = create_cell(leader_cell); }
-			else
-			{ pCell = create_cell(follower_cell); }
-				
-			pCell->assign_position( x , y , 0.0 );
-
-			
-			if( fabs( y ) > 0.01 )
-			{
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( x , -y , 0.0 );
-			}
-			
-			if( fabs( x ) > 0.01 )
-			{ 
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( -x , y , 0.0 );
-				
-				if( fabs( y ) > 0.01 )
-				{
-					if( UniformRandom() < leader_cell_fraction )
-					{ pCell = create_cell(leader_cell); }
-					else
-					{ pCell = create_cell(follower_cell); }
-                   	
-					pCell->assign_position( -x , -y , 0.0 );
-				}
-			}
-			x += cell_spacing; 
-			
-		}
-		
-		y += cell_spacing * sqrt(3.0)/2.0; 
-		n++; 
+		pCell = create_cell(leader_cell); 
+		pCell->assign_position( -1400.0 , n , 0.0 );
+		n = n + 10.0;
 	}
 		
 	return; 
@@ -438,7 +393,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	
 	phenotype.motility.is_motile = true; 
-	phenotype.motility.migration_bias = 0.95;
+	phenotype.motility.migration_bias = 0.5;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
 
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
@@ -476,17 +431,11 @@ void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , doubl
         }
     }
 
-    for( int i=0; i < d.size() ; i++ )
-    {
-
-		// If highly uniformly aligned (high anisotropy), bias direction is very influenced by fiber direction
-
-        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
-    }
+   	pCell->phenotype.motility.migration_bias_direction[0] = 1.0;
+   	pCell->phenotype.motility.migration_bias_direction[1] = 0.0;
+    pCell->phenotype.motility.migration_bias_direction[2] = 0.0;
 
     normalize(pCell->phenotype.motility.migration_bias_direction);
-    
-    phenotype.motility.migration_bias = a;
 
     return;
 }
@@ -719,7 +668,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     
     // START HERE! Double check math as well as if time step is working!
 
-    /* for( int i=0; i < phenotype.motility.motility_vector.size() ; i++ )
+     for( int i=0; i < phenotype.motility.motility_vector.size() ; i++ )
     {
         double temp = ECM_orientation[i] + dt * (r_realignment * (ECM_orientation[i] - phenotype.motility.motility_vector[i]));
        	// std::cout<<temp<<std::endl<<std::endl;
@@ -728,7 +677,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 		// Make sure each vector component of the ecm orientation is going the same direction as its corresponding component of the cell's motility vector
 		if(ecm.ecm_data[ecm_index].ECM_orientation[i] * phenotype.motility.motility_vector[i] < 0.0)
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
-    } */
+    } 
 
 	double ddotf;
 	std::vector<double> temp;
@@ -789,7 +738,7 @@ ECM_DATA::ECM_DATA()
 {
 	density = 0.5;
 	ECM_orientation.resize(3,0.0);
-	anisotropy = 0.0;
+	anisotropy =0.0;
 	return;
 }
 
@@ -900,10 +849,15 @@ void change_migration_bias_vector_ecm(Cell* pCell)
         }
     }
 
-    for( int i=0; i < d.size() ; i++ )
-    {
-        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
-    }
+    // for( int i=0; i < d.size() ; i++ )
+    // {
+    //     pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
+    //     pCell->phenotype.motility.migration_bias_direction[0] = 1;
+    // }
+
+    pCell->phenotype.motility.migration_bias_direction[0] = 1.0;
+   	pCell->phenotype.motility.migration_bias_direction[1] = 0.0;
+    pCell->phenotype.motility.migration_bias_direction[2] = 0.0;
 
     normalize(pCell->phenotype.motility.migration_bias_direction);
 
