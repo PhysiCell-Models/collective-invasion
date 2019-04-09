@@ -1,0 +1,32 @@
+New Model Specs:
+-Keep our model for updating speed
+-Change everything else to what Dr Macklin has
+-Model from presentation has no chemotactic influence. We'll add this
+by computing it separately based on existing code, and using a new 
+sensitivity variable to tune how much to listen to that.
+-Keep ECM file writing function. It'll need to be changed though
+because ECM is now a microenvironment density, like oxygen, so
+we need to access the ECM stats differently. (see powerpoint for that)
+-Need to update Makefile (probably) to reflect new changes.
+-Need to change ECM field initiation. Current code from new model
+has ECM density permanently 0 outside of a 200x200 voxel square in
+the center of the mesh.
+
+Questions About New Model:
+-What is the initial density value for the areas not zeroed manually?
+-How is this density updated?
+
+Steps to Answer These Questions:
+-Make changing the ECM data to file printing function a first step after
+integrating Dr Macklin's code as is. Then, let's graph the density using
+a heatmap in matlab and see what the field looks like. This will also
+give us insight into if the ECM density is being changed at all.
+-Look into user guide about how microenvironment density things (like O2)
+are updated/decay.
+
+Possible Problems:
+-It seems like the ECM density should decay, given that it is a
+microenvironment density thing like oxygen, but I really don't think
+the fiber alignment is being updated by the cells at all, so we lose
+the two way interaction of our previous model. That would need to be added
+somehow.
