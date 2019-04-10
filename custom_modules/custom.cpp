@@ -213,6 +213,7 @@ void ECM_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	// sample ECM 
 	double ECM = pCell->nearest_density_vector()[nECM]; 
+	std::cout << std::endl << "Density = " << ECM << std::endl;
 	phenotype.motility.migration_speed = pCell->custom_data[nMaxSpeed]*ECM*(1-ECM)*4.0; 
 	
 	return; 
@@ -309,4 +310,45 @@ void ECM_motility_aligned_faster( Cell* pCell, Phenotype& phenotype, double dt )
 
 	phenotype.motility.migration_speed = pCell->custom_data[nMaxSpeed]*ECM*(1-ECM)*4.0; 
 	return; 
+}
+
+
+void write_ECM_Data_matlab( std::string filename )
+
+{
+	static int nECM = microenvironment.find_density_index( "ECM" );
+	
+	double density = 0;
+
+    int number_of_data_entries = microenvironment.number_of_voxels();
+	
+    int size_of_each_datum = 4;
+
+    FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
+
+    for( int i=0; i < number_of_data_entries ; i++ )
+
+    {
+		density = microenvironment(i)[nECM];
+
+	    fwrite( (char*) &( ecm.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
+
+        fwrite( (char*) &( ecm.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
+
+        fwrite( (char*) &( ecm.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
+		
+		fwrite( (char*) &( density ), sizeof(double) , 1 , fp ); // 4
+
+        // current voxel index of cell
+
+    }
+
+
+
+    fclose( fp );
+
+
+
+    return;
+
 }
