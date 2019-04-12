@@ -44,7 +44,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := AMIGOS-invasion.o
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -133,8 +133,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-AMIGOS-invasion.o: ./custom_modules/AMIGOS-invasion.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion.cpp
+custom.o: ./custom_modules/custom.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 # cleanup
 
@@ -153,7 +153,12 @@ data-cleanup:
 	rm -f *.xml
 	rm -f *.svg
 	rm -f *.pov
-	rm -f ./Output/*
+	rm -f ./output/*.mat
+	rm -f ./output/*.xml
+	rm -f ./output/*.svg
+	rm -f ./output/*.pov
+	rm -f ./output/*.tx
+	rm -f ./output/*.avi
 	rm -f ./SVG/*
 
 # archival 

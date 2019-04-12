@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">120</max_time> 
+		<max_time units="min">1440</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -54,6 +54,7 @@
         <default_cell_speed type="double">0.05</default_cell_speed>
         <leader_motility_mode type="bool">true</leader_motility_mode>
         <follower_motility_mode type="bool">true</follower_motility_mode>
+		<max_migration_speed type="double">1.0</max_migration_speed>
 		
 	</user_parameters>
 	

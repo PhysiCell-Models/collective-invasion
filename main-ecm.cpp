@@ -75,7 +75,6 @@
 // custom user modules 
 
 #include "./custom_modules/custom.h" 
-#include "./custom_modules/custom.cpp"
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -142,12 +141,12 @@ int main( int argc, char* argv[] )
 	//std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
 
-	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
+	sprintf( filename , "%s/initiRUNal.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	display_citations(); 
 	
-	run_biotransport( 5.0 ); 
+	//run_biotransport( 5.0 ); 
 	
 	// set the performance timers 
 

@@ -97,3 +97,7 @@ void ECM_motility( Cell* pCell, Phenotype& phenotype, double dt );
 void ECM_motility_aligned( Cell* pCell, Phenotype& phenotype, double dt );
 void ECM_motility_aligned_faster( Cell* pCell, Phenotype& phenotype, double dt );
 
+void write_ECM_Data_matlab( std::string filename );
+
+void run_biotransport( double t_max );
+

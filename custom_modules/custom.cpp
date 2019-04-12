@@ -75,7 +75,7 @@ std::vector< std::vector<double> > ECM_fiber_alignment;
 
 void create_cell_types( void )
 {
-	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
+	SeedRandom( 0.595959);//parameters.ints("random_seed") ); // or specify a seed here 
 
 	// housekeeping 
 	initialize_default_cell_definition();
@@ -114,13 +114,24 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
 	
 	// add custom data here, if any 
+
+	/*************************************Start of custom code here***********************************************/
+
+	/**First thing we'll do is allow cells to "uptake" the ECM to simulate decay**/
+
+	int ecm_index = microenvironment.find_density_index("ECM");
+
+	/***********************We'll need to play around with this, but for now just set it to the same uptake rate as O2*********************/
+	cell_defaults.phenotype.secretion.uptake_rates[ecm_index] = 10;
+
+
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 
-		parameters.doubles( "max_migration_speed") ); 
+	parameters.doubles( "max_migration_speed") ); 
 	
 	// enable motility 
 	cell_defaults.phenotype.motility.is_motile = true; 
-	cell_defaults.phenotype.motility.persistence_time = parameters.doubles( "migration_persistence_time" ); // 15.0; 
-	cell_defaults.phenotype.motility.migration_speed = parameters.doubles( "max_migration_speed" ); // 0.25 micron/minute 
+	//cell_defaults.phenotype.motility.persistence_time = parameters.doubles( "migration_persistence_time" ); // 15.0; 
+	//cell_defaults.phenotype.motility.migration_speed = parameters.doubles( "max_migration_speed" ); // 0.25 micron/minute 
 	cell_defaults.phenotype.motility.migration_bias = 0.0;// completely random 
 	
 	// Set birth and death rates to zero 
@@ -331,11 +342,11 @@ void write_ECM_Data_matlab( std::string filename )
     {
 		density = microenvironment(i)[nECM];
 
-	    fwrite( (char*) &( ecm.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
+	    fwrite( (char*) &( microenvironment.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
 
-        fwrite( (char*) &( ecm.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
+        fwrite( (char*) &( microenvironment.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
 
-        fwrite( (char*) &( ecm.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
+        fwrite( (char*) &( microenvironment.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
 		
 		fwrite( (char*) &( density ), sizeof(double) , 1 , fp ); // 4
 
@@ -351,4 +362,37 @@ void write_ECM_Data_matlab( std::string filename )
 
     return;
 
+}
+
+void run_biotransport( double t_max )
+{
+	std::cout << "working on initial conditions .. " << std::endl; 
+	double t = 0.0;
+	
+	// make sure the associated cell has the correct rate vectors 
+	
+	for( int i=0 ; i < (*all_cells).size() ; i++ )
+	{
+		Cell* pCell = (*all_cells)[i];
+		
+//			pCell->secretion_rates = &secretion_rates; 
+//			pCell->uptake_rates = &uptake_rates; 
+//			pCell->saturation_densities = &saturation_densities; 
+			
+			pCell->set_total_volume( pCell->phenotype.volume.total ); 
+			pCell->set_internal_uptake_constants( diffusion_dt );
+	}
+	
+	while( t < t_max )
+	{
+		microenvironment.simulate_diffusion_decay( diffusion_dt );
+		#pragma omp parallel for 
+		for( int i=0 ; i < (*all_cells).size() ; i++ )
+		{
+			(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i] , (*all_cells)[i]->phenotype , diffusion_dt ) ;
+		}
+		t += diffusion_dt; 
+	}
+	std::cout << "done!" << std::endl; 
+	return; 
 }
