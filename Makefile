@@ -162,9 +162,16 @@ data-cleanup:
 	rm -f ./output/*.png
 	rm -f ./SVG/*
 
-output_movie:
-	mencoder mf://./output/*.png -mf w=800:h=600:fps=5:type=png -ovc lavc \
-		-lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o ./output/output.avi
+density_movie:
+	mencoder mf://./output/output*.png -mf w=800:h=600:fps=5:type=png -ovc lavc \
+		-lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o ./output/density_output.avi
+
+svg_to_png:
+	magick mogrify -format png ./output/snap*.svg
+
+snapshot_movie:
+	mencoder mf://./output/snap*.png -mf w=800:h=600:fps=20:type=png -ovc lavc \
+		-lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o ./output/cells_output.avi
 
 density_maps:
 	matlab -nodisplay -nosplash -nodesktop -r "run('./output/create_heat_maps.m');exit;" | tail -n +11

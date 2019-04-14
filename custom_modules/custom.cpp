@@ -188,7 +188,8 @@ void setup_microenvironment( void )
 	{
 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 		normalize( position ); 
-		ECM_fiber_alignment[n] = { -position[1],position[0],0}; // position; 
+		ECM_fiber_alignment[n] =  { position[0],position[1],0};
+		//Paul's initial position { -position[1],position[0],0}; // position; 
 	}
 	
 	return; 
@@ -205,7 +206,7 @@ void setup_tissue( void )
 		pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
 	}*/
 
-	/******************************************Spheroid initialization***************************************/
+	/******************************************2D Spheroid initialization***************************************/
 
 	//Get tumor radius from XML parameters
 	double tumor_radius = parameters.doubles("tumor_radius");
@@ -268,6 +269,11 @@ void setup_tissue( void )
 		n++; 
 	}
 		
+
+	/******************************************3D Spheroid initialization***************************************/
+
+	/*To come later*/
+
 	return; 
 }
 
@@ -331,9 +337,30 @@ void ECM_motility_aligned( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	double sensitivity = 1.0; 
 	double theta = a*sensitivity; 
+
+	std::vector<double> new_migration_bias_direction = (1.0-theta)*c_1*d_perp + c_2*f;
+	normalize( new_migration_bias_direction ); 
+
+	/****************************************Add in influence of chemotaxis here****************************************/
+	//No clue if this next part is right. I just structured it off of the above code for finding new migration_bias_direction with
+	//random influence + ECM influence.
+
+	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
+	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
+	normalize(chemotaxis_grad);
+
+	//part of new_migration_bias_direction perpendicular to O2 gradient 
+	std::vector<double> c_perp = new_migration_bias_direction - dot_product(new_migration_bias_direction,chemotaxis_grad)*chemotaxis_grad;
+	normalize( c_perp );
+
+	double c_3 = dot_product( new_migration_bias_direction , c_perp ); 
+	double c_4 = dot_product( new_migration_bias_direction, chemotaxis_grad ); 
 	
-	phenotype.motility.migration_bias_direction = (1.0-theta)*c_1*d_perp + c_2*f;
+	double chemotaxis_sensitivity = 0.5;
+
+	phenotype.motility.migration_bias_direction = (1.0 - chemotaxis_sensitivity)*c_3*c_perp + c_4*chemotaxis_grad;
 	normalize( phenotype.motility.migration_bias_direction ); 
+
 	phenotype.motility.migration_bias = parameters.doubles( "cell_bias" );
 
 	phenotype.motility.migration_speed = (pCell->custom_data[nMaxSpeed]) * ECM * (1-ECM) * 4.0; 
