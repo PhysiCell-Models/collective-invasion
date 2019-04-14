@@ -196,12 +196,76 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	Cell* pC;
+	/*******************************************Random initialization****************************************/
+	/*Cell* pC;
 	
 	for( int n = 0 ; n < 200 ; n++ )
 	{
 		pC = create_cell(); 
 		pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
+	}*/
+
+	/******************************************Spheroid initialization***************************************/
+
+	//Get tumor radius from XML parameters
+	double tumor_radius = parameters.doubles("tumor_radius");
+	double cell_radius = cell_defaults.phenotype.geometry.radius;
+    //double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
+    //double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+    
+    double cell_spacing = 0.95 * 2.0 * cell_radius;//(1 - sqrt_adhesion_to_repulsion_ratio);
+    //cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
+	
+    std::cout<<2*cell_radius<<std::endl;
+    std::cout<<cell_spacing<<std::endl;
+    std::cout<<cell_spacing/(2*cell_radius)<<std::endl;
+    
+	Cell* pCell = NULL; 
+	
+	double x = 0.0;
+	double x_outer = tumor_radius; 
+	double y = 0.0;
+	
+	//double leader_cell_fraction = 0.2;
+	
+	int n = 0; 
+	while( y < tumor_radius )
+	{
+		x = 0.0; 
+		if( n % 2 == 1 )
+		{ x = 0.5*cell_spacing; }
+		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+		
+		while( x < x_outer )
+		{
+			pCell = create_cell();
+				
+			pCell->assign_position( x , y , 0.0 );
+
+			
+			if( fabs( y ) > 0.01 )
+			{
+				pCell = create_cell();
+				pCell->assign_position( x , -y , 0.0 );
+			}
+			
+			if( fabs( x ) > 0.01 )
+			{ 
+				pCell = create_cell();
+				pCell->assign_position( -x , y , 0.0 );
+				
+				if( fabs( y ) > 0.01 )
+				{
+					pCell = create_cell();
+					pCell->assign_position( -x , -y , 0.0 );
+				}
+			}
+			x += cell_spacing; 
+			
+		}
+		
+		y += cell_spacing * sqrt(3.0)/2.0; 
+		n++; 
 	}
 		
 	return; 
