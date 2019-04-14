@@ -2,7 +2,7 @@
 %output...ECM.mat files are
 
 clear all
-for i = 0:240
+for i = 0:24
     filename1 = sprintf('output%08u_ECM.mat', i) ;
     DATA1 = read_ecm_data(filename1);
     h1 = figure();set(gcf,'Visible', 'off');

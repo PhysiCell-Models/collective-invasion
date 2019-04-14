@@ -159,6 +159,7 @@ data-cleanup:
 	rm -f ./output/*.pov
 	rm -f ./output/*.tx
 	rm -f ./output/*.avi
+	rm -f ./output/*.png
 	rm -f ./SVG/*
 
 # archival 
