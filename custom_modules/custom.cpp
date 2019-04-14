@@ -122,7 +122,7 @@ void create_cell_types( void )
 	int ecm_index = microenvironment.find_density_index("ECM");
 
 	/***********************We'll need to play around with this, but for now just set it to the same uptake rate as O2*********************/
-	cell_defaults.phenotype.secretion.uptake_rates[ecm_index] = 10;
+	cell_defaults.phenotype.secretion.uptake_rates[ecm_index] = parameters.doubles("ecm_uptake_rate");
 
 
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 
@@ -130,8 +130,8 @@ void create_cell_types( void )
 	
 	// enable motility 
 	cell_defaults.phenotype.motility.is_motile = true; 
-	//cell_defaults.phenotype.motility.persistence_time = parameters.doubles( "migration_persistence_time" ); // 15.0; 
-	//cell_defaults.phenotype.motility.migration_speed = parameters.doubles( "max_migration_speed" ); // 0.25 micron/minute 
+	cell_defaults.phenotype.motility.persistence_time = 15.0; //parameters.doubles( "migration_persistence_time" ); // 15.0; 
+	cell_defaults.phenotype.motility.migration_speed = 0.25; //parameters.doubles( "max_migration_speed" ); // 0.25 micron/minute 
 	cell_defaults.phenotype.motility.migration_bias = 0.0;// completely random 
 	
 	// Set birth and death rates to zero 
@@ -170,7 +170,7 @@ void setup_microenvironment( void )
 	// set up ECM profile
 	int nECM = microenvironment.find_density_index( "ECM" ); 
 	int nECM_A = microenvironment.find_density_index( "ECM anisotropy" ); 
-	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
+	/*for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 		if( fabs( position[0] ) > 200 || fabs( position[1] ) > 200 )
@@ -178,7 +178,7 @@ void setup_microenvironment( void )
 			microenvironment(n)[nECM] = 0.0; 
 			microenvironment(n)[nECM_A] = 1.0; 
 		}
-	}
+	}*/
 	
 	// set up ECM alignment 
 	std::vector<double> fiber_direction = { 1.0 , 0.0, 0.0 }; 
@@ -225,7 +225,7 @@ void ECM_motility( Cell* pCell, Phenotype& phenotype, double dt )
 	// sample ECM 
 	double ECM = pCell->nearest_density_vector()[nECM]; 
 	std::cout << std::endl << "Density = " << ECM << std::endl;
-	phenotype.motility.migration_speed = pCell->custom_data[nMaxSpeed]*ECM*(1-ECM)*4.0; 
+	phenotype.motility.migration_speed = (pCell->custom_data[nMaxSpeed]) * ECM * (1-ECM) *4.0; 
 	
 	return; 
 }
@@ -270,9 +270,9 @@ void ECM_motility_aligned( Cell* pCell, Phenotype& phenotype, double dt )
 	
 	phenotype.motility.migration_bias_direction = (1.0-theta)*c_1*d_perp + c_2*f;
 	normalize( phenotype.motility.migration_bias_direction ); 
-	phenotype.motility.migration_bias = 1.0; 
+	phenotype.motility.migration_bias = parameters.doubles( "cell_bias" );
 
-	phenotype.motility.migration_speed = pCell->custom_data[nMaxSpeed]*ECM*(1-ECM)*4.0; 
+	phenotype.motility.migration_speed = (pCell->custom_data[nMaxSpeed]) * ECM * (1-ECM) * 4.0; 
 	return; 
 }
 
