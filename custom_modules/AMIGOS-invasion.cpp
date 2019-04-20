@@ -152,7 +152,8 @@ void create_cell_types( void )
 	// Obviously missing - add later
     
 	// 10% proliferation 
-    leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
+    leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
+    leader_cell.phenotype.death.rates[apoptosis_index] = 0.0;
     
 	// Temperarily eliminating leader/follower signal	
 	
@@ -273,7 +274,7 @@ void ECM_setup(double numvox)  /// long term - move to ECM.cpp
 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 		
-		double buffer_region = 20;
+		// double buffer_region = 20;
 		
 		ecm.ecm_data[i].density = initial_density;
 		
@@ -377,10 +378,10 @@ void setup_tissue( void )
 	double leader_cell_fraction = 1.0;
 	
 	int n = -1500.0; 
-	while( n < 1500.0 )
+	while( n <= 1500.0 )
 	{
 		pCell = create_cell(leader_cell); 
-		pCell->assign_position( -1400.0 , n , 0.0 );
+		pCell->assign_position( -1450.0 , n , 0.0 );
 		n = n + 10.0;
 	}
 		
@@ -536,7 +537,7 @@ void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt
 	double pO2 = (pCell->nearest_density_vector())[oxygen_i]; // PhysiCell_constants::oxygen_index]; 
 	
 	// set death and birth 
-	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt); 
+	// update_cell_and_death_parameters_O2_based(pCell,phenotype,dt); 
 
 	// ALWAYS MOTILE
 
@@ -738,7 +739,7 @@ ECM_DATA::ECM_DATA()
 {
 	density = 0.5;
 	ECM_orientation.resize(3,0.0);
-	anisotropy =0.0;
+	anisotropy = 0.0;
 	return;
 }
 
@@ -794,6 +795,11 @@ void cell_update_from_ecm( void )
         change_speed_ecm(pCell); // As long as density is set to 0.5, this will have no impact on cell speed
         change_migration_bias_vector_ecm(pCell);
 		change_bias_ecm(pCell);
+
+		// if (pCell->position[0] > 1490.0)
+		// {
+		// 	reset_cell_position();
+		// }
 	}
 	return;
 }
@@ -862,6 +868,19 @@ void change_migration_bias_vector_ecm(Cell* pCell)
     normalize(pCell->phenotype.motility.migration_bias_direction);
 
      return;
+}
+
+void reset_cell_position( void )
+{
+	int n = -1500.0;
+
+	for(int i = 0; i < (*all_cells).size(); i++)
+	{
+		Cell* pCell = (*all_cells)[i];
+		pCell->assign_position( -1450.0 , n , 0.0 );
+		n = n + 10.0;
+	}
+		
 }
 
     

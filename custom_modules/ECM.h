@@ -40,6 +40,7 @@ void change_migration_bias_vector_ecm(Cell* pCell);
 void change_bias_ecm(Cell* pCell);
 void ecm_update_from_cell(double numvox, double dt);
 void change_ecm_density(int ecm_index, double dt);
+void reset_cell_position(void);
 
 void write_ECM_Data_matlab( std::string filename );
 
