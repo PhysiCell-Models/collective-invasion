@@ -152,7 +152,8 @@ void create_cell_types( void )
 	// Obviously missing - add later
     
 	// 10% proliferation 
-    leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
+    leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
+    leader_cell.phenotype.death.rates[apoptosis_index] = 0.0;
     
 	// Temperarily eliminating leader/follower signal	
 	
@@ -380,7 +381,7 @@ void setup_tissue( void )
 	{
 		pCell = create_cell(leader_cell); 
 		pCell->assign_position( n , 0.0 , 0.0 );
-		n = n + 50,0;
+		n = n + 20.0;
 	}
 		
 	return; 
@@ -541,7 +542,7 @@ void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt
 	double pO2 = (pCell->nearest_density_vector())[oxygen_i]; // PhysiCell_constants::oxygen_index]; 
 	
 	// set death and birth 
-	update_cell_and_death_parameters_O2_based(pCell,phenotype,dt); 
+	// update_cell_and_death_parameters_O2_based(pCell,phenotype,dt); 
 
 	// ALWAYS MOTILE
 
