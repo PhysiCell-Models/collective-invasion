@@ -134,7 +134,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 custom.o: ./custom_modules/custom.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion.cpp
 
 # cleanup
 
