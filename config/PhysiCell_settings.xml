@@ -44,7 +44,7 @@
 	 
 	
         
-        <tumor_radius type="double">50</tumor_radius>
+        <tumor_radius type="double">150</tumor_radius>
         <enable_ecm_outputs type="bool">true</enable_ecm_outputs>
         <initial_density_ecm type="double">0.5</initial_density_ecm>
         <leader_adhesion type="double">1.25</leader_adhesion>

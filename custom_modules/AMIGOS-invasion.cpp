@@ -135,8 +135,8 @@ void create_cell_types( void )
 	cell_defaults.phenotype.motility.persistence_time = 0.01;
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	cell_defaults.phenotype.motility.migration_bias = 0.90;
-	cell_defaults.functions.update_migration_bias = ECM_informed_motility_update; 
+	cell_defaults.phenotype.motility.migration_bias = 0.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
+	cell_defaults.functions.update_migration_bias = ECM_informed_motility_update; // NEW!
 	// add custom data 
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
@@ -497,6 +497,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
+	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	// static double vmax = parameters.doubles("default_cell_speed"); // Could go into a custom variable instead if cells have different default speeds ... 
 	
 	// sample ECM 
@@ -504,6 +505,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
 	int n = pCell->get_current_voxel_index();
 	std::vector<double> f = ECM_fiber_alignment[n];
+	std::vector<double> d_mot_previous = phenotype.motility.migration_bias_direction;
 	
 	/****************************************Begin new migration direction update****************************************/
 
@@ -511,45 +513,77 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	// (note - there is NO memeory of previous direction in this model - previous ECM-based motility used the current 
 	// velocity vector to build off, not a random one - this could produce divergent behaviors between models)
 
-	double angle = UniformRandom() * 6.283185307179586;
-	std::vector<double> d_mot = { cos(angle) , sin(angle) , 0.0 }; 
-	
-	// Determine ECM component of future motility direction based on new random direction:
-	
-	// part of d_mot that is perpendicular to f; 
-	std::vector<double> d_perp = d_mot - dot_product(d_mot,f)*f; 
+	// Can I rewrite this to use the previous directio ninstead of just random ... ?
+	// Yes - you could get d_perp from d_mot_previous instead getting d_ECM, and then do a linear combination of d_random, d_ECM, and d_chemo
+	// BUT - should d_ECM be updated everytime it switches voxels??? Sure but at 0.1 updates BUT update_migration_bias only happens when called by the persistence time.
+	// So if persistence time is low, this works ... 
+
+	// if we don't use the previous direction, why not just blend all three??? I don't konw that we need this fancy stuff if we aren't trying to make a composite, right?
+	// Write it out both ways in notes ... 
+
+	// Normal chemo taxis is just a linear combination of a gradient vector and a random vector. So yeah - pretty sure no point in doing the fancy stuff if their isn't
+	// some memory in the cell. 
+
+	// AND if we are oing to put random motiltiy into this function, we need to disable the bit of random motility or it will be double random. CHECK THIS OUTTT!!
+
+	// get ECM influenced direction from previous direction and ECM fiber direction
+
+	std::vector<double> d_perp = d_mot_previous - dot_product(d_mot_previous,f)*f; 
 	normalize( d_perp ); 
 	
-	double c_1 = dot_product( d_mot , d_perp ); 
-	double c_2 = dot_product( d_mot, f ); 
-	
-	double sensitivity = 1.0; 
-	double theta = a*sensitivity; 
+	// part of d_mot_previous that is perpendicular to f; 
 
-	std::vector<double> new_migration_bias_direction = (1.0-theta)*c_1*d_perp + c_2*f;
+	double c_1 = dot_product( d_mot_previous , d_perp ); 
+	double c_2 = dot_product( d_mot_previous, f ); 
+	
+	std::vector<double> ecm_influenced_motility_direction = c_1*d_perp + c_2*f;
+
+	normalize( ecm_influenced_motility_direction ); 
+
+	// get random vector to blend into ECM and chemotaxis vectors
+
+	double angle = UniformRandom() * 6.283185307179586;
+	std::vector<double> random_vector = { cos(angle) , sin(angle) , 0.0 }; 
+
+	// get vector for chemotaxis
+
+	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
+	normalize(chemotaxis_grad);  // needed???
+
+	// finally, combine them using anisotropy for the bias for ECM influence, s for senstitiy to chemotaxis and the balance for random???
+	
+	static double eps = 0.000000000001;
+	double sensitivity_chemotaxis = 1.0; // consider putting in as custom data
+	double sensitivity_ECM = 1.0; // consider putting in as custom data
+	double ecm_bias = sensitivity_ECM * a / (a + sensitivity_chemotaxis + eps);
+	double chemotaxis_bias = sensitivity_chemotaxis / (a + sensitivity_chemotaxis + eps);
+	double random_bias = 1 - ecm_bias - chemotaxis_bias;
+
+	std::vector<double> new_migration_bias_direction = random_bias * random_vector + ecm_bias * ecm_influenced_motility_direction + chemotaxis_bias * chemotaxis_grad;
+
 	normalize( new_migration_bias_direction ); 
 
 	/****************************************Add in influence of chemotaxis here****************************************/
 	//No clue if this next part is right. I just structured it off of the above code for finding new migration_bias_direction with
 	//random influence + ECM influence.
 
-	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
-	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
-	normalize(chemotaxis_grad);
+	// static int o2_index = microenvironment.find_density_index( "oxygen" ); 
+	// std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
+	// normalize(chemotaxis_grad);
 
-	//part of new_migration_bias_direction perpendicular to O2 gradient 
-	std::vector<double> c_perp = new_migration_bias_direction - dot_product(new_migration_bias_direction,chemotaxis_grad)*chemotaxis_grad;
-	normalize( c_perp );
+	// //part of new_migration_bias_direction perpendicular to O2 gradient 
+	// std::vector<double> c_perp = new_migration_bias_direction - dot_product(new_migration_bias_direction,chemotaxis_grad)*chemotaxis_grad;
+	// normalize( c_perp );
 
-	double c_3 = dot_product( new_migration_bias_direction , c_perp ); 
-	double c_4 = dot_product( new_migration_bias_direction, chemotaxis_grad ); 
+	// double c_3 = dot_product( new_migration_bias_direction , c_perp ); 
+	// double c_4 = dot_product( new_migration_bias_direction, chemotaxis_grad ); 
 	
-	double chemotaxis_sensitivity = 0.5;
+	// double chemotaxis_sensitivity = 0.5;
 
-	phenotype.motility.migration_bias_direction = (1.0 - chemotaxis_sensitivity)*c_3*c_perp + c_4*chemotaxis_grad;
-	normalize( phenotype.motility.migration_bias_direction ); 
+	// phenotype.motility.migration_bias_direction = (1.0 - chemotaxis_sensitivity)*c_3*c_perp + c_4*chemotaxis_grad;
+	// normalize( phenotype.motility.migration_bias_direction ); 
 
-	phenotype.motility.migration_bias = parameters.doubles( "cell_bias" );
+	phenotype.motility.migration_bias = 1.0; // parameters.doubles( "cell_bias" ); // just set to one???
 
 	// END cell migration vector update
 
@@ -576,51 +610,6 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 	
 	return; 
-}
-
-void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt )
-{
-
-    int ecm_index =  pCell->get_current_voxel_index();
-    double a = ecm.ecm_data[ecm_index].anisotropy;
-    
-    std::vector<double> d = pCell->phenotype.motility.motility_vector; 
-    std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
-
-    double ddotf = 0.0;
-
-    normalize(d);
-
-	// may not need normalized
-    normalize(f);
-
-    // change bias direction
-    for( int i=0; i < d.size() ; i++ )
-    {
-        ddotf += d[i] * f[i];
-    }
-
-    if(ddotf < 0.0)
-    {
-        for( int i=0; i< f.size(); i++)
-        {
-            f[i] *= -1.0;
-        }
-    }
-
-    for( int i=0; i < d.size() ; i++ )
-    {
-
-		// If highly uniformly aligned (high anisotropy), bias direction is very influenced by fiber direction
-
-        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
-    }
-
-    normalize(pCell->phenotype.motility.migration_bias_direction);
-    
-    phenotype.motility.migration_bias = a;
-
-    return;
 }
 
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) 
@@ -821,26 +810,25 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
     int ecm_index = pCell->get_current_voxel_index();
+	
+
+	// Find correct fields
+	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
     
     // Cell-ECM density interaction
-    
-    double density = ecm.ecm_data[ecm_index].density;
+    double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
     double r = 1.0;
     
-    ecm.ecm_data[ecm_index].density = density + r * dt  * (0.5 - density);
+    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (0.5 - ECM_density);
     
     // END Cell-ECM density interaction
     
     // Cell-ECM Fiber realingment
+	int n = pCell->get_current_voxel_index();
+	std::vector<double> ECM_orientation = ECM_fiber_alignment[n];
 
-    std::vector<double> ECM_orientation = ecm.ecm_data[ecm_index].ECM_orientation;
-
-	// 	// FIX ME!!!!
-
-	// { phenotype.motility.motility_vector /= motility_vector_norm; } // Why is this here???????? Seems weird to normalize the motility vector when we don't change it.
-	// std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector);
-
-    double anisotropy = ecm.ecm_data[ecm_index].anisotropy;
+	double anisotropy = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
     double migration_speed = pCell->phenotype.motility.migration_speed;
 	
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
@@ -886,12 +874,12 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	for(int i = 0; i < 3; i++)
 	{
-		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i];
-		ecm.ecm_data[ecm_index].ECM_orientation[i] -= dt * r_realignment * f_minus_d[i];
+		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i]; // This doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
+		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i];
 	}
 	
 	
-    normalize(&(ecm.ecm_data[ecm_index].ECM_orientation));
+    normalize(&(ECM_fiber_alignment[n])); // why by reference??
 
 
     // End Cell-ECM Fiber realingment
@@ -901,7 +889,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     double r_a0 = 1.0/1000.0; // min-1
     double r_anisotropy = r_a0 * migration_speed;
    	
-    ecm.ecm_data[ecm_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+    pCell->nearest_density_vector()[ECM_anisotropy_index] = anisotropy + r_anisotropy * dt  * (1- anisotropy);
     
     // END Cell-ECM Anisotropy Modification
     

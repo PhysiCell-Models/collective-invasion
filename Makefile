@@ -44,7 +44,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := custom.o
+PhysiCell_custom_module_OBJECTS := AMIGOS-invasion.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -133,7 +133,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-custom.o: ./custom_modules/custom.cpp 
+AMIGOS-invasion.o: ./custom_modules/AMIGOS-invasion.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion.cpp
 
 # cleanup
@@ -153,28 +153,9 @@ data-cleanup:
 	rm -f *.xml
 	rm -f *.svg
 	rm -f *.pov
-	rm -f ./output/*.mat
-	rm -f ./output/*.xml
-	rm -f ./output/*.svg
-	rm -f ./output/*.pov
-	rm -f ./output/*.tx
-	rm -f ./output/*.avi
-	rm -f ./output/*.png
+	rm -f ./Output/*
 	rm -f ./SVG/*
 
-density_movie:
-	mencoder mf://./output/output*.png -mf w=800:h=600:fps=5:type=png -ovc lavc \
-		-lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o ./output/density_output.avi
-
-svg_to_png:
-	magick mogrify -format png ./output/snap*.svg
-
-snapshot_movie:
-	mencoder mf://./output/snap*.png -mf w=800:h=600:fps=20:type=png -ovc lavc \
-		-lavcopts vcodec=mpeg4:mbd=2:trell -oac copy -o ./output/cells_output.avi
-
-density_maps:
-	matlab -nodisplay -nosplash -nodesktop -r "run('./output/create_heat_maps.m');exit;" | tail -n +11
 # archival 
 	
 zip:

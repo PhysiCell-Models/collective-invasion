@@ -74,13 +74,16 @@
 
 // custom user modules 
 
-#include "./custom_modules/custom.h" 
+#include "./custom_modules/AMIGOS-invasion.h" 
+#include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
 using namespace PhysiCell;
 
 
 // set number of threads for OpenMP (parallel computing)
+
+void ecm_update(void);
 
 int main( int argc, char* argv[] )
 {
@@ -116,6 +119,11 @@ int main( int argc, char* argv[] )
 	
 	create_cell_types();
 	setup_tissue();
+	ECM_setup(microenvironment.number_of_voxels());
+ 
+	/* Users typically start modifying here. START USERMODS */ 
+	
+	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
 
@@ -137,16 +145,14 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	/********************** Move back to AMIGOS coloring function soon**********/
-	//std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
-
-	sprintf( filename , "%s/initiRUNal.svg" , PhysiCell_settings.folder.c_str() ); 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
+	
+	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	display_citations(); 
 	
-	//run_biotransport( 5.0 ); 
+	run_biotransport( 5.0 ); 
 	
 	// set the performance timers 
 
@@ -211,6 +217,15 @@ int main( int argc, char* argv[] )
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
+			
+			//add ECM update here!
+            
+            // This changes the cell speed and bias as based on the ECM. It is the funciton that makes teh cells "see" the ECM and react to it with changes in their dynamics.
+            // In this current LS18 implementation, that means that only follower cells will see the ECM.
+            
+            // May need something that specifics that only followers do this (fixed with test on cell type). Could perhaps put that into the custom stuff. Would need something similar for the ECM realignment. Would like to move this out of diffusion loop so we can specify how frequently it updates.
+            
+            // cell_update_from_ecm();
             
 			PhysiCell_globals.current_time += diffusion_dt;
 			
@@ -241,4 +256,3 @@ int main( int argc, char* argv[] )
 
 	return 0; 
 }
-
