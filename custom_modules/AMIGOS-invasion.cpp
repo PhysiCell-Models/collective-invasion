@@ -899,6 +899,93 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 }
 
+void change_migration_bias_vector_ecm(Cell* pCell)
+{
+
+     int ecm_index =  pCell->get_current_voxel_index();
+     double a = ecm.ecm_data[ecm_index].anisotropy;
+     std::vector<double> d = pCell->phenotype.motility.migration_bias_direction;
+     std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
+     double ddotf = 0.0;
+
+     normalize(d);
+     normalize(f);
+
+    // check relative direction of fibers and cell direciton
+    for( int i=0; i < d.size() ; i++ )
+    {
+        ddotf += d[i] * f[i];
+    }
+
+    if(ddotf < 0.0)
+    {
+        for( int i=0; i< f.size(); i++)
+        {
+            f[i] *= -1.0;
+        }
+    }
+
+    for( int i=0; i < d.size() ; i++ )
+    {
+        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
+    }
+
+    normalize(pCell->phenotype.motility.migration_bias_direction);
+
+     return;
+}
+
+    
+void write_ECM_Data_matlab( std::string filename )
+
+{
+
+    int number_of_data_entries = microenvironment.number_of_voxels();
+
+    int size_of_each_datum = 8;
+
+	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+		// sample ECM 
+	// double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
+	// double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
+	// int n = pCell->get_current_voxel_index();
+	// std::vector<double> f = ECM_fiber_alignment[n];
+
+    FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
+
+    for( int i=0; i < number_of_data_entries ; i++ )
+
+    {
+
+	    fwrite( (char*) &( microenvironment.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
+
+        fwrite( (char*) &( microenvironment.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
+
+        fwrite( (char*) &( microenvironment.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
+		
+		fwrite( (char*) &( microenvironment.density_vector(i)[ECM_anisotropy_index]), sizeof(double) , 1 , fp ); // 4
+	
+        fwrite( (char*) &( microenvironment.density_vector(i)[ECM_anisotropy_index]), sizeof(double) , 1 , fp ); // 5
+
+        fwrite( (char*) &( ECM_fiber_alignment[i][0]), sizeof(double) , 1 , fp ); // 6
+
+        fwrite( (char*) &( ECM_fiber_alignment[i][1]), sizeof(double) , 1 , fp ); // 7
+
+        fwrite( (char*) &( ECM_fiber_alignment[i][2]), sizeof(double) , 1 , fp ); // 8
+
+    }
+
+
+
+    fclose( fp );
+
+
+
+    return;
+
+}
+
 // From ECM.cpp. Moving into to consolidate methods for ease of testing and development. Will eventaully separate out. See AMIGOS-hypoxia project for example on how to do that. 
 
 namespace PhysiCell{
