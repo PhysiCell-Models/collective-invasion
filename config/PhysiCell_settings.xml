@@ -51,11 +51,12 @@
         <leader_repulsion type="double">25</leader_repulsion>
         <follower_adhesion type="double">1.25</follower_adhesion>
         <follower_repulsion type="double">25</follower_repulsion>
-        <default_cell_speed type="double">0.05</default_cell_speed>
+        <default_cell_speed type="double">1.0</default_cell_speed>
         <leader_motility_mode type="bool">true</leader_motility_mode>
         <follower_motility_mode type="bool">true</follower_motility_mode>
 		<max_migration_speed type="double">1.0</max_migration_speed>
-		<cell_bias type = "double">1.0</cell_bias>
+		<default_chemotaxis_bias type = "double">0.0</default_chemotaxis_bias>
+		<default_ECM_sensitivity type = "double">1.0</default_ECM_sensitivity>
 		<ecm_uptake_rate type = "double">0.0</ecm_uptake_rate>
 		
 	</user_parameters>

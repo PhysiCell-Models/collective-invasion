@@ -115,3 +115,4 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NO
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt );
+void write_ECM_Data_matlab( std::string filename );

@@ -139,6 +139,8 @@ void create_cell_types( void )
 	cell_defaults.functions.update_migration_bias = ECM_informed_motility_update; // NEW!
 	// add custom data 
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
+	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
+	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
 	
 	// leader cells 
@@ -234,7 +236,7 @@ void setup_microenvironment( void )
 	// set Dirichlet conditions 
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	std::vector<double> bc_vector = { 38.0 , 0.5 , 1 };  // 5% o2 , half max ECM , isotropic  
+	std::vector<double> bc_vector = { 38.0 , 0.5 , 0.0, 0.0, 0.0 };  // 5% o2 , half max ECM , isotropic  (CHANGE TO XML!!!)
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
     
 	// Temperarily eliminating leader/follower signal	
@@ -270,72 +272,22 @@ void setup_microenvironment( void )
 	// set up ECM alignment 
 	std::vector<double> fiber_direction = { 1.0 , 0.0, 0.0 }; 
 	ECM_fiber_alignment.resize( microenvironment.mesh.voxels.size() , fiber_direction );  
+
+// 		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+// 		ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+// 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+// 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 	
 	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
-		normalize( position ); 
-		ECM_fiber_alignment[n] =  { position[0],position[1],0};
-		//Paul's initial position { -position[1],position[0],0}; // position; 
+		normalize( &position ); 
+		ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
+		//ECM_fiber_alignment[n] = { -position[1],position[0],0}; // oriented in cirlce (tangent to perpendiular circles)
 	}
 	
 	return; 
 }	
-
-void ECM_setup(double numvox)  /// long term - move to ECM.cpp
-{
-	// Save initial parameters from XML file once so we don't have to call fxn repeatedly
-	double initial_density = parameters.doubles("initial_density_ecm");
-	double tumor_radius = parameters.doubles("tumor_radius");
-	
-    ecm.sync_to_BioFVM(); 		
-    ecm.ecm_data.resize(numvox);
-	
-	for (int i = 0; i<numvox-1; i++)
-    {
- 	    // std::cout<<"Hi! 2"<<std::endl;
-        //  std::cout<<i<<std::endl;
-        
-		// This block of code is to randomly orient the ecm fibers using vector randomization from BioFVM_vector.cpp, line 262
-		//   Pick a random angle from 0 to 2pi and then set components equal to sin(theta) and cos(theta)
-		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
-		ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
-		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
-		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
-		
-		double buffer_region = 20;
-		
-		ecm.ecm_data[i].density = initial_density;
-		
-		// This block of code is used to create an initial density field that is different what the
-		// default ECM constructor instantiates
-
-		// if sqrt(x^2 + y^2) > (tumor rad + buf region)
-		// get coord from ecm.mesh.voxels[i].center[0] -x ecm.mesh.voxels[i].center[1]
-		
-		/* double x = ecm.mesh.voxels[i].center[0];
-		double y = ecm.mesh.voxels[i].center[1];
-		if((sqrt((x*x) + (y*y)) > (tumor_radius + 20)))
-		{
-			ecm.ecm_data[i].density = 1.0;
-		} */
-		
-		// This block of code is used for orienting the ecm fibers radially outward from the origin
-
-        /* double epsilon = 1E-6;
-        double ECM_radius = sqrt(ecm.mesh.voxels[i].center.at(0) * ecm.mesh.voxels[i].center.at(0)
-                                 +ecm.mesh.voxels[i].center.at(1) * ecm.mesh.voxels[i].center.at(1)
-                                 + ecm.mesh.voxels[i].center.at(2) * ecm.mesh.voxels[i].center.at(2));
-
-        ecm.ecm_data[i].ECM_orientation[0] = ecm.mesh.voxels[i].center[0]/(ECM_radius + epsilon);
-        ecm.ecm_data[i].ECM_orientation[1] = ecm.mesh.voxels[i].center[1]/(ECM_radius + epsilon);
-        ecm.ecm_data[i].ECM_orientation[2] = ecm.mesh.voxels[i].center[2]/(ECM_radius + epsilon); */
-
-        normalize(ecm.ecm_data[i].ECM_orientation);
-        
-    }
-    return;
-}
 
 void run_biotransport( double t_max ) // used to set up initial chemical conditions to prevent unwanted phenotype switching due to starting the simulation
 {
@@ -491,13 +443,18 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
 
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	
+	phenotype.motility.is_motile = true; 
 	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
 
 	// find location of variables and base parameter values
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
-	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
+
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
+	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
+	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
 	// static double vmax = parameters.doubles("default_cell_speed"); // Could go into a custom variable instead if cells have different default speeds ... 
 	
 	// sample ECM 
@@ -505,7 +462,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
 	int n = pCell->get_current_voxel_index();
 	std::vector<double> f = ECM_fiber_alignment[n];
-	std::vector<double> d_mot_previous = phenotype.motility.migration_bias_direction;
+	
 	
 	/****************************************Begin new migration direction update****************************************/
 
@@ -528,73 +485,52 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	// get ECM influenced direction from previous direction and ECM fiber direction
 
-	std::vector<double> d_perp = d_mot_previous - dot_product(d_mot_previous,f)*f; 
+	// If it is supposed to be random combiend directly with fiber, why? How does that prevent the cells from "jumping off" the fibers?  Better run the math! Strt witha a cell and fibers, vectors and our notes. 
+	// This only lets random motion occur along fibers??? It just uses random motiltiy to select direction etc? Such that travel can ONLY occur in two directions and the rate and direction (up or down) is impacted by randonness, but not the general direction???? Then what will chemotaxis do?? The same? I think that this is the issue - the fiber hold. 
+
+	// See lab note book - MUST start with random vector. In the old method I defintiely used the previous motility vector in the method, but makes no sense here!
+
+	// get random vector - cell's "intended" or chosen random direction
+	double angle = UniformRandom() * 6.283185307179586;
+	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
+
+	// get vector for chemotaxis (sample uE)
+	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
+
+	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
+	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+
+	// to determine direction along f, find part of d_choice that is perpendicular to f; 
+	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
 	normalize( d_perp ); 
 	
-	// part of d_mot_previous that is perpendicular to f; 
+	// find constants to span d_choice with d_perp and f
+	double c_1 = dot_product( d_motility , d_perp ); 
+	double c_2 = dot_product( d_motility, f ); 
 
-	double c_1 = dot_product( d_mot_previous , d_perp ); 
-	double c_2 = dot_product( d_mot_previous, f ); 
-	
-	std::vector<double> ecm_influenced_motility_direction = c_1*d_perp + c_2*f;
+	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
-	normalize( ecm_influenced_motility_direction ); 
+	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
 
-	// get random vector to blend into ECM and chemotaxis vectors
+	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
+	normalize( phenotype.motility.migration_bias_direction ); 
+	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
-	double angle = UniformRandom() * 6.283185307179586;
-	std::vector<double> random_vector = { cos(angle) , sin(angle) , 0.0 }; 
-
-	// get vector for chemotaxis
-
-	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
-	normalize(chemotaxis_grad);  // needed???
-
-	// finally, combine them using anisotropy for the bias for ECM influence, s for senstitiy to chemotaxis and the balance for random???
-	
-	static double eps = 0.000000000001;
-	double sensitivity_chemotaxis = 1.0; // consider putting in as custom data
-	double sensitivity_ECM = 1.0; // consider putting in as custom data
-	double ecm_bias = sensitivity_ECM * a / (a + sensitivity_chemotaxis + eps);
-	double chemotaxis_bias = sensitivity_chemotaxis / (a + sensitivity_chemotaxis + eps);
-	double random_bias = 1 - ecm_bias - chemotaxis_bias;
-
-	std::vector<double> new_migration_bias_direction = random_bias * random_vector + ecm_bias * ecm_influenced_motility_direction + chemotaxis_bias * chemotaxis_grad;
-
-	normalize( new_migration_bias_direction ); 
-
-	/****************************************Add in influence of chemotaxis here****************************************/
-	//No clue if this next part is right. I just structured it off of the above code for finding new migration_bias_direction with
-	//random influence + ECM influence.
-
-	// static int o2_index = microenvironment.find_density_index( "oxygen" ); 
-	// std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
-	// normalize(chemotaxis_grad);
-
-	// //part of new_migration_bias_direction perpendicular to O2 gradient 
-	// std::vector<double> c_perp = new_migration_bias_direction - dot_product(new_migration_bias_direction,chemotaxis_grad)*chemotaxis_grad;
-	// normalize( c_perp );
-
-	// double c_3 = dot_product( new_migration_bias_direction , c_perp ); 
-	// double c_4 = dot_product( new_migration_bias_direction, chemotaxis_grad ); 
-	
-	// double chemotaxis_sensitivity = 0.5;
-
-	// phenotype.motility.migration_bias_direction = (1.0 - chemotaxis_sensitivity)*c_3*c_perp + c_4*chemotaxis_grad;
-	// normalize( phenotype.motility.migration_bias_direction ); 
-
-	phenotype.motility.migration_bias = 1.0; // parameters.doubles( "cell_bias" ); // just set to one???
-
-	// END cell migration vector update
+	/****************************************END new migration direction update****************************************/
 
 
-	// Update cell migration speed based on ECM density and base parameter value (both found at top of function)
-	if(pCell->phenotype.motility.is_motile == true)
-	{
-        // Needs min and max stuff
-		pCell->phenotype.motility.migration_speed = (-(4.0)*pow((ECM_density-0.5),2.0) + 1.0) * pCell->custom_data[max_cell_speed_index];
-        //   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
-	}
+	/*********************************************Begin speed update***************************************************/
+
+	// Old update, from model prior to Sumeer 2019
+
+	// Needs min and max stuff
+	pCell->phenotype.motility.migration_speed = (-(4.0)*pow((ECM_density-0.5),2.0) + 1.0) * pCell->custom_data[max_cell_speed_index];
+	//   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+
+	/*********************************************Begin speed update***************************************************/
+
+
 	return; 
 }
 
@@ -898,43 +834,6 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     
 
 }
-
-void change_migration_bias_vector_ecm(Cell* pCell)
-{
-
-     int ecm_index =  pCell->get_current_voxel_index();
-     double a = ecm.ecm_data[ecm_index].anisotropy;
-     std::vector<double> d = pCell->phenotype.motility.migration_bias_direction;
-     std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
-     double ddotf = 0.0;
-
-     normalize(d);
-     normalize(f);
-
-    // check relative direction of fibers and cell direciton
-    for( int i=0; i < d.size() ; i++ )
-    {
-        ddotf += d[i] * f[i];
-    }
-
-    if(ddotf < 0.0)
-    {
-        for( int i=0; i< f.size(); i++)
-        {
-            f[i] *= -1.0;
-        }
-    }
-
-    for( int i=0; i < d.size() ; i++ )
-    {
-        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
-    }
-
-    normalize(pCell->phenotype.motility.migration_bias_direction);
-
-     return;
-}
-
     
 void write_ECM_Data_matlab( std::string filename )
 
@@ -944,8 +843,9 @@ void write_ECM_Data_matlab( std::string filename )
 
     int size_of_each_datum = 8;
 
-	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 		// sample ECM 
 	// double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
 	// double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
@@ -966,7 +866,7 @@ void write_ECM_Data_matlab( std::string filename )
 		
 		fwrite( (char*) &( microenvironment.density_vector(i)[ECM_anisotropy_index]), sizeof(double) , 1 , fp ); // 4
 	
-        fwrite( (char*) &( microenvironment.density_vector(i)[ECM_anisotropy_index]), sizeof(double) , 1 , fp ); // 5
+        fwrite( (char*) &( microenvironment.density_vector(i)[ECM_density_index]), sizeof(double) , 1 , fp ); // 5
 
         fwrite( (char*) &( ECM_fiber_alignment[i][0]), sizeof(double) , 1 , fp ); // 6
 
@@ -986,178 +886,270 @@ void write_ECM_Data_matlab( std::string filename )
 
 }
 
+
+// void ECM_setup(double numvox)  /// long term - move to ECM.cpp
+// {
+// 	// Save initial parameters from XML file once so we don't have to call fxn repeatedly
+// 	double initial_density = parameters.doubles("initial_density_ecm");
+// 	double tumor_radius = parameters.doubles("tumor_radius");
+	
+//     ecm.sync_to_BioFVM(); 		
+//     ecm.ecm_data.resize(numvox);
+	
+// 	for (int i = 0; i<numvox-1; i++)
+//     {
+//  	    // std::cout<<"Hi! 2"<<std::endl;
+//         //  std::cout<<i<<std::endl;
+        
+// 		// This block of code is to randomly orient the ecm fibers using vector randomization from BioFVM_vector.cpp, line 262
+// 		//   Pick a random angle from 0 to 2pi and then set components equal to sin(theta) and cos(theta)
+// 		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+// 		ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+// 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+// 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+		
+// 		double buffer_region = 20;
+		
+// 		ecm.ecm_data[i].density = initial_density;
+		
+// 		// This block of code is used to create an initial density field that is different what the
+// 		// default ECM constructor instantiates
+
+// 		// if sqrt(x^2 + y^2) > (tumor rad + buf region)
+// 		// get coord from ecm.mesh.voxels[i].center[0] -x ecm.mesh.voxels[i].center[1]
+		
+// 		/* double x = ecm.mesh.voxels[i].center[0];
+// 		double y = ecm.mesh.voxels[i].center[1];
+// 		if((sqrt((x*x) + (y*y)) > (tumor_radius + 20)))
+// 		{
+// 			ecm.ecm_data[i].density = 1.0;
+// 		} */
+		
+// 		// This block of code is used for orienting the ecm fibers radially outward from the origin
+
+//         /* double epsilon = 1E-6;
+//         double ECM_radius = sqrt(ecm.mesh.voxels[i].center.at(0) * ecm.mesh.voxels[i].center.at(0)
+//                                  +ecm.mesh.voxels[i].center.at(1) * ecm.mesh.voxels[i].center.at(1)
+//                                  + ecm.mesh.voxels[i].center.at(2) * ecm.mesh.voxels[i].center.at(2));
+
+//         ecm.ecm_data[i].ECM_orientation[0] = ecm.mesh.voxels[i].center[0]/(ECM_radius + epsilon);
+//         ecm.ecm_data[i].ECM_orientation[1] = ecm.mesh.voxels[i].center[1]/(ECM_radius + epsilon);
+//         ecm.ecm_data[i].ECM_orientation[2] = ecm.mesh.voxels[i].center[2]/(ECM_radius + epsilon); */
+
+//         normalize(ecm.ecm_data[i].ECM_orientation);
+        
+//     }
+//     return;
+// }
+
+// void change_migration_bias_vector_ecm(Cell* pCell)
+// {
+
+//      int ecm_index =  pCell->get_current_voxel_index();
+//      double a = ecm.ecm_data[ecm_index].anisotropy;
+//      std::vector<double> d = pCell->phenotype.motility.migration_bias_direction;
+//      std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
+//      double ddotf = 0.0;
+
+//      normalize(d);
+//      normalize(f);
+
+//     // check relative direction of fibers and cell direciton
+//     for( int i=0; i < d.size() ; i++ )
+//     {
+//         ddotf += d[i] * f[i];
+//     }
+
+//     if(ddotf < 0.0)
+//     {
+//         for( int i=0; i< f.size(); i++)
+//         {
+//             f[i] *= -1.0;
+//         }
+//     }
+
+//     for( int i=0; i < d.size() ; i++ )
+//     {
+//         pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
+//     }
+
+//     normalize(pCell->phenotype.motility.migration_bias_direction);
+
+//      return;
+// }
+
 // From ECM.cpp. Moving into to consolidate methods for ease of testing and development. Will eventaully separate out. See AMIGOS-hypoxia project for example on how to do that. 
 
-namespace PhysiCell{
+// namespace PhysiCell{
 	
-ECM ecm;
+// ECM ecm;
 
-ECM_DATA::ECM_DATA()
-{
-	density = 0.5;
-	ECM_orientation.resize(3,0.0);
-	anisotropy = 0.0;
-	return;
-}
+// ECM_DATA::ECM_DATA()
+// {
+// 	density = 0.5;
+// 	ECM_orientation.resize(3,0.0);
+// 	anisotropy = 0.0;
+// 	return;
+// }
 
-ECM::ECM()
-{
-	pMicroenvironment = NULL; 
-	return;
-}
+// ECM::ECM()
+// {
+// 	pMicroenvironment = NULL; 
+// 	return;
+// }
 
-void ECM::sync_to_BioFVM(void)
-{
-	if( pMicroenvironment == NULL )
-	{ pMicroenvironment = get_default_microenvironment(); }
+// void ECM::sync_to_BioFVM(void)
+// {
+// 	if( pMicroenvironment == NULL )
+// 	{ pMicroenvironment = get_default_microenvironment(); }
 	
-	int Xnodes = pMicroenvironment->mesh.x_coordinates.size(); 
-	int Ynodes = pMicroenvironment->mesh.y_coordinates.size();  
-	int Znodes = pMicroenvironment->mesh.z_coordinates.size();
+// 	int Xnodes = pMicroenvironment->mesh.x_coordinates.size(); 
+// 	int Ynodes = pMicroenvironment->mesh.y_coordinates.size();  
+// 	int Znodes = pMicroenvironment->mesh.z_coordinates.size();
 	
-	mesh.resize( default_microenvironment_options.X_range[0] , default_microenvironment_options.X_range[1] ,
-		default_microenvironment_options.Y_range[0] , default_microenvironment_options.Y_range[1] ,
-		default_microenvironment_options.Z_range[0] , default_microenvironment_options.Z_range[1] ,
-		Xnodes, Ynodes, Znodes ); 
-	mesh.units = default_microenvironment_options.spatial_units; 
+// 	mesh.resize( default_microenvironment_options.X_range[0] , default_microenvironment_options.X_range[1] ,
+// 		default_microenvironment_options.Y_range[0] , default_microenvironment_options.Y_range[1] ,
+// 		default_microenvironment_options.Z_range[0] , default_microenvironment_options.Z_range[1] ,
+// 		Xnodes, Ynodes, Znodes ); 
+// 	mesh.units = default_microenvironment_options.spatial_units; 
     
-	//ECM_DATA.resize( mesh.voxels.size() );
+// 	//ECM_DATA.resize( mesh.voxels.size() );
 	
-	return;
-}
+// 	return;
+// }
 
-void cell_update_from_ecm( void )
-{
-	for(int i = 0; i < (*all_cells).size(); i++)
-	{
-		Cell* pCell = (*all_cells)[i];
+// void cell_update_from_ecm( void )
+// {
+// 	for(int i = 0; i < (*all_cells).size(); i++)
+// 	{
+// 		Cell* pCell = (*all_cells)[i];
         
         
         
-		//Test 1: Non-motile follower cells. In this case paramaters.bools("follower_motility_mode") will be false
-        if(parameters.bools("follower_motility_mode") == false)
-        {
-            if(pCell->type == 2)
-                continue;
-        }
+// 		//Test 1: Non-motile follower cells. In this case paramaters.bools("follower_motility_mode") will be false
+//         if(parameters.bools("follower_motility_mode") == false)
+//         {
+//             if(pCell->type == 2)
+//                 continue;
+//         }
 	
-    	//if followers don't respond to cues from ecm
+//     	//if followers don't respond to cues from ecm
 
-        /* if(pCell->type == 2)
-        {
-            continue;
-            std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
-        } */
+//         /* if(pCell->type == 2)
+//         {
+//             continue;
+//             std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+//         } */
   
-        change_speed_ecm(pCell); // As long as density is set to 0.5, this will have no impact on cell speed
-        change_migration_bias_vector_ecm(pCell);
-		change_bias_ecm(pCell);
-	}
-	return;
-}
+//         change_speed_ecm(pCell); // As long as density is set to 0.5, this will have no impact on cell speed
+//         change_migration_bias_vector_ecm(pCell);
+// 		change_bias_ecm(pCell);
+// 	}
+// 	return;
+// }
 
-void change_bias_ecm(Cell* pCell)
-{
-    int ecm_index =  pCell->get_current_voxel_index();
-    pCell->phenotype.motility.migration_bias = ecm.ecm_data[ecm_index].anisotropy;
+// void change_bias_ecm(Cell* pCell)
+// {
+//     int ecm_index =  pCell->get_current_voxel_index();
+//     pCell->phenotype.motility.migration_bias = ecm.ecm_data[ecm_index].anisotropy;
     
-    return;
-}
+//     return;
+// }
     
-void change_speed_ecm(Cell* pCell)
-{
-	double vmax = parameters.doubles("default_cell_speed");
+// void change_speed_ecm(Cell* pCell)
+// {
+// 	double vmax = parameters.doubles("default_cell_speed");
     
-	int ecm_index =  pCell->get_current_voxel_index();
-	double density = ecm.ecm_data[ecm_index].density;
+// 	int ecm_index =  pCell->get_current_voxel_index();
+// 	double density = ecm.ecm_data[ecm_index].density;
 	
-	if(pCell->phenotype.motility.is_motile == true)
-	{
-        // Needs min and max stuff
-		pCell->phenotype.motility.migration_speed = (-(4.0)*pow((density-0.5),2.0) + 1.0)*vmax;
-        //   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
-	}
+// 	if(pCell->phenotype.motility.is_motile == true)
+// 	{
+//         // Needs min and max stuff
+// 		pCell->phenotype.motility.migration_speed = (-(4.0)*pow((density-0.5),2.0) + 1.0)*vmax;
+//         //   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+// 	}
 	
-	return;
-}
+// 	return;
+// }
 
-void change_migration_bias_vector_ecm(Cell* pCell)
-{
+// void change_migration_bias_vector_ecm(Cell* pCell)
+// {
 
-     int ecm_index =  pCell->get_current_voxel_index();
-     double a = ecm.ecm_data[ecm_index].anisotropy;
-     std::vector<double> d = pCell->phenotype.motility.migration_bias_direction;
-     std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
-     double ddotf = 0.0;
+//      int ecm_index =  pCell->get_current_voxel_index();
+//      double a = ecm.ecm_data[ecm_index].anisotropy;
+//      std::vector<double> d = pCell->phenotype.motility.migration_bias_direction;
+//      std::vector<double> f = ecm.ecm_data[ecm_index].ECM_orientation;
+//      double ddotf = 0.0;
 
-     normalize(d);
-     normalize(f);
+//      normalize(d);
+//      normalize(f);
 
-    // check relative direction of fibers and cell direciton
-    for( int i=0; i < d.size() ; i++ )
-    {
-        ddotf += d[i] * f[i];
-    }
+//     // check relative direction of fibers and cell direciton
+//     for( int i=0; i < d.size() ; i++ )
+//     {
+//         ddotf += d[i] * f[i];
+//     }
 
-    if(ddotf < 0.0)
-    {
-        for( int i=0; i< f.size(); i++)
-        {
-            f[i] *= -1.0;
-        }
-    }
+//     if(ddotf < 0.0)
+//     {
+//         for( int i=0; i< f.size(); i++)
+//         {
+//             f[i] *= -1.0;
+//         }
+//     }
 
-    for( int i=0; i < d.size() ; i++ )
-    {
-        pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
-    }
+//     for( int i=0; i < d.size() ; i++ )
+//     {
+//         pCell->phenotype.motility.migration_bias_direction[i] = a * f[i]  + (1.0-a) * d[i];
+//     }
 
-    normalize(pCell->phenotype.motility.migration_bias_direction);
+//     normalize(pCell->phenotype.motility.migration_bias_direction);
 
-     return;
-}
+//      return;
+// }
 
     
-void write_ECM_Data_matlab( std::string filename )
+// void write_ECM_Data_matlab( std::string filename )
 
-{
+// {
 
-    int number_of_data_entries = microenvironment.number_of_voxels();
+//     int number_of_data_entries = microenvironment.number_of_voxels();
 
-    int size_of_each_datum = 8;
+//     int size_of_each_datum = 8;
 
-    FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
+//     FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
 
-    for( int i=0; i < number_of_data_entries ; i++ )
+//     for( int i=0; i < number_of_data_entries ; i++ )
 
-    {
+//     {
 
-	    fwrite( (char*) &( ecm.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
+// 	    fwrite( (char*) &( ecm.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
 
-        fwrite( (char*) &( ecm.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
+//         fwrite( (char*) &( ecm.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
 
-        fwrite( (char*) &( ecm.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
+//         fwrite( (char*) &( ecm.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
 		
-		fwrite( (char*) &( ecm.ecm_data[i].anisotropy), sizeof(double) , 1 , fp ); // 4
+// 		fwrite( (char*) &( ecm.ecm_data[i].anisotropy), sizeof(double) , 1 , fp ); // 4
 	
-        fwrite( (char*) &( ecm.ecm_data[i].density), sizeof(double) , 1 , fp ); // 5
+//         fwrite( (char*) &( ecm.ecm_data[i].density), sizeof(double) , 1 , fp ); // 5
 
-        fwrite( (char*) &( ecm.ecm_data[i].ECM_orientation[0]), sizeof(double) , 1 , fp ); // 6
+//         fwrite( (char*) &( ecm.ecm_data[i].ECM_orientation[0]), sizeof(double) , 1 , fp ); // 6
 
-        fwrite( (char*) &( ecm.ecm_data[i].ECM_orientation[1]), sizeof(double) , 1 , fp ); // 7
+//         fwrite( (char*) &( ecm.ecm_data[i].ECM_orientation[1]), sizeof(double) , 1 , fp ); // 7
 
-        fwrite( (char*) &( ecm.ecm_data[i].ECM_orientation[2]), sizeof(double) , 1 , fp ); // 8
+//         fwrite( (char*) &( ecm.ecm_data[i].ECM_orientation[2]), sizeof(double) , 1 , fp ); // 8
 
-    }
-
-
-
-    fclose( fp );
+//     }
 
 
 
-    return;
+//     fclose( fp );
 
-}
 
-};
+
+//     return;
+
+// }
+
+// };

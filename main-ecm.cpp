@@ -75,7 +75,7 @@
 // custom user modules 
 
 #include "./custom_modules/AMIGOS-invasion.h" 
-#include "./custom_modules/ECM.h"
+// #include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
 	
 	create_cell_types();
 	setup_tissue();
-	ECM_setup(microenvironment.number_of_voxels());
+	// ECM_setup(microenvironment.number_of_voxels());
  
 	/* Users typically start modifying here. START USERMODS */ 
 	
