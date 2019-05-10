@@ -132,10 +132,10 @@ void create_cell_types( void )
 	// set default motility parameters (even for when off)
 	
 	cell_defaults.phenotype.motility.is_motile = true;
-	cell_defaults.phenotype.motility.persistence_time = 0.01;
+	cell_defaults.phenotype.motility.persistence_time = 0.1;
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	cell_defaults.phenotype.motility.migration_bias = 0.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
+	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
 	cell_defaults.functions.update_migration_bias = ECM_informed_motility_update; // NEW!
 	// add custom data 
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
@@ -236,7 +236,7 @@ void setup_microenvironment( void )
 	// set Dirichlet conditions 
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	std::vector<double> bc_vector = { 38.0 , 0.5 , 0.0, 0.0, 0.0 };  // 5% o2 , half max ECM , isotropic  (CHANGE TO XML!!!)
+	std::vector<double> bc_vector = { 38.0 , parameters.doubles("initial_ECM_density") , parameters.doubles("initial_anisotropy") , 0.0, 0.0 };  // 5% o2 , half max ECM , isotropic, leader signal, follower signal
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
     
 	// Temperarily eliminating leader/follower signal	
@@ -282,8 +282,8 @@ void setup_microenvironment( void )
 	{
 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 		normalize( &position ); 
-		ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
-		//ECM_fiber_alignment[n] = { -position[1],position[0],0}; // oriented in cirlce (tangent to perpendiular circles)
+		// ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
+		ECM_fiber_alignment[n] = { -position[1],position[0],0}; // oriented in cirlce (tangent to perpendiular circles)
 	}
 	
 	return; 
@@ -368,7 +368,7 @@ void setup_tissue( void )
 	double x_outer = tumor_radius; 
 	double y = 0.0;
 	
-	double leader_cell_fraction = 0.2;
+	double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
 	
 	int n = 0; 
 	while( y < tumor_radius )
@@ -444,9 +444,14 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	
-	phenotype.motility.is_motile = true; 
+	if(phenotype.death.dead == true)
+	{
+		phenotype.motility.is_motile = false;
+		pCell->functions.update_migration_bias = NULL;
+		pCell->functions.update_phenotype = NULL;
+	}
 	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
-
+	// std::cout<<1<<std::endl;
 	// find location of variables and base parameter values
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
@@ -502,7 +507,8 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
-	normalize( d_perp ); 
+	
+	normalize( &d_perp ); 
 	
 	// find constants to span d_choice with d_perp and f
 	double c_1 = dot_product( d_motility , d_perp ); 
@@ -513,7 +519,9 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
-	normalize( phenotype.motility.migration_bias_direction ); 
+	std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	normalize( &phenotype.motility.migration_bias_direction ); 
+	std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
 	/****************************************END new migration direction update****************************************/
@@ -540,7 +548,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	
 	phenotype.motility.is_motile = true; 
-	phenotype.motility.migration_bias = 0.95;
+	phenotype.motility.migration_bias = parameters.doubles("oxygen_migration_bias_for_leaders"); //0.95;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
 
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
