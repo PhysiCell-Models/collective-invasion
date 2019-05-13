@@ -137,6 +137,8 @@ void create_cell_types( void )
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
 	cell_defaults.functions.update_migration_bias = ECM_informed_motility_update; // NEW!
+	// std::cout<<cell_defaults.functions.update_migration_bias<<std::endl;
+	// std::cin.get();
 	// add custom data 
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
 	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
@@ -164,10 +166,10 @@ void create_cell_types( void )
 	leader_cell.phenotype.motility.is_motile = parameters.bools("leader_motility_mode"); 
 	
     leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("leader_adhesion");
-	std::cout<<leader_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
+	// std::cout<<leader_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
     
 	leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("leader_repulsion");
-    std::cout<<leader_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
+    // std::cout<<leader_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 
 	// Temperarily eliminating leader/follower signal	
 
@@ -196,6 +198,9 @@ void create_cell_types( void )
 	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
    	
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
+	// follower_cell.functions.update_migration_bias = ECM_informed_motility_update;
+	// std::cout<<follower_cell.functions.update_migration_bias<<std::endl;
+	// std::cin.get();
     
 	// Temperarily eliminating leader/follower signal
 
@@ -383,7 +388,7 @@ void setup_tissue( void )
 			if( UniformRandom() < leader_cell_fraction )
 			{ pCell = create_cell(leader_cell); }
 			else
-			{ pCell = create_cell(follower_cell); }
+			{ pCell = create_cell(follower_cell);}
 				
 			pCell->assign_position( x , y , 0.0 );
 
@@ -446,9 +451,11 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	
 	if(phenotype.death.dead == true)
 	{
+		
 		phenotype.motility.is_motile = false;
 		pCell->functions.update_migration_bias = NULL;
 		pCell->functions.update_phenotype = NULL;
+		std::cout<<2<<std::endl;
 	}
 	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
 	// std::cout<<1<<std::endl;
@@ -519,9 +526,9 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
-	std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	// std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	normalize( &phenotype.motility.migration_bias_direction ); 
-	std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	// std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
 	/****************************************END new migration direction update****************************************/
@@ -692,8 +699,32 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
     update_cell_and_death_parameters_O2_based(pCell,phenotype,dt);
     
     // ALWAYS MOTILE
+    // phenotype.motility.is_motile = true;
+
+
+	if(phenotype.death.dead == true)
+	{
+		phenotype.motility.is_motile==false;
+		pCell->functions.update_phenotype = NULL;
+		pCell->functions.update_migration_bias = NULL;
+		// std::cout<<"Follower is dead"<<std::endl;
+		// std::cout<<"Is it motile?"<<std::endl;
+		// if(phenotype.motility.is_motile==true)
+		// {
+		// 	std::cout<<"Yes"<<std::endl;
+		// 	phenotype.motility.is_motile==false;
+		// 	pCell->functions.update_phenotype = NULL;
+		// 	pCell->functions.update_migration_bias = NULL;
+		// }
+
+		// if(phenotype.motility.is_motile==false)
+		// {
+		// 	std::cout<<"No"<<std::endl;
+		// }
+
+	}
+
     
-    phenotype.motility.is_motile = true;
    	// phenotype.motility.migration_bias = 1.0;
     
 	/* if( pO2 > pCell->custom_data[hypoxic_i] )
