@@ -90,6 +90,10 @@ void leader_cell_motility_model0( Cell* pCell , Phenotype& phenotype , double dt
 
 void switching_phenotype_model( Cell* pCell, Phenotype& phenotype, double dt ); 
 
+void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt );
+
+void reset_cell_position(void);
+
 class Options 
 {
  public: 

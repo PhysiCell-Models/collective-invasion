@@ -132,7 +132,8 @@ void create_cell_types( void )
 	// set default motility parameters (even for when off)
 	
 	cell_defaults.phenotype.motility.is_motile = true;
-	cell_defaults.phenotype.motility.persistence_time = 0.1;
+	// consider what "best" persistence time would be, given the voxel dimensions. 
+	cell_defaults.phenotype.motility.persistence_time = parameters.doubles("default_persistence_time"); //10.0; // Voxels are 20 um in all dimensions. Given a top speed of 0.5 um/min, cells will likely be in one voxel for 10 minutes or more. So update of 10 isn't bad. Should consider "best" number later. 
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
@@ -285,10 +286,14 @@ void setup_microenvironment( void )
 	
 	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
+		static double eps = 1E-9;
 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+		// double radius = sqrt(position[0] * position[0] + position[1]*position[1] + position[2]*position[2]);
 		normalize( &position ); 
 		// ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
-		ECM_fiber_alignment[n] = { -position[1],position[0],0}; // oriented in cirlce (tangent to perpendiular circles)
+		ECM_fiber_alignment[n] =  { position[1],-position[0],0};
+		// ECM_fiber_alignment[n] = { position[1]/(radius+eps),-position[0]/(radius + eps),position[2]/(radius + eps)}; // oriented in cirlce (tangent to perpendiular circles)
+		// normalize(&ECM_fiber_alignment[n]);
 	}
 	
 	return; 
@@ -369,69 +374,81 @@ void setup_tissue( void )
     
 	Cell* pCell = NULL; 
 	
-	double x = 0.0;
-	double x_outer = tumor_radius; 
-	double y = 0.0;
+	// double x = 0.0;
+	// double x_outer = tumor_radius; 
+	// double y = 0.0;
 	
-	double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
+	// double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
 	
-	int n = 0; 
-	while( y < tumor_radius )
-	{
-		x = 0.0; 
-		if( n % 2 == 1 )
-		{ x = 0.5*cell_spacing; }
-		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+	// int n = 0; 
+	// while( y < tumor_radius )
+	// {
+	// 	x = 0.0; 
+	// 	if( n % 2 == 1 )
+	// 	{ x = 0.5*cell_spacing; }
+	// 	x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
 		
-		while( x < x_outer )
-		{
-			if( UniformRandom() < leader_cell_fraction )
-			{ pCell = create_cell(leader_cell); }
-			else
-			{ pCell = create_cell(follower_cell);}
+	// 	while( x < x_outer )
+	// 	{
+	// 		if( UniformRandom() < leader_cell_fraction )
+	// 		{ pCell = create_cell(leader_cell); }
+	// 		else
+	// 		{ pCell = create_cell(follower_cell);}
 				
-			pCell->assign_position( x , y , 0.0 );
+	// 		pCell->assign_position( x , y , 0.0 );
 
 			
-			if( fabs( y ) > 0.01 )
-			{
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( x , -y , 0.0 );
-			}
+	// 		if( fabs( y ) > 0.01 )
+	// 		{
+	// 			if( UniformRandom() < leader_cell_fraction )
+	// 			{ pCell = create_cell(leader_cell); }
+	// 			else
+	// 			{ pCell = create_cell(follower_cell); }
+	// 			pCell->assign_position( x , -y , 0.0 );
+	// 		}
 			
-			if( fabs( x ) > 0.01 )
-			{ 
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( -x , y , 0.0 );
+	// 		if( fabs( x ) > 0.01 )
+	// 		{ 
+	// 			if( UniformRandom() < leader_cell_fraction )
+	// 			{ pCell = create_cell(leader_cell); }
+	// 			else
+	// 			{ pCell = create_cell(follower_cell); }
+	// 			pCell->assign_position( -x , y , 0.0 );
 				
-				if( fabs( y ) > 0.01 )
-				{
-					if( UniformRandom() < leader_cell_fraction )
-					{ pCell = create_cell(leader_cell); }
-					else
-					{ pCell = create_cell(follower_cell); }
+	// 			if( fabs( y ) > 0.01 )
+	// 			{
+	// 				if( UniformRandom() < leader_cell_fraction )
+	// 				{ pCell = create_cell(leader_cell); }
+	// 				else
+	// 				{ pCell = create_cell(follower_cell); }
                    	
-					pCell->assign_position( -x , -y , 0.0 );
-				}
-			}
-			x += cell_spacing; 
+	// 				pCell->assign_position( -x , -y , 0.0 );
+	// 			}
+	// 		}
+	// 		x += cell_spacing; 
 			
-		}
+	// 	}
 		
-		y += cell_spacing * sqrt(3.0)/2.0; 
-		n++; 
-	}
+	// 	y += cell_spacing * sqrt(3.0)/2.0; 
+	// 	n++; 
+	// }
 
 
 	/******************************************3D Spheroid initialization***************************************/
 
 	/*To come later*/
+
+	/******************************************Line of cells at x > 0 initialization***************************************/
+
+	int n = 0.0; 
+	while( n <= 1000.0 )
+	{
+		pCell = create_cell(follower_cell); 
+		pCell->assign_position( n , 0.0 , 0.0 );
+		n = n + 20.0;
+	}
+		
+	return; 
 
 	return; 
 }
@@ -549,6 +566,30 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	return; 
 }
 
+void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt )
+{
+
+	pCell->phenotype.motility.migration_bias_direction[0] = 1.0;
+   	pCell->phenotype.motility.migration_bias_direction[1] = 0.0;
+    pCell->phenotype.motility.migration_bias_direction[2] = 0.0;
+
+	return;
+}
+
+void reset_cell_position( void ) // for cell mark/ECM change test
+{
+	int n = -1500.0;
+
+	std::cout<<1<<std::endl;
+
+	for(int i = 0; i < (*all_cells).size(); i++)
+	{
+		Cell* pCell = (*all_cells)[i];
+		pCell->assign_position( -1450.0 , n , 0.0 );
+		n = n + 10.0;
+	}
+		
+}
 
 void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 {
