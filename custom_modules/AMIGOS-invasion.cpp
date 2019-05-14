@@ -96,6 +96,13 @@ void create_cell_types( void )
 	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
 	
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+
+	// For strict ECM invasion testing, why have on death and birth at all??
+
+	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
+    cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0;
+	cell_defaults.phenotype.death.rates[necrosis_index] = 0.0;
 	
 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
 	cell_defaults.parameters.o2_reference = 38.0;
@@ -157,7 +164,14 @@ void create_cell_types( void )
 	// Obviously missing - add later
     
 	// 10% proliferation 
-    leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
+    // leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
+
+	/*******************************************For "march" simulation****************************************/
+
+	leader_cell.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
+    leader_cell.phenotype.death.rates[apoptosis_index] = 0.0;
+	leader_cell.phenotype.death.rates[necrosis_index] = 0.0;
+	
     
 	// Temperarily eliminating leader/follower signal	
 	
@@ -182,9 +196,9 @@ void create_cell_types( void )
 
 	// set functions
 	
-	leader_cell.functions.update_migration_bias = chemotaxis_oxygen; 
+	leader_cell.functions.update_migration_bias = rightward_deterministic_cell_march; 
 	
-    leader_cell.functions.update_phenotype = leader_cell_phenotype_model;
+    leader_cell.functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 	
 	// follower cells
 
@@ -192,7 +206,7 @@ void create_cell_types( void )
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
     
-    follower_cell.functions.update_phenotype = follower_cell_phenotype_model;
+    follower_cell.functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
 	
@@ -279,21 +293,25 @@ void setup_microenvironment( void )
 	std::vector<double> fiber_direction = { 1.0 , 0.0, 0.0 }; 
 	ECM_fiber_alignment.resize( microenvironment.mesh.voxels.size() , fiber_direction );  
 
-// 		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
-// 		ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
-// 		ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
-// 		ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+
 	
 	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
-		static double eps = 1E-9;
-		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+		// For random 2-D initalization
+		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+		// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+		// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+		// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+		ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0};
+
+		// for starburst or circular initialization
+		/* std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 		// double radius = sqrt(position[0] * position[0] + position[1]*position[1] + position[2]*position[2]);
 		normalize( &position ); 
 		// ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
-		ECM_fiber_alignment[n] =  { position[1],-position[0],0};
-		// ECM_fiber_alignment[n] = { position[1]/(radius+eps),-position[0]/(radius + eps),position[2]/(radius + eps)}; // oriented in cirlce (tangent to perpendiular circles)
-		// normalize(&ECM_fiber_alignment[n]);
+		ECM_fiber_alignment[n] =  { position[1],-position[0],0}; // oriented in cirlce */
+
+		normalize(&ECM_fiber_alignment[n]);
 	}
 	
 	return; 
@@ -438,14 +456,24 @@ void setup_tissue( void )
 
 	/*To come later*/
 
-	/******************************************Line of cells at x > 0 initialization***************************************/
+	/************************************Line of cells at y = 0, x > 0 initialization***************************************/
 
-	int n = 0.0; 
-	while( n <= 1000.0 )
+	// int n = 0.0; 
+	// while( n <= 1000.0 )
+	// {
+	// 	pCell = create_cell(follower_cell); 
+	// 	pCell->assign_position( n , 0.0 , 0.0 );
+	// 	n = n + 20.0;
+	// }
+
+	/******************************************Line of cells at x = -1450 initialization***************************************/
+
+	int n = -1490.0; 
+	while( n <= 1490.0 )
 	{
-		pCell = create_cell(follower_cell); 
-		pCell->assign_position( n , 0.0 , 0.0 );
-		n = n + 20.0;
+		pCell = create_cell(leader_cell); 
+		pCell->assign_position( -1450.0 , n , 0.0 );
+		n = n + 10.0;
 	}
 		
 	return; 
@@ -599,6 +627,15 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	phenotype.motility.migration_bias = parameters.doubles("oxygen_migration_bias_for_leaders"); //0.95;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
 
+	if(phenotype.death.dead == true)
+	{
+		phenotype.motility.is_motile==false;
+		pCell->functions.update_phenotype = NULL;
+		pCell->functions.update_migration_bias = NULL;
+
+
+	}	
+
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 	
 	return; 
@@ -612,13 +649,13 @@ void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype ,
 }
 
 
-void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double dt )
-{
-    // o2-based birth and death, nothing more
-    tumor_cell_phenotype_with_oncoprotein(pCell,phenotype,dt);
+// void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double dt )
+// {
+//     // o2-based birth and death, nothing more
+//     tumor_cell_phenotype_with_oncoprotein(pCell,phenotype,dt);
 
-    return;
-}
+//     return;
+// }
 
 /* // not being used currently (03.11.19)
 
@@ -687,6 +724,13 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
 	return output; 
 }
 
+// void no_birth_or_death_phenotype_model (Cell* pCell , Phenotype& phenotype , double dt)
+// {
+
+
+
+// 	return;
+// }
 
 void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt )
 {
@@ -704,7 +748,7 @@ void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt
 
 	// ALWAYS MOTILE
 
-    phenotype.motility.is_motile = true;
+    // phenotype.motility.is_motile = true;
     
 	/* if( pO2 > pCell->custom_data[hypoxic_i] )
 	{
