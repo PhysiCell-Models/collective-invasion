@@ -196,7 +196,7 @@ void create_cell_types( void )
 
 	// set functions
 	
-	leader_cell.functions.update_migration_bias = rightward_deterministic_cell_march; 
+	leader_cell.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; 
 	
     leader_cell.functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 	
@@ -392,64 +392,64 @@ void setup_tissue( void )
     
 	Cell* pCell = NULL; 
 	
-	// double x = 0.0;
-	// double x_outer = tumor_radius; 
-	// double y = 0.0;
+	double x = 0.0;
+	double x_outer = tumor_radius; 
+	double y = 0.0;
 	
-	// double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
+	double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
 	
-	// int n = 0; 
-	// while( y < tumor_radius )
-	// {
-	// 	x = 0.0; 
-	// 	if( n % 2 == 1 )
-	// 	{ x = 0.5*cell_spacing; }
-	// 	x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+	int n = 0; 
+	while( y < tumor_radius )
+	{
+		x = 0.0; 
+		if( n % 2 == 1 )
+		{ x = 0.5*cell_spacing; }
+		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
 		
-	// 	while( x < x_outer )
-	// 	{
-	// 		if( UniformRandom() < leader_cell_fraction )
-	// 		{ pCell = create_cell(leader_cell); }
-	// 		else
-	// 		{ pCell = create_cell(follower_cell);}
+		while( x < x_outer )
+		{
+			if( UniformRandom() < leader_cell_fraction )
+			{ pCell = create_cell(leader_cell); }
+			else
+			{ pCell = create_cell(follower_cell);}
 				
-	// 		pCell->assign_position( x , y , 0.0 );
+			pCell->assign_position( x , y , 0.0 );
 
 			
-	// 		if( fabs( y ) > 0.01 )
-	// 		{
-	// 			if( UniformRandom() < leader_cell_fraction )
-	// 			{ pCell = create_cell(leader_cell); }
-	// 			else
-	// 			{ pCell = create_cell(follower_cell); }
-	// 			pCell->assign_position( x , -y , 0.0 );
-	// 		}
+			if( fabs( y ) > 0.01 )
+			{
+				if( UniformRandom() < leader_cell_fraction )
+				{ pCell = create_cell(leader_cell); }
+				else
+				{ pCell = create_cell(follower_cell); }
+				pCell->assign_position( x , -y , 0.0 );
+			}
 			
-	// 		if( fabs( x ) > 0.01 )
-	// 		{ 
-	// 			if( UniformRandom() < leader_cell_fraction )
-	// 			{ pCell = create_cell(leader_cell); }
-	// 			else
-	// 			{ pCell = create_cell(follower_cell); }
-	// 			pCell->assign_position( -x , y , 0.0 );
+			if( fabs( x ) > 0.01 )
+			{ 
+				if( UniformRandom() < leader_cell_fraction )
+				{ pCell = create_cell(leader_cell); }
+				else
+				{ pCell = create_cell(follower_cell); }
+				pCell->assign_position( -x , y , 0.0 );
 				
-	// 			if( fabs( y ) > 0.01 )
-	// 			{
-	// 				if( UniformRandom() < leader_cell_fraction )
-	// 				{ pCell = create_cell(leader_cell); }
-	// 				else
-	// 				{ pCell = create_cell(follower_cell); }
+				if( fabs( y ) > 0.01 )
+				{
+					if( UniformRandom() < leader_cell_fraction )
+					{ pCell = create_cell(leader_cell); }
+					else
+					{ pCell = create_cell(follower_cell); }
                    	
-	// 				pCell->assign_position( -x , -y , 0.0 );
-	// 			}
-	// 		}
-	// 		x += cell_spacing; 
+					pCell->assign_position( -x , -y , 0.0 );
+				}
+			}
+			x += cell_spacing; 
 			
-	// 	}
+		}
 		
-	// 	y += cell_spacing * sqrt(3.0)/2.0; 
-	// 	n++; 
-	// }
+		y += cell_spacing * sqrt(3.0)/2.0; 
+		n++; 
+	}
 
 
 	/******************************************3D Spheroid initialization***************************************/
@@ -458,23 +458,23 @@ void setup_tissue( void )
 
 	/************************************Line of cells at y = 0, x > 0 initialization***************************************/
 
-	// int n = 0.0; 
-	// while( n <= 1000.0 )
-	// {
-	// 	pCell = create_cell(follower_cell); 
-	// 	pCell->assign_position( n , 0.0 , 0.0 );
-	// 	n = n + 20.0;
-	// }
+/* 	int n = 0.0; 
+	while( n <= 1000.0 )
+	{
+		pCell = create_cell(follower_cell); 
+		pCell->assign_position( n , 0.0 , 0.0 );
+		n = n + 20.0;
+	} */
 
 	/******************************************Line of cells at x = -1450 initialization***************************************/
 
-	int n = -1490.0; 
+	/* int n = -1490.0; 
 	while( n <= 1490.0 )
 	{
 		pCell = create_cell(leader_cell); 
 		pCell->assign_position( -1450.0 , n , 0.0 );
 		n = n + 10.0;
-	}
+	} */
 		
 	return; 
 
