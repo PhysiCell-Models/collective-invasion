@@ -198,7 +198,7 @@ void create_cell_types( void )
 	
 	leader_cell.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; 
 	
-    leader_cell.functions.update_phenotype = NULL; // leader_cell_phenotype_model;
+    leader_cell.functions.update_phenotype = leader_cell_phenotype_model; //NULL; // leader_cell_phenotype_model;
 	
 	// follower cells
 
@@ -206,12 +206,12 @@ void create_cell_types( void )
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
     
-    follower_cell.functions.update_phenotype = NULL;// follower_cell_phenotype_model;
+    follower_cell.functions.update_phenotype = follower_cell_phenotype_model;//NULL;// follower_cell_phenotype_model;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
-	
+	std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
 	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
-   	
+   	std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
 	// follower_cell.functions.update_migration_bias = ECM_informed_motility_update;
 	// std::cout<<follower_cell.functions.update_migration_bias<<std::endl;
@@ -493,6 +493,7 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
 
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt )
 {
+
 	
 	if(phenotype.death.dead == true)
 	{
@@ -893,7 +894,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 
-    double r_0 = 1/10.0*migration_speed; // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+    double r_0 = 1/1.0*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 
     double r_realignment = r_0 * (1-anisotropy);
     
