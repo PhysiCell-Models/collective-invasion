@@ -229,9 +229,9 @@ void setup_microenvironment( void )
 {
 	// set domain parameters
 
-	default_microenvironment_options.X_range = {-1500, 1500};
+	/* default_microenvironment_options.X_range = {-1500, 1500};
 	default_microenvironment_options.Y_range = {-1500, 1500};
-	default_microenvironment_options.simulate_2D = true; 
+	default_microenvironment_options.simulate_2D = true;  */
 	
 	// Add ECM structures
 	microenvironment.add_density( "ECM", "dimensionless", 0.0 , 0.0 ); 
