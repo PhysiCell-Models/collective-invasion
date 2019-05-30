@@ -196,7 +196,7 @@ int main( int argc, char* argv[] )
 				}
 				if( parameters.bools("enable_ecm_outputs") == true)
 				{
-					sprintf( filename , "output/output%08u_ECM.mat" , PhysiCell_globals.full_output_index);
+					sprintf( filename , "%s/output%08u_ECM.mat" , PhysiCell_settings.folder.c_str(), PhysiCell_globals.full_output_index);
 					write_ECM_Data_matlab( filename );
 				}
 				PhysiCell_globals.full_output_index++; 
