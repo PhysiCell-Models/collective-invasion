@@ -147,13 +147,24 @@ reset:
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
-	
-data-cleanup:
+
+data-cleanup-all:
 	rm -f *.mat
 	rm -f *.xml
 	rm -f *.svg
 	rm -f *.pov
 	rm -f ./Output/*
+	rm -f ./SVG/*
+
+data-cleanup-light:
+	rm -f *.mat
+	rm -f *.xml
+	rm -f *.svg
+	rm -f *.pov
+	rm -f ./Output/*.mat
+	rm -f ./Output/*.xml
+	rm -f ./Output/*.svg
+	rm -f ./Output/*.png
 	rm -f ./SVG/*
 
 # archival 
@@ -163,6 +174,17 @@ zip:
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest.zip VERSION_$(VERSION).zip 
 	mv *.zip archives/
+
+zip-data:
+	zip -r latest-data.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* output/*.xml output/*.mat output/*.svg output/*.png output/*.m output/*.mov output/*.gif output/*.mp4
+	cp latest-data.zip $$(date +%b_%d_%Y_%H%M).zip
+	cp latest-data.zip VERSION_$(VERSION).zip 
+	mv *.zip data_archives/
+
+move-data:
+	mkdir $$(date +%b_%d_%Y_%H%M)
+	cp -a Makefile* /$$(date +%b_%d_%Y_%H%M)
+	mv /$$(date +%b_%d_%Y_%H%M) data//$$(date +%b_%d_%Y_%H%M)
 	
 tar:
 	tar --ignore-failed-read -czf latest.tar Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/* 

@@ -75,7 +75,7 @@
 // custom user modules 
 
 #include "./custom_modules/AMIGOS-invasion.h" 
-#include "./custom_modules/ECM.cpp"
+// #include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
 	
 	create_cell_types();
 	setup_tissue();
-	ECM_setup(microenvironment.number_of_voxels());
+	// ECM_setup(microenvironment.number_of_voxels());
  
 	/* Users typically start modifying here. START USERMODS */ 
 	
@@ -161,6 +161,10 @@ int main( int argc, char* argv[] )
 	
 	std::ofstream report_file;
 
+	//variables for March Project
+	double reset_Cells_interval = 1440.0;
+	bool enable_cell_resets = true;
+
 	// main loop 
 	if( PhysiCell_settings.enable_legacy_saves == true )
 	{	
@@ -192,7 +196,7 @@ int main( int argc, char* argv[] )
 				}
 				if( parameters.bools("enable_ecm_outputs") == true)
 				{
-					sprintf( filename , "output/output%08u_ECM.mat" , PhysiCell_globals.full_output_index);
+					sprintf( filename , "%s/output%08u_ECM.mat" , PhysiCell_settings.folder.c_str(), PhysiCell_globals.full_output_index);
 					write_ECM_Data_matlab( filename );
 				}
 				PhysiCell_globals.full_output_index++; 
@@ -211,6 +215,16 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
 			}
+
+			// if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt)	
+			// {
+			// 	if (enable_cell_resets == true )
+			// 	{
+			// 		reset_cell_position();
+			// 		reset_Cells_interval += 1440;
+			// 	}
+				
+			// }
 		
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
@@ -223,9 +237,9 @@ int main( int argc, char* argv[] )
             // This changes the cell speed and bias as based on the ECM. It is the funciton that makes teh cells "see" the ECM and react to it with changes in their dynamics.
             // In this current LS18 implementation, that means that only follower cells will see the ECM.
             
-            // Need somethign that specifics that only followers do this. Maybe put that into the custom stuff ... Not sure how to do that. Will need somethign similar for the ECM realignment.
+            // May need something that specifics that only followers do this (fixed with test on cell type). Could perhaps put that into the custom stuff. Would need something similar for the ECM realignment. Would like to move this out of diffusion loop so we can specify how frequently it updates.
             
-            cell_update_from_ecm();
+            // cell_update_from_ecm();
             
 			PhysiCell_globals.current_time += diffusion_dt;
 			
@@ -256,4 +270,3 @@ int main( int argc, char* argv[] )
 
 	return 0; 
 }
-

@@ -90,6 +90,10 @@ void leader_cell_motility_model0( Cell* pCell , Phenotype& phenotype , double dt
 
 void switching_phenotype_model( Cell* pCell, Phenotype& phenotype, double dt ); 
 
+void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt );
+
+void reset_cell_position(void);
+
 class Options 
 {
  public: 
@@ -114,3 +118,5 @@ std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
+void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt );
+void write_ECM_Data_matlab( std::string filename );
