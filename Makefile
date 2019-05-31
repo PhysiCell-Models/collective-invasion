@@ -181,6 +181,12 @@ zip-data:
 	cp latest-data.zip VERSION_$(VERSION).zip 
 	mv *.zip data_archives/
 
+zip-source:
+	zip -r latest-data.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* output/*.m
+	cp latest-data.zip $$(date +%b_%d_%Y_%H%M).zip
+	cp latest-data.zip VERSION_$(VERSION).zip 
+	mv *.zip data_archives/
+
 move-data:
 	mkdir $$(date +%b_%d_%Y_%H%M)
 	cp -a Makefile* /$$(date +%b_%d_%Y_%H%M)
