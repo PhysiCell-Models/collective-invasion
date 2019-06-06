@@ -48,7 +48,7 @@
 
 		<Lesion_intialization type="double" units="dimensionless" description="Lesion_intialization">0</Lesion_intialization>
         <tumor_radius type="double" units="microns" description="Initial cell mass radius">150</tumor_radius>
-		<initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized">0.0</initial_leader_cell_fraction>
+		<initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized">0.1</initial_leader_cell_fraction>
 
 		<Cell_properties type="double" units="dimensionless" description="Cell_properties">0</Cell_properties>
         <leader_adhesion type="double" units="dimensionless" description="Strength of leader cells\' cell-cell adhesion">6.5</leader_adhesion>

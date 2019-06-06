@@ -870,7 +870,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
-    int ecm_index = pCell->get_current_voxel_index();
+    int ecm_index = pCell->get_current_voxel_index(); // can likely take out ... 06.05.19 - no time for testing right now though.
 	
 
 	// Find correct fields
@@ -911,15 +911,23 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	       ecm.ecm_data[ecm_index].ECM_orientation[i] *= -1.0;
     } */
 
+// Rewrite with the dot product function and other speed ups (like direct vector addition and substraction). But does this just need rethought??
+
 	double ddotf;
-	std::vector<double> temp;
-	temp.resize(3,0.0);
-	for(int i = 0; i < 3; i++)
-	{
-		temp[i] = ECM_orientation[i] * phenotype.motility.motility_vector[i];
-	}
-	ddotf = temp[1] + temp[2] + temp[3];
-	
+	std::vector<double> norm_cell_motility;
+	norm_cell_motility.resize(3,0.0);
+		// for(int i = 0; i < 3; i++)
+		// {
+		// 	temp[i] = ECM_orientation[i] * phenotype.motility.motility_vector[i];
+		// }
+		// ddotf = temp[1] + temp[2] + temp[3];
+	norm_cell_motility = phenotype.motility.motility_vector;
+	normalize(&norm_cell_motility);
+
+	ddotf = dot_product(ECM_orientation, phenotype.motility.motility_vector);
+
+	std::cout<<ddotf<<std::endl;
+
 	if(ddotf < 0)
 	{
 		for(int i = 0; i < 3; i++)
@@ -935,8 +943,8 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	for(int i = 0; i < 3; i++)
 	{
-		f_minus_d[i] = ECM_orientation[i] - phenotype.motility.motility_vector[i]; // This doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
-		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i];
+		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // This doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
+		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; // Also - this seems out of whack - the ODE isn't being solved ... 
 	}
 	
 	
