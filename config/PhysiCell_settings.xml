@@ -26,7 +26,7 @@
 		<folder>output</folder>  
 
 		<full_data>
-			<interval units="min">6</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		 
@@ -44,11 +44,11 @@
 		<Model_Initialization type="double" units="dimensionless" description="This is a spacer">0</Model_Initialization>
 		<ECM_initialization_parameters type="double" units="dimensionless" description="ECM_initialization_parameters">0</ECM_initialization_parameters>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
-		<initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
+		<initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.25</initial_ECM_density>
 
 		<Lesion_intialization type="double" units="dimensionless" description="Lesion_intialization">0</Lesion_intialization>
         <tumor_radius type="double" units="microns" description="Initial cell mass radius">150</tumor_radius>
-		<initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized">0.1</initial_leader_cell_fraction>
+		<initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized">0.2</initial_leader_cell_fraction>
 
 		<Cell_properties type="double" units="dimensionless" description="Cell_properties">0</Cell_properties>
         <leader_adhesion type="double" units="dimensionless" description="Strength of leader cells\' cell-cell adhesion">6.5</leader_adhesion>

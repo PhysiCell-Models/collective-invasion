@@ -581,15 +581,52 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 
 	/*********************************************Begin speed update***************************************************/
+	
+	// New speed update (06.10.19)
+	
+	// alpha, beta, gamma, and delta are specifified by solving a system of linear equations in which an there is an upper and lower set of bounds beyond which speed is zero.
+	// and a density in which a maxium speed is acheived. 
+	double alpha, beta, delta, episolon;
 
-	// Old update, from model prior to Sumeer 2019
+	// derivied by let the lower and upper bound equal 0.0, and the maximum speed occur at rho = 0.25 as well as the derivitve of speed wrt to rho = 0 at rho = 0.25.
 
-	// Needs min and max stuff
-	pCell->phenotype.motility.migration_speed = (-(4.0)*pow((ECM_density-0.5),2.0) + 1.0) * pCell->custom_data[max_cell_speed_index];
+	alpha = 0;
+	beta = 8.8889;
+	delta = -23.111;
+	episolon = 14.222;
+
+	double speed = alpha + beta * ECM_density + delta * ECM_density * ECM_density + episolon * ECM_density * ECM_density * ECM_density;
+
+	std::cout<<"ECM_density = "<<ECM_density<<std::endl;
+
+	if (speed > 1.0)
+	{
+		pCell->phenotype.motility.migration_speed = 1.0 * pCell->custom_data[max_cell_speed_index];
+
+	}
+
+	else if (speed <= 0.0)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+	}
+	
+	else
+	{
+		pCell->phenotype.motility.migration_speed = speed * pCell->custom_data[max_cell_speed_index];
+	}
+	
+
+	  std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+	// New speed update END
+
+	// Old parabolic update  - just the one line!
+
+	// pCell->phenotype.motility.migration_speed = (-(4.0)*pow((ECM_density-0.5),2.0) + 1.0) * pCell->custom_data[max_cell_speed_index];
 	//   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 
 
-	/*********************************************Begin speed update***************************************************/
+	/*********************************************END speed update***************************************************/
 
 
 	return; 
@@ -892,7 +929,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	double anisotropy = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
     double migration_speed = pCell->phenotype.motility.migration_speed;
 	
-   	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+   	// std:: <<pCell->phenotype.motility.migration_speed<<std::endl;
 
     double r_0 = 1/1.0*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 
@@ -926,7 +963,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	ddotf = dot_product(ECM_orientation, phenotype.motility.motility_vector);
 
-	std::cout<<ddotf<<std::endl;
+	// std::cout<<ddotf<<std::endl;
 
 	if(ddotf < 0)
 	{
@@ -943,8 +980,8 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	for(int i = 0; i < 3; i++)
 	{
-		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // This doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
-		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; // Also - this seems out of whack - the ODE isn't being solved ... 
+		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixedThis doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
+		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; // Also - this seems out of whack - the ODE isn't being solved ... Nope - is the decrement operator so that works!
 	}
 	
 	
