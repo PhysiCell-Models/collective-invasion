@@ -63,9 +63,13 @@
 
 #include "./AMIGOS-invasion.h"
 #include "./ECM.h"
+#include <chrono>  // for high_resolution_clock - https://www.pluralsight.com/blog/software-development/how-to-measure-execution-time-intervals-in-c--
 Cell_Definition leader_cell; 
 Cell_Definition follower_cell; 
 std::vector< std::vector<double> > ECM_fiber_alignment; 
+unsigned long long int counter=0; // counter for calculating average for the crazy ad hoc timing I am doing ... 
+int time_total = 0;
+
 void create_cell_types( void )
 {
 	// use the same random seed so that future experiments have the 
@@ -590,14 +594,14 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	// derivied by let the lower and upper bound equal 0.0, and the maximum speed occur at rho = 0.25 as well as the derivitve of speed wrt to rho = 0 at rho = 0.25.
 
-	alpha = 0;
+ 	alpha = 0;
 	beta = 8.8889;
 	delta = -23.111;
 	episolon = 14.222;
 
 	double speed = alpha + beta * ECM_density + delta * ECM_density * ECM_density + episolon * ECM_density * ECM_density * ECM_density;
 
-	std::cout<<"ECM_density = "<<ECM_density<<std::endl;
+	// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
 
 	if (speed > 1.0)
 	{
@@ -616,7 +620,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	}
 	
 
-	  std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	//   std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
 
 	// New speed update END
 
@@ -904,6 +908,11 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
    return;
 } */
 
+long fibonacci(unsigned n)
+{
+    if (n < 2) return n;
+    return fibonacci(n-1) + fibonacci(n-2);
+}
 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
@@ -918,7 +927,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
     double r = 1.0;
     
-    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (0.5 - ECM_density);
+    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (0.25 - ECM_density);
     
     // END Cell-ECM density interaction
     
@@ -949,15 +958,12 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     } */
 
 // Rewrite with the dot product function and other speed ups (like direct vector addition and substraction). But does this just need rethought??
+	// Record start time
+	auto start = std::chrono::high_resolution_clock::now();
 
 	double ddotf;
 	std::vector<double> norm_cell_motility;
-	norm_cell_motility.resize(3,0.0);
-		// for(int i = 0; i < 3; i++)
-		// {
-		// 	temp[i] = ECM_orientation[i] * phenotype.motility.motility_vector[i];
-		// }
-		// ddotf = temp[1] + temp[2] + temp[3];
+	norm_cell_motility.resize(3,0.0)
 	norm_cell_motility = phenotype.motility.motility_vector;
 	normalize(&norm_cell_motility);
 
@@ -967,20 +973,52 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	if(ddotf < 0)
 	{
-		for(int i = 0; i < 3; i++)
-		{
-		   ECM_orientation[i] *= -1.0;
-		}
+		ECM_orientation = -1.0 * ECM_orientation; // This is pretty simple ... I am not sure what using the sgn function will do to help us with ... Can I get some evidence of this?
+
+
+
+		// I could put it in a new vector, but then that vector will need to be allocated each time and then unallocated. That seems slow. 
+
+		// for(int i = 0; i < 3; i++)
+		// {
+		//    ECM_orientation[i] *= -1.0;
+		// }
 	}
 	
+	// std::cout << "f(8) = " << fibonacci(8) << '\n';
+	// Record end time
+	auto finish = std::chrono::high_resolution_clock::now();
+	
+
+	// Calculate elapsed time using the duration class
+	// std::chrono::duration<double, std::micro> elapsed = finish - start;
+	std::chrono::duration<double, std::micro> elapsed = finish - start;
+
+	// std::cout<<"Wall time for single calculation "<<printf("%3.2f", elapsed.count())<<" us\n";//std::endl;
+	// Call count method on instansance of duration to produce the time
+	// std::cout << printf("%E", elapsed.count()) << " \n";
+
+	// std::cout<< "Wall clock time passed: "
+	// 	// << std::chrono::duration<double, std::nano>(finish-start).count()
+	// 	<< elapsed.count()
+	// 	<< " us\n";
+	counter++;
+	// time_total += std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
+	// time_total += std::chrono::duration<double, std::nano>(finish - start).count();
+	time_total = time_total + elapsed.count();
+	// std::cout<< "Count "<<counter << " \n";
+	// std::cout<< "Time Total "<< time_total << " \n";	
+
 	std::vector<double> f_minus_d;
 	f_minus_d.resize(3,0.0);
 
 //    std::vector<double> d = normalize(pCell->phenotype.motility.motility_vector); or some other method to normalize a vector for use in line 757.
 
+	// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
+
 	for(int i = 0; i < 3; i++)
 	{
-		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixedThis doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
+		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed This doesn't seem right - this is a normal minus a non-formal?? but mabye make sense - faster toe better?
 		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; // Also - this seems out of whack - the ODE isn't being solved ... Nope - is the decrement operator so that works!
 	}
 	
