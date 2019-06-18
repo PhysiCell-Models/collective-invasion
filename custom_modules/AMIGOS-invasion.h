@@ -120,3 +120,4 @@ void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , doubl
 void run_biotransport( double t_max );
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt );
 void write_ECM_Data_matlab( std::string filename );
+double sign_function (double number);

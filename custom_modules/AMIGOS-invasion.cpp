@@ -499,6 +499,17 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
  return out; 
 }
 
+double sign_function (double number)
+{
+	// double sign = 0.0
+	if (number<0)
+	{ return -1.0;}
+
+	else
+	{ return 1.0;}
+
+}
+
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt )
 {
 
@@ -929,7 +940,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
    return;
 } */
 
-long fibonacci(unsigned n)
+long fibonacci(unsigned n) // just being used for timing. 
 {
     if (n < 2) return n;
     return fibonacci(n-1) + fibonacci(n-2);
@@ -989,23 +1000,35 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	norm_cell_motility = phenotype.motility.motility_vector;
 	normalize(&norm_cell_motility);
 
-	ddotf = dot_product(ECM_orientation, phenotype.motility.motility_vector);
+	// ddotf = dot_product(ECM_orientation, phenotype.motility.motility_vector);
+	ddotf = dot_product(ECM_orientation, norm_cell_motility);
 
 	// std::cout<<ddotf<<std::endl;
 
-	if(ddotf < 0)
-	{
-		ECM_orientation = -1.0 * ECM_orientation; // This is pretty simple ... I am not sure what using the sgn function will do to help us with ... Can I get some evidence of this?
+	// for( unsigned int i=0 ; i < ECM_orientation.size() ; i++ )
+ 	// { std::cout<<"Before flipping"<<ECM_orientation[i]<<"\n"; }
+
+	// std::cout<<sign_function(ddotf)<<std::endl;
+	
+	ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later. 
+
+	// for( unsigned int i=0 ; i < ECM_orientation.size() ; i++ )
+ 	// { std::cout<<"After flipping"<<ECM_orientation[i]<<"\n"; }
+
+
+	// if(ddotf < 0)
+	// {
+	// 	ECM_orientation = -1.0 * ECM_orientation; // This is pretty simple ... I am not sure what using the sgn function will do to help us with ... Can I get some evidence of this?
 
 
 
-		// I could put it in a new vector, but then that vector will need to be allocated each time and then unallocated. That seems slow. 
+	// 	// I could put it in a new vector, but then that vector will need to be allocated each time and then unallocated. That seems slow. 
 
-		// for(int i = 0; i < 3; i++)
-		// {
-		//    ECM_orientation[i] *= -1.0;
-		// }
-	}
+	// 	// for(int i = 0; i < 3; i++)
+	// 	// {
+	// 	//    ECM_orientation[i] *= -1.0;
+	// 	// }
+	// }
 	
 	// std::cout << "f(8) = " << fibonacci(8) << '\n';
 	// Record end time
@@ -1016,14 +1039,14 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	// std::chrono::duration<double, std::micro> elapsed = finish - start;
 	std::chrono::duration<double, std::micro> elapsed = finish - start;
 
-	// std::cout<<"Wall time for single calculation "<<printf("%3.2f", elapsed.count())<<" us\n";//std::endl;
-	// Call count method on instansance of duration to produce the time
-	// std::cout << printf("%E", elapsed.count()) << " \n";
+	/* std::cout<<"Wall time for single calculation "<<printf("%3.2f", elapsed.count())<<" us\n";//std::endl;
+	Call count method on instansance of duration to produce the time
+	std::cout << printf("%E", elapsed.count()) << " \n";
 
-	// std::cout<< "Wall clock time passed: "
-	// 	// << std::chrono::duration<double, std::nano>(finish-start).count()
-	// 	<< elapsed.count()
-	// 	<< " us\n";
+	std::cout<< "Wall clock time passed: "
+		// << std::chrono::duration<double, std::nano>(finish-start).count()
+		<< elapsed.count()
+		<< " us\n"; */
 	counter++;
 	// time_total += std::chrono::duration_cast<std::chrono::microseconds>(finish - start).count();
 	// time_total += std::chrono::duration<double, std::nano>(finish - start).count();
