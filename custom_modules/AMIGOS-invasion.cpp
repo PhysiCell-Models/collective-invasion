@@ -152,6 +152,7 @@ void create_cell_types( void )
 	// std::cout<<cell_defaults.functions.update_migration_bias<<std::endl;
 	// std::cin.get();
 	// add custom data 
+	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
 	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
@@ -517,7 +518,6 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
 	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
 	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
-	// static double vmax = parameters.doubles("default_cell_speed"); // Could go into a custom variable instead if cells have different default speeds ... 
 	
 	// sample ECM 
 	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
@@ -916,18 +916,19 @@ long fibonacci(unsigned n)
 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
-    int ecm_index = pCell->get_current_voxel_index(); // can likely take out ... 06.05.19 - no time for testing right now though.
+    // int ecm_index = pCell->get_current_voxel_index(); // can likely take out ... 06.05.19 - no time for testing right now though.
 	
 
 	// Find correct fields
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
     
     // Cell-ECM density interaction
     double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
     double r = 1.0;
     
-    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (0.25 - ECM_density);
+    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
     
     // END Cell-ECM density interaction
     
@@ -963,7 +964,7 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	double ddotf;
 	std::vector<double> norm_cell_motility;
-	norm_cell_motility.resize(3,0.0)
+	norm_cell_motility.resize(3,0.0);
 	norm_cell_motility = phenotype.motility.motility_vector;
 	normalize(&norm_cell_motility);
 

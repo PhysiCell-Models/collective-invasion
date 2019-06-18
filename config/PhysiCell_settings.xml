@@ -57,6 +57,7 @@
         <follower_repulsion type="double" units="dimensionless" description="Strength of follower cells\' cell-cell repulsion">25</follower_repulsion>
         <default_cell_speed type="double" units="microns/minute" description="Base/maximum cell speed">0.3</default_cell_speed>
 		<default_persistence_time type="double" units="minutes" description="Cell directional persistence time">10.0</default_persistence_time>
+		<default_ECM_density_target type="double" units="dimenionless" description="Cell ECM density target">0.25</default_ECM_density_target>
 		<default_chemotaxis_bias type = "double" units="dimensionless" description="Chemotaxis bias for ECM following type cells" hidden="true">0.0</default_chemotaxis_bias>
 		<default_ECM_sensitivity type = "double" units="dimensionless" description="Cell sensitivity to ECM orientation for ECM following type cells">1.0</default_ECM_sensitivity>
 		<oxygen_migration_bias_for_leaders type = "double" units="dimensionless" description="Chemotaxis bias for non-ECM influenced cell types">0.95</oxygen_migration_bias_for_leaders>
