@@ -152,11 +152,14 @@ void create_cell_types( void )
 	// std::cout<<cell_defaults.functions.update_migration_bias<<std::endl;
 	// std::cin.get();
 	// add custom data 
-	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
+	cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", parameters.doubles( "rho_L") );  // Minimum ECM density required for cell motility
+	cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", parameters.doubles( "rho_H") );  // Maximum ECM density allowing cell motility
+	cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", parameters.doubles( "rho_I") );  // Ideal ECM density cell motility
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
 	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
+	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
 	
 	// leader cells 
 	
@@ -518,6 +521,9 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
 	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
 	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
 	
 	// sample ECM 
 	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
@@ -586,41 +592,56 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	/*********************************************Begin speed update***************************************************/
 	
-	// New speed update (06.10.19)
+	// New speed update (06.18.19) - piece wise continous
 	
-	// alpha, beta, gamma, and delta are specifified by solving a system of linear equations in which an there is an upper and lower set of bounds beyond which speed is zero.
-	// and a density in which a maxium speed is acheived. 
-	double alpha, beta, delta, episolon;
-
-	// derivied by let the lower and upper bound equal 0.0, and the maximum speed occur at rho = 0.25 as well as the derivitve of speed wrt to rho = 0 at rho = 0.25.
-
- 	alpha = 0;
-	beta = 8.8889;
-	delta = -23.111;
-	episolon = 14.222;
-
-	double speed = alpha + beta * ECM_density + delta * ECM_density * ECM_density + episolon * ECM_density * ECM_density * ECM_density;
+	double rho_low = pCell->custom_data[min_ECM_mot_den_index];
+	double rho_high = pCell->custom_data[max_ECM_mot_den_index];
+	double rho_ideal = pCell->custom_data[ideal_ECM_mot_den_index];
 
 	// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
 
-	if (speed > 1.0)
+	if (ECM_density <= rho_low)
 	{
-		pCell->phenotype.motility.migration_speed = 1.0 * pCell->custom_data[max_cell_speed_index];
+		pCell->phenotype.motility.migration_speed = 0.0;
 
 	}
 
-	else if (speed <= 0.0)
+	else if (rho_low < ECM_density && ECM_density <= rho_ideal)
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low));
+	}
+
+	else if (rho_ideal < ECM_density && ECM_density < rho_high )
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high));
+	}
+
+	else //if (ECM_density >= rho_high)
 	{
 		pCell->phenotype.motility.migration_speed = 0.0;
 	}
-	
-	else
-	{
-		pCell->phenotype.motility.migration_speed = speed * pCell->custom_data[max_cell_speed_index];
-	}
-	
 
 	//   std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	
+
+	
+
 
 	// New speed update END
 
