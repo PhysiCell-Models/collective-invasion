@@ -162,7 +162,7 @@ int main( int argc, char* argv[] )
 	std::ofstream report_file;
 
 	//variables for March Project
-	double reset_Cells_interval = 1440.0;
+	double reset_Cells_interval = 980.0; // for a 1000 by 1000 um computational domain
 	bool enable_cell_resets = true;
 
 	// main loop 
@@ -216,15 +216,16 @@ int main( int argc, char* argv[] )
 				}
 			}
 
-			// if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt)	
-			// {
-			// 	if (enable_cell_resets == true )
-			// 	{
-			// 		reset_cell_position();
-			// 		reset_Cells_interval += 1440;
-			// 	}
+			// Uncomment to run march test
+ 			/*  if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt)	
+			{
+				if (enable_cell_resets == true )
+				{
+					reset_cell_position();
+					reset_Cells_interval += 980.0; // for a 1000 by 1000 um computational domain
+				}
 				
-			// }
+			} */
 		
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );

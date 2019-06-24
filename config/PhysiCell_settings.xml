@@ -1,9 +1,9 @@
 <PhysiCell_settings version="1.4.1">
 	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
+		<x_min>-750</x_min>
+		<x_max>750</x_max>
+		<y_min>-750</y_min>
+		<y_max>750</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -47,7 +47,7 @@
 		<initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
 
 		<Lesion_intialization type="double" units="dimensionless" description="Lesion_intialization">0</Lesion_intialization>
-        <tumor_radius type="double" units="microns" description="Initial cell mass radius">150</tumor_radius>
+        <tumor_radius type="double" units="microns" description="Initial cell mass radius">175</tumor_radius>
 		<initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized">0.2</initial_leader_cell_fraction>
 
 		<Cell_properties type="double" units="dimensionless" description="Cell_properties">0</Cell_properties>
