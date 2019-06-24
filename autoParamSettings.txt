@@ -1,12 +1,16 @@
-id:test_for_merge_JPM
-status:in progress
-startTime:2019-03-10 23:16:08
+id:DAP_testing_2
+status:sim
+startTime:2019-06-24 16:48:54
 endTime:
-performedBy:
-comments:This ist just a test!!
+performedBy:jpmetzca@indiana.edu
+comments:
 tasks:clean,xml,sim,imgProc,upload,zip
 computerStrength:1
-./overall/max_time:120
+./overall/max_time:2880
+./domain/x_min:-750
+./domain/x_max:750
+./domain/y_min:-750
+./domain/y_max:750
 ./user_parameters/tumor_radius:175
 ./user_parameters/enable_ecm_outputs:true
 ./user_parameters/initial_density_ecm:0.5

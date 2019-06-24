@@ -6,9 +6,10 @@ client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
 boxFolderID:68205708427
 boxFolderZipID:68205648241
 removeZip:True
+removeMovie:True
 resetTime:172800
 numOfRuns:1
 computerStrength:2
-accessToken:rsmwze8kmm0bixwHquktpQWcSW02g6gi
-refressToken:CCHenVQhZaADTumKeG1Zn9Bqu2lcBDks3yYgIkklxGUdXQD6WREzbXsiBimHEmgE
+accessToken:ZO9ZRgFlmjdTcPw81w3B60QvQK3B4K6b
+refressToken:0QiKFBQIkhCgsGgW9Eusy2BUXbrXlBxUrKnCd3EdTnymMTou2YhHQhN1U9AuOj0T
 refressTokenExpires:

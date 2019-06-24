@@ -26,14 +26,14 @@ def createXML(parameters, offLimits=[]):
     tree.write("config/PhysiCell_settings.xml")
 
 def dataCleanup(config):
-    # Emulating make data-cleanup: remove .mat, .xml, .svg, .txt, .pov
+    # Emulating make data-cleanup-light: remove .mat, .xml, .svg, .txt, .pov
     for file in os.listdir("."):
-        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')):
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')) or (config['removeMovie']=='True' and file.endswith('.mp4')):
             os.remove(file)
 
     for file in os.listdir("output/"):
-        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
-         os.remove("output/" + file)
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".png"):
+            os.remove("output/" + file)
 
 def createSettingsFile(parameters):
     data = ""
