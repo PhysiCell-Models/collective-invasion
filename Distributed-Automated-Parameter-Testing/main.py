@@ -61,6 +61,7 @@ def createZip(parameters):
     # Add programming files
     zip.write('config/PhysiCell_settings.xml', compress_type = zipfile.ZIP_DEFLATED)
     zip.write('main-ecm.cpp', compress_type = zipfile.ZIP_DEFLATED)
+    zip.write('Makefile', compress_type = zipfile.ZIP_DEFLATED)
     zip.write('custom_modules/AMIGOS-invasion.h', compress_type = zipfile.ZIP_DEFLATED)
     zip.write('custom_modules/AMIGOS-invasion.cpp', compress_type = zipfile.ZIP_DEFLATED)
 
