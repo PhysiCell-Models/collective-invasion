@@ -1,6 +1,6 @@
 '''
-    Ben Duggan modified by John Metzcar
-    2/18/19
+    Ben Duggan modified by John Metzcar for ECM invasion project
+    06/24/19
     Main script to run distributed parameter testing
 '''
 
