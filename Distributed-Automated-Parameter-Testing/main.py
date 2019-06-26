@@ -1,6 +1,6 @@
 '''
-    Ben Duggan modified by John Metzcar
-    2/18/19
+    Ben Duggan modified by John Metzcar for ECM invasion project
+    06/24/19
     Main script to run distributed parameter testing
 '''
 
@@ -26,14 +26,14 @@ def createXML(parameters, offLimits=[]):
     tree.write("config/PhysiCell_settings.xml")
 
 def dataCleanup(config):
-    # Emulating make data-cleanup: remove .mat, .xml, .svg, .txt, .pov
+    # Emulating make data-cleanup-light: remove .mat, .xml, .svg, .txt, .pov
     for file in os.listdir("."):
-        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')):
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov") or file.endswith(".png") or (config['removeZip']=='True' and file.endswith('.zip')) or (config['removeMovie']=='True' and file.endswith('.mp4')):
             os.remove(file)
 
     for file in os.listdir("output/"):
-        #if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".pov"):
-         os.remove("output/" + file)
+        if file.endswith(".mat") or file.endswith(".xml") or file.endswith(".svg") or file.endswith(".txt") or file.endswith(".png"):
+            os.remove("output/" + file)
 
 def createSettingsFile(parameters):
     data = ""
@@ -61,6 +61,7 @@ def createZip(parameters):
     # Add programming files
     zip.write('config/PhysiCell_settings.xml', compress_type = zipfile.ZIP_DEFLATED)
     zip.write('main-ecm.cpp', compress_type = zipfile.ZIP_DEFLATED)
+    zip.write('Makefile', compress_type = zipfile.ZIP_DEFLATED)
     zip.write('custom_modules/AMIGOS-invasion.h', compress_type = zipfile.ZIP_DEFLATED)
     zip.write('custom_modules/AMIGOS-invasion.cpp', compress_type = zipfile.ZIP_DEFLATED)
 
