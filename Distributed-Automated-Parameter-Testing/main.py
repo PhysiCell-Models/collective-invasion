@@ -105,6 +105,10 @@ def main():
                 createSettingsFile(parameters)
                 ap.updateStatus(parameters['id'], 'xml')
 
+            if 'parameters' in parameters['tasks']:
+                createSettingsFile(parameters)
+                ap.updateStatus(parameters['id'], 'parameters')
+
             if 'sim' in parameters['tasks']:
                 # Run PhysiCell
                 print("Running test")

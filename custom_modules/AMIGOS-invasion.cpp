@@ -115,7 +115,7 @@ void create_cell_types( void )
 	// set default uptake and secretion 
 	// oxygen 
 	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[0] = 10; 
+	cell_defaults.phenotype.secretion.uptake_rates[0] = parameters.doubles("oxygen_uptake"); 
 	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
 
 	// Fields for leader-follower diffusing signal based communication. Commented out 03.11.19
@@ -241,7 +241,7 @@ void setup_microenvironment( void )
 
 	// Turn on gradients - oxygen chemotaxis
 	
-	default_microenvironment_options.calculate_gradients = true; 
+	default_microenvironment_options.calculate_gradients = false; 
 
 	// Temperarily eliminating leader/follower signal (except here)
     
@@ -267,6 +267,16 @@ void setup_microenvironment( void )
 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
     
 	initialize_microenvironment(); 
+
+	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
+
+	for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+	{
+		std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+		microenvironment.gradient_vector(i)[0] = { position[0],position[1],0}; 
+		normalize(&microenvironment.gradient_vector(i)[0]);
+		// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+	}
 	
 	// run to get a decent starting conditoin (refers to code no longer present but will be added back for leader-follower signaling models)
 	
@@ -299,18 +309,18 @@ void setup_microenvironment( void )
 	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
 		// For random 2-D initalization - coment this out to produce starburst or circlular initialization
-		double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+		/* double theta = 6.2831853071795864769252867665590 * uniform_random(); 
 		// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
 		// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 		// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
-		ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0};
+		ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0}; */
 
 		// for starburst or circular initialization - comment this out to produce a random initialization
-		/* std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 		// double radius = sqrt(position[0] * position[0] + position[1]*position[1] + position[2]*position[2]);
 		normalize( &position ); 
 		// ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
-		ECM_fiber_alignment[n] =  { position[1],-position[0],0}; // oriented in cirlce */
+		ECM_fiber_alignment[n] =  { position[1],-position[0],0}; // oriented in cirlce
 
 		normalize(&ECM_fiber_alignment[n]);
 	}
@@ -355,80 +365,65 @@ void run_biotransport( double t_max ) // used to set up initial chemical conditi
 
 void setup_tissue( void )
 {
+	if(parameters.strings("cell_setup") == "random")
+	{
+		std::cout<<"string worked"<<std::endl;
 	
 		/*******************************************Random initialization****************************************/
-	/*Cell* pC;
-	
-	for( int n = 0 ; n < 200 ; n++ )
-	{
-		pC = create_cell(); 
-		pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
-	}*/
+		Cell* pC;
+		
+		for( int n = 0 ; n < 200 ; n++ )
+		{
+			pC = create_cell(); 
+			pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
+		}
 
+		std::cout<<"Cell's placed randomly on domain- this function is HARD CODED!!!! WARNING!!!!!"<<std::endl;
+
+	}
+	
 	/******************************************2D Spheroid initialization***************************************/
 	
-	// place a cluster of tumor cells at the center 
-	
-   	/* pCell->custom_data[0] = NormalRandom( 1.0, 0.33 );
-   	if( pCell->custom_data[0] < 0.0 )
-   	{ pCell->custom_data[0] = 0.0; }
-   	if( pCell->custom_data[0] > 2.0 )
-   	{ pCell->custom_data[0] = .0; } */
-    
-	//Get tumor radius from XML parameters
-	double tumor_radius = parameters.doubles("tumor_radius");
-
-	// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
-
-	double cell_radius = cell_defaults.phenotype.geometry.radius;
-    double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
-    double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
-    
-    double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
-    cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
-    
-	Cell* pCell = NULL; 
-	
-	double x = 0.0;
-	double x_outer = tumor_radius; 
-	double y = 0.0;
-	
-	double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
-	
-	int n = 0; 
-	while( y < tumor_radius )
+	else if(parameters.strings("cell_setup") == "lesion")
 	{
-		x = 0.0; 
-		if( n % 2 == 1 )
-		{ x = 0.5*cell_spacing; }
-		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
-		
-		while( x < x_outer )
-		{
-			if( UniformRandom() < leader_cell_fraction )
-			{ pCell = create_cell(leader_cell); }
-			else
-			{ pCell = create_cell(follower_cell);}
-				
-			pCell->assign_position( x , y , 0.0 );
+		// place a cluster of tumor cells at the center
+    
+		//Get tumor radius from XML parameters
+		double tumor_radius = parameters.doubles("tumor_radius");
 
+		// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
+
+		double cell_radius = cell_defaults.phenotype.geometry.radius;
+		double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
+		double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+		
+		double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
+		cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
+		
+		Cell* pCell = NULL; 
+		
+		double x = 0.0;
+		double x_outer = tumor_radius; 
+		double y = 0.0;
+		
+		double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
+		
+		int n = 0; 
+		while( y < tumor_radius )
+		{
+			x = 0.0; 
+			if( n % 2 == 1 )
+			{ x = 0.5*cell_spacing; }
+			x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
 			
-			if( fabs( y ) > 0.01 )
+			while( x < x_outer )
 			{
 				if( UniformRandom() < leader_cell_fraction )
 				{ pCell = create_cell(leader_cell); }
 				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( x , -y , 0.0 );
-			}
-			
-			if( fabs( x ) > 0.01 )
-			{ 
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell); }
-				pCell->assign_position( -x , y , 0.0 );
+				{ pCell = create_cell(follower_cell);}
+					
+				pCell->assign_position( x , y , 0.0 );
 				
 				if( fabs( y ) > 0.01 )
 				{
@@ -436,18 +431,40 @@ void setup_tissue( void )
 					{ pCell = create_cell(leader_cell); }
 					else
 					{ pCell = create_cell(follower_cell); }
-                   	
-					pCell->assign_position( -x , -y , 0.0 );
+					pCell->assign_position( x , -y , 0.0 );
 				}
+				
+				if( fabs( x ) > 0.01 )
+				{ 
+					if( UniformRandom() < leader_cell_fraction )
+					{ pCell = create_cell(leader_cell); }
+					else
+					{ pCell = create_cell(follower_cell); }
+					pCell->assign_position( -x , y , 0.0 );
+					
+					if( fabs( y ) > 0.01 )
+					{
+						if( UniformRandom() < leader_cell_fraction )
+						{ pCell = create_cell(leader_cell); }
+						else
+						{ pCell = create_cell(follower_cell); }
+						
+						pCell->assign_position( -x , -y , 0.0 );
+					}
+				}
+				x += cell_spacing; 
+				
 			}
-			x += cell_spacing; 
 			
+			y += cell_spacing * sqrt(3.0)/2.0; 
+			n++; 
 		}
-		
-		y += cell_spacing * sqrt(3.0)/2.0; 
-		n++; 
+
+		std::cout<<"Cell's placed in 2-lesion at center of domain"<<std::endl;
+
 	}
 
+	
 
 	/******************************************3D Spheroid initialization***************************************/
 
@@ -455,26 +472,40 @@ void setup_tissue( void )
 
 	/************************************Line of cells at y = 0, x > 0 initialization***************************************/
 
-/* 	int n = default_microenvironment_options.X_range[0] + 10.0; 
-	while( n <= default_microenvironment_options.X_range[1] )
+	else if(parameters.strings("cell_setup") == "cells at y = 0")
 	{
-		pCell = create_cell(follower_cell); 
-		pCell->assign_position( n , 0.0 , 0.0 );
-		n = n + 20.0;
-	} */
+
+		Cell* pCell = NULL; 
+		int n = default_microenvironment_options.X_range[0] + 10.0; 
+		while( n <= default_microenvironment_options.X_range[1] )
+		{
+			pCell = create_cell(follower_cell); 
+			pCell->assign_position( n , 0.0 , 0.0 );
+			n = n + 30.0;
+		}
+		std::cout<<"Cell's placed at y = 0"<<std::endl;
+	}
 
 	/******************************************Line of cells at x = left boundary + 10 initialization***************************************/
-
-/* 	int n = default_microenvironment_options.X_range[0] + 10.0; 
-	while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+	else if(parameters.strings("cell_setup") == "cells at left boundary/march")
 	{
-		pCell = create_cell(leader_cell); 
-		pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-		n = n + 10.0;
-	} */
 		
-	return; 
+		Cell* pCell = NULL; 
+		int n = default_microenvironment_options.X_range[0] + 10.0; 
+		while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+		{
+			pCell = create_cell(leader_cell); 
+			pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
+			n = n + 10.0;
+		}
+		std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
+	}
 
+	else
+	{
+		std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION"<<std::endl;
+	}
+	
 	return; 
 }
 
@@ -545,6 +576,10 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	// get vector for chemotaxis (sample uE)
 	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
 
+	// std::cout<<chemotaxis_grad<<std::endl;
+
+	normalize( &chemotaxis_grad ); 
+
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
 	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
 
@@ -556,6 +591,9 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	// find constants to span d_choice with d_perp and f
 	double c_1 = dot_product( d_motility , d_perp ); 
 	double c_2 = dot_product( d_motility, f ); 
+
+	// std::cout<<"D_mot dot d_perp "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f "<<c_2<<std::endl;
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
@@ -983,7 +1021,7 @@ void write_ECM_Data_matlab( std::string filename )
 
     int number_of_data_entries = microenvironment.number_of_voxels();
 
-    int size_of_each_datum = 8;
+    int size_of_each_datum = 11;
 
 	
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
@@ -1010,6 +1048,12 @@ void write_ECM_Data_matlab( std::string filename )
         fwrite( (char*) &( ECM_fiber_alignment[i][1]), sizeof(double) , 1 , fp ); // 7
 
         fwrite( (char*) &( ECM_fiber_alignment[i][2]), sizeof(double) , 1 , fp ); // 8
+
+		fwrite( (char*) &( microenvironment.gradient_vector(i)[0][0]), sizeof(double) , 1 , fp ); // 9
+
+		fwrite( (char*) &( microenvironment.gradient_vector(i)[0][1]), sizeof(double) , 1 , fp ); // 10
+
+		fwrite( (char*) &( microenvironment.gradient_vector(i)[0][2]), sizeof(double) , 1 , fp ); // 11
 
     }
 

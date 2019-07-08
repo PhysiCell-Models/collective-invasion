@@ -1,9 +1,9 @@
 <PhysiCell_settings version="1.4.1">
 	<domain>
-		<x_min>-750</x_min>
-		<x_max>750</x_max>
-		<y_min>-750</y_min>
-		<y_max>750</y_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -13,25 +13,25 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2880</max_time> 
+		<max_time units="min">7200</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>1</omp_num_threads>
 	</parallel> 
 	
 	<save>
 		<folder>output</folder>  
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</full_data>
 		 
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -43,29 +43,35 @@
 	<user_parameters>
 		<Model_Initialization description="This is a spacer" type="double" units="dimensionless">0</Model_Initialization>
 		<ECM_initialization_parameters description="ECM_initialization_parameters" type="double" units="dimensionless">0</ECM_initialization_parameters>
-        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">0.0</initial_anisotropy>
+        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">1.0</initial_anisotropy>
 		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
 
 		<Lesion_intialization description="Lesion_intialization" type="double" units="dimensionless">0</Lesion_intialization>
-        <tumor_radius description="Initial cell mass radius" type="double" units="microns">175</tumor_radius>
-		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.2</initial_leader_cell_fraction>
+        <tumor_radius description="Initial cell mass radius" type="double" units="microns">150</tumor_radius>
+		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.0</initial_leader_cell_fraction>
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
+		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">0.0</oxygen_uptake>
         <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">1.25</leader_adhesion>
         <leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
         <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">1.25</follower_adhesion>
         <follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25</follower_repulsion>
-        <default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.05</default_cell_speed>
+        <default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">1.0</default_cell_speed>
 		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
 		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
 		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
-		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0.0</default_chemotaxis_bias>
+		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">1.0</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
 		<oxygen_migration_bias_for_leaders description="Chemotaxis bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
+
+		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
+
+		<cell_setup description="Specifies the initial cell setup" type="string" units="microns">lesion</cell_setup>
+
 		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>
 		
 		
