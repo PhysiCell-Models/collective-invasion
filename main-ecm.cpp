@@ -217,7 +217,7 @@ int main( int argc, char* argv[] )
 			}
 
 			// Uncomment to run march test
- 			/*  if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt)	
+ 			if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt && parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)	
 			{
 				if (enable_cell_resets == true )
 				{
@@ -225,10 +225,14 @@ int main( int argc, char* argv[] )
 					reset_Cells_interval += 980.0; // for a 1000 by 1000 um computational domain
 				}
 				
-			} */
+			}
 		
 			// update the microenvironment
-			// microenvironment.simulate_diffusion_decay( diffusion_dt );
+
+			if( parameters.ints("unit_test_setup") == 0) // Is there a way to set this only once??
+			{
+				microenvironment.simulate_diffusion_decay( diffusion_dt );
+			}
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );

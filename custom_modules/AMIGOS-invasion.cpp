@@ -116,6 +116,7 @@ void create_cell_types( void )
 	// oxygen 
 	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
 	cell_defaults.phenotype.secretion.uptake_rates[0] = parameters.doubles("oxygen_uptake"); 
+	std::cout<<cell_defaults.phenotype.secretion.uptake_rates[0]<<std::endl;
 	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
 
 	// Fields for leader-follower diffusing signal based communication. Commented out 03.11.19
@@ -161,6 +162,35 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
 	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
+
+			// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
+
+	if( parameters.ints("unit_test_setup") == 1)
+	{
+		cell_defaults.phenotype.motility.persistence_time = 10.0;
+		cell_defaults.phenotype.motility.migration_speed = 1.0;
+		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 1.25;
+		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 25.0;
+		cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
+		cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
+		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
+		cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 1.0 );  // Ideal ECM density cell motility
+		cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
+
+		std::cout<< "running unit test setup follower"<<std::endl;
+
+	}
+
+	else if ( parameters.ints("unit_test_setup") == 0)
+	{
+		std::cout<<"not in unit test mode"<<std::endl;
+	}
+
+	else
+	{
+		std::cout<<"WARNING!!!!! Cell parameters not set correctly - unit test set up must either be true or false!!!!"<<std::endl;
+	}
+	
 	
 	// leader cells 
 	
@@ -208,6 +238,25 @@ void create_cell_types( void )
 	leader_cell.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
     leader_cell.functions.update_phenotype = leader_cell_phenotype_model; //NULL; // leader_cell_phenotype_model;
+
+	if( parameters.ints("unit_test_setup") == 1)
+	{
+		leader_cell.phenotype.motility.persistence_time = 10.0;
+		leader_cell.phenotype.motility.migration_speed = 1.0;
+		leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = 1.25;
+		leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = 25.0;
+		leader_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
+		leader_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
+		leader_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
+		leader_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 1.0 );  // Ideal ECM density cell motility
+		leader_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
+		if (parameters.ints("march_unit_test_setup") == 1){
+		leader_cell.functions.update_migration_bias = rightward_deterministic_cell_march;
+		}
+
+		// std::cout<< "running unit test setup leader"<<std::endl;
+
+	}
 	
 	// follower cells
 
@@ -222,6 +271,23 @@ void create_cell_types( void )
 	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
    	std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
+	follower_cell.functions.update_migration_bias = ECM_informed_motility_update; // NEW!
+
+	if( parameters.ints("unit_test_setup") == 1)
+	{
+		follower_cell.phenotype.motility.persistence_time = 10.0;
+		follower_cell.phenotype.motility.migration_speed = 1.0;
+		follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = 1.25;
+		follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = 25.0;
+		follower_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
+		follower_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
+		follower_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
+		follower_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 1.0 );  // Ideal ECM density cell motility
+		follower_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
+
+		std::cout<< "running unit test setup follower"<<std::endl;
+
+	}
     
 	// Temperarily eliminating leader/follower signal
 
@@ -258,7 +324,42 @@ void setup_microenvironment( void )
 	// set Dirichlet conditions 
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	std::vector<double> bc_vector = { 38.0 , parameters.doubles("initial_ECM_density") , parameters.doubles("initial_anisotropy") , 0.0, 0.0 };  // 5% o2 , half max ECM , isotropic, leader signal, follower signal
+
+	std::vector<double> bc_vector;
+
+	if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
+	{
+
+		bc_vector = { 38.0 , 0.5, 1.0 , 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
+		default_microenvironment_options.X_range[0] = -500.0;
+		default_microenvironment_options.X_range[1] = 500.0;
+		default_microenvironment_options.Y_range[0] = -500.0;
+		default_microenvironment_options.Y_range[1] = 500.0;
+
+	}
+
+	else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+	{
+		bc_vector = { 38.0 , 0.5, parameters.doubles("initial_anisotropy"), 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
+		default_microenvironment_options.X_range[0] = -500.0;
+		default_microenvironment_options.X_range[1] = 500.0;
+		default_microenvironment_options.Y_range[0] = -500.0;
+		default_microenvironment_options.Y_range[1] = 500.0;
+	}
+
+	else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
+	{
+		bc_vector = { 38.0 , parameters.doubles("initial_ECM_density") , parameters.doubles("initial_anisotropy") , 0.0, 0.0 };  // 5% o2 , half max ECM , isotropic, leader signal, follower signal
+	}
+
+	else
+	{
+		std::cout<<"ECM density and anisotropy not cell correctly!!!! WARNING!!!"<<std::endl;
+
+		return;
+	}
+	
+	
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
     
 	// Temperarily eliminating leader/follower signal	
@@ -270,14 +371,17 @@ void setup_microenvironment( void )
 
 	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
 
-	for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+	if( parameters.ints("unit_test_setup") == 1)
 	{
-		std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-		microenvironment.gradient_vector(i)[0] = { position[0],position[1],0}; 
-		normalize(&microenvironment.gradient_vector(i)[0]);
-		// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+
+		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+		{
+			std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+			microenvironment.gradient_vector(i)[0] = { position[0],position[1],0}; 
+			normalize(&microenvironment.gradient_vector(i)[0]);
+			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+		}
 	}
-	
 	// run to get a decent starting conditoin (refers to code no longer present but will be added back for leader-follower signaling models)
 	
 	// now, let's set the leader signal to 1, so we don't hvae early swiching 
@@ -303,26 +407,59 @@ void setup_microenvironment( void )
 	}*/
 
 	// set up ECM alignment 
+
+	// <ECM_orientation_setup description="Specifies the initial ECM orientation: random, circular, starburt, oriented to the right, or oriented to the top" type="string" units="NA">circular</ECM_orientation_setup> parameters.string( "ECM_orientation_setup")
 	std::vector<double> fiber_direction = { 1.0 , 0.0, 0.0 }; 
 	ECM_fiber_alignment.resize( microenvironment.mesh.voxels.size() , fiber_direction );  
 
 	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
-		// For random 2-D initalization - coment this out to produce starburst or circlular initialization
-		/* double theta = 6.2831853071795864769252867665590 * uniform_random(); 
-		// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
-		// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
-		// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
-		ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0}; */
+		// For random 2-D initalization 
+		if(parameters.strings( "ECM_orientation_setup") == "random")
+		{
+			double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+			// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+			// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+			// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+			ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0};
+		}
 
-		// for starburst or circular initialization - comment this out to produce a random initialization
-		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
-		// double radius = sqrt(position[0] * position[0] + position[1]*position[1] + position[2]*position[2]);
-		normalize( &position ); 
-		// ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
-		ECM_fiber_alignment[n] =  { position[1],-position[0],0}; // oriented in cirlce
+		// for starburst initialization 
+		else if(parameters.strings( "ECM_orientation_setup") == "starburt")
+		{
+			std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+			normalize( &position ); 
+			ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
+			normalize(&ECM_fiber_alignment[n]);
+		}
 
-		normalize(&ECM_fiber_alignment[n]);
+		// for circular initialization 
+		else if(parameters.strings( "ECM_orientation_setup") == "circular")
+		{
+			std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+			normalize( &position );
+			ECM_fiber_alignment[n] =  { position[1],-position[0],0}; // oriented in cirlce
+			normalize(&ECM_fiber_alignment[n]);
+		}
+
+		else if(parameters.strings( "ECM_orientation_setup") == "oriented to the right")
+		{
+			ECM_fiber_alignment[n] =  { 1.0, 0.0, 0.0}; 
+			normalize(&ECM_fiber_alignment[n]);
+		}
+
+		else if(parameters.strings( "ECM_orientation_setup") == "oriented to the top")
+		{
+			ECM_fiber_alignment[n] =  { 0.0, 1.0, 0.0}; 
+			normalize(&ECM_fiber_alignment[n]);
+		}
+
+		else
+		{
+			std::cout<<"WARNING: NO ECM ORIENTATION SPECIFIED. FIX THIS!!!"<<std::endl;
+			return;
+		}
+		
 	}
 	
 	return; 
@@ -364,83 +501,94 @@ void run_biotransport( double t_max ) // used to set up initial chemical conditi
 }
 
 void setup_tissue( void )
-{
-	if(parameters.strings("cell_setup") == "random")
+{	
+
+	if (parameters.ints("march_unit_test_setup") == 0)
 	{
-		std::cout<<"string worked"<<std::endl;
-	
-		/*******************************************Random initialization****************************************/
-		Cell* pC;
-		
-		for( int n = 0 ; n < 200 ; n++ )
+		if(parameters.strings("cell_setup") == "random")
 		{
-			pC = create_cell(); 
-			pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
-		}
-
-		std::cout<<"Cell's placed randomly on domain- this function is HARD CODED!!!! WARNING!!!!!"<<std::endl;
-
-	}
-	
-	/******************************************2D Spheroid initialization***************************************/
-	
-	else if(parameters.strings("cell_setup") == "lesion")
-	{
-		// place a cluster of tumor cells at the center
-    
-		//Get tumor radius from XML parameters
-		double tumor_radius = parameters.doubles("tumor_radius");
-
-		// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
-
-		double cell_radius = cell_defaults.phenotype.geometry.radius;
-		double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
-		double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+			std::cout<<"string worked"<<std::endl;
 		
-		double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
-		cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
-		
-		Cell* pCell = NULL; 
-		
-		double x = 0.0;
-		double x_outer = tumor_radius; 
-		double y = 0.0;
-		
-		double leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
-		
-		int n = 0; 
-		while( y < tumor_radius )
-		{
-			x = 0.0; 
-			if( n % 2 == 1 )
-			{ x = 0.5*cell_spacing; }
-			x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+			/*******************************************Random initialization****************************************/
+			Cell* pC;
 			
-			while( x < x_outer )
+			for( int n = 0 ; n < 200 ; n++ )
 			{
-				if( UniformRandom() < leader_cell_fraction )
-				{ pCell = create_cell(leader_cell); }
-				else
-				{ pCell = create_cell(follower_cell);}
-					
-				pCell->assign_position( x , y , 0.0 );
+				pC = create_cell(); 
+				pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
+			}
+
+			std::cout<<"Cell's placed randomly on domain - this function uses a HARD CODED domain size!!!! WARNING!!!!!"<<std::endl;
+			std::cin.get();
+
+		}
+		
+		/******************************************2D Spheroid initialization***************************************/
+		
+		else if(parameters.strings("cell_setup") == "lesion")
+		{
+			// place a cluster of tumor cells at the center
+		
+			//Get tumor radius from XML parameters
+
+			double tumor_radius; 
+
+			if( parameters.ints("unit_test_setup") == 1)
+			{
+				tumor_radius = 150;
+
+			}
+
+			else
+			{
+				tumor_radius = parameters.doubles("tumor_radius");
+			}
+			
+			
+
+			// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
+
+			double cell_radius = cell_defaults.phenotype.geometry.radius;
+			double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
+			double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+			
+			double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
+			cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
+			
+			Cell* pCell = NULL; 
+			
+			double x = 0.0;
+			double x_outer = tumor_radius; 
+			double y = 0.0;
+
+			double leader_cell_fraction;
+			
+			if( parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 0)
+			{
+				leader_cell_fraction = 0.0;
+			}
+
+			else
+			{
+				leader_cell_fraction = parameters.doubles("initial_leader_cell_fraction"); // 0.2;
+			}
+
+			int n = 0; 
+			while( y < tumor_radius )
+			{
+				x = 0.0; 
+				if( n % 2 == 1 )
+				{ x = 0.5*cell_spacing; }
+				x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
 				
-				if( fabs( y ) > 0.01 )
+				while( x < x_outer )
 				{
 					if( UniformRandom() < leader_cell_fraction )
 					{ pCell = create_cell(leader_cell); }
 					else
-					{ pCell = create_cell(follower_cell); }
-					pCell->assign_position( x , -y , 0.0 );
-				}
-				
-				if( fabs( x ) > 0.01 )
-				{ 
-					if( UniformRandom() < leader_cell_fraction )
-					{ pCell = create_cell(leader_cell); }
-					else
-					{ pCell = create_cell(follower_cell); }
-					pCell->assign_position( -x , y , 0.0 );
+					{ pCell = create_cell(follower_cell);}
+						
+					pCell->assign_position( x , y , 0.0 );
 					
 					if( fabs( y ) > 0.01 )
 					{
@@ -448,48 +596,84 @@ void setup_tissue( void )
 						{ pCell = create_cell(leader_cell); }
 						else
 						{ pCell = create_cell(follower_cell); }
-						
-						pCell->assign_position( -x , -y , 0.0 );
+						pCell->assign_position( x , -y , 0.0 );
 					}
+					
+					if( fabs( x ) > 0.01 )
+					{ 
+						if( UniformRandom() < leader_cell_fraction )
+						{ pCell = create_cell(leader_cell); }
+						else
+						{ pCell = create_cell(follower_cell); }
+						pCell->assign_position( -x , y , 0.0 );
+						
+						if( fabs( y ) > 0.01 )
+						{
+							if( UniformRandom() < leader_cell_fraction )
+							{ pCell = create_cell(leader_cell); }
+							else
+							{ pCell = create_cell(follower_cell); }
+							
+							pCell->assign_position( -x , -y , 0.0 );
+						}
+					}
+					x += cell_spacing; 
+					
 				}
-				x += cell_spacing; 
 				
+				y += cell_spacing * sqrt(3.0)/2.0; 
+				n++; 
 			}
-			
-			y += cell_spacing * sqrt(3.0)/2.0; 
-			n++; 
+
+			std::cout<<"Cell's placed in 2-lesion at center of domain"<<std::endl;
+
 		}
 
-		std::cout<<"Cell's placed in 2-lesion at center of domain"<<std::endl;
-
-	}
-
-	
-
-	/******************************************3D Spheroid initialization***************************************/
-
-	/*To come later*/
-
-	/************************************Line of cells at y = 0, x > 0 initialization***************************************/
-
-	else if(parameters.strings("cell_setup") == "cells at y = 0")
-	{
-
-		Cell* pCell = NULL; 
-		int n = default_microenvironment_options.X_range[0] + 10.0; 
-		while( n <= default_microenvironment_options.X_range[1] )
-		{
-			pCell = create_cell(follower_cell); 
-			pCell->assign_position( n , 0.0 , 0.0 );
-			n = n + 30.0;
-		}
-		std::cout<<"Cell's placed at y = 0"<<std::endl;
-	}
-
-	/******************************************Line of cells at x = left boundary + 10 initialization***************************************/
-	else if(parameters.strings("cell_setup") == "cells at left boundary/march")
-	{
 		
+
+		/******************************************3D Spheroid initialization***************************************/
+
+		/*To come later*/
+
+		/************************************Line of cells at y = 0, x > 0 initialization***************************************/
+
+		else if(parameters.strings("cell_setup") == "cells at y = 0")
+		{
+
+			Cell* pCell = NULL; 
+			int n = default_microenvironment_options.X_range[0] + 10.0; 
+			while( n <= default_microenvironment_options.X_range[1] )
+			{
+				pCell = create_cell(follower_cell); 
+				pCell->assign_position( n , 0.0 , 0.0 );
+				n = n + 30.0;
+			}
+			std::cout<<"Cell's placed at y = 0"<<std::endl;
+		}
+
+		/******************************************Line of cells at x = left boundary + 10 initialization***************************************/
+		else if(parameters.strings("cell_setup") == "cells at left boundary/march")
+		{
+			
+			Cell* pCell = NULL; 
+			int n = default_microenvironment_options.X_range[0] + 10.0; 
+			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+			{
+				pCell = create_cell(leader_cell); 
+				pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
+				n = n + 10.0;
+			}
+			std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
+		}
+
+		else
+		{
+			std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION"<<std::endl;
+		}
+	}
+
+	else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+	{
 		Cell* pCell = NULL; 
 		int n = default_microenvironment_options.X_range[0] + 10.0; 
 		while( n <= default_microenvironment_options.X_range[1] - 10.0 )
@@ -499,13 +683,15 @@ void setup_tissue( void )
 			n = n + 10.0;
 		}
 		std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
+
 	}
 
 	else
 	{
-		std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION"<<std::endl;
+		std::cout<<"RUN MODE (TESTING OR NOT TESTING) NOT SPECIFIED!!!!! WARNING!!!!"<<std::endl;
 	}
 	
+
 	return; 
 }
 
@@ -655,7 +841,10 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		pCell->phenotype.motility.migration_speed = 0.0;
 	}
 
-	//   std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	// std::cout<<"cell adhesion = "<<pCell->phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
+	// std::cout<<"cell repulsion = "<<pCell->phenotype.mechanics.cell_cell_repulsion_strength <<std::endl;
+	// std::cout<<"cell persistence time ="<<pCell->phenotype.motility.persistence_time <<std::endl;
 	
 	// END New speed update 
 
@@ -703,6 +892,8 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	phenotype.motility.is_motile = true; 
 	phenotype.motility.migration_bias = parameters.doubles("oxygen_migration_bias_for_leaders"); //0.95;
 	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
+
+	normalize( &( phenotype.motility.migration_bias_direction ) );
 
 	if(phenotype.death.dead == true)
 	{

@@ -10,6 +10,6 @@ removeMovie:True
 resetTime:172800
 numOfRuns:2
 computerStrength:2
-accessToken:KeRB1Y8zWOlbVWKzmtU5Uyqi9xVaVVpf
-refressToken:cQHMAa7y2HpH4qHaibLCkshp8ED2c7NfhwqoLO2BDuS5gItk4rKBpoiaTcyejEhW
+accessToken:caRJU3g2r5CzMGjwa0XML1hl0KNpEotM
+refressToken:7GDEuLo6Zq6lOcRtmoTlXrTojv8YhfJI6hTyDZ5V0F1RpmNiHrxPwAiYtYFtTgq5
 refressTokenExpires:
