@@ -93,19 +93,19 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>1</omp_num_threads>
 	</parallel> 
 	
 	<save>
 		<folder>output</folder>  
 
 		<full_data>
-			<interval units="min">12</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</full_data>
 		 
 		<SVG>
-			<interval units="min">12</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -125,7 +125,7 @@
 		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.2</initial_leader_cell_fraction>
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
-		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">30.0</oxygen_uptake>
+		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10.0</oxygen_uptake>
         <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</leader_adhesion>
         <leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
         <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
@@ -143,10 +143,11 @@
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
+		<normalize_ECM_influenced_motility_vector hidden="true" type="bool">false</normalize_ECM_influenced_motility_vector>
 		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">0</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
 		<cell_setup description="Specifies the initial cell setup: random, lesion, cells at y = 0, or cells at left boundary/march" type="string">lesion</cell_setup>
-		<ECM_orientation_setup description="Specifies the initial ECM orientation: random, circular, starburt, oriented to the right, or oriented to the top" type="string">starburt</ECM_orientation_setup>
+		<ECM_orientation_setup description="Specifies the initial ECM orientation: random, circular, starburt, oriented to the right, or oriented to the top" type="string">random</ECM_orientation_setup>
 
 		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>
 		

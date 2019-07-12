@@ -169,8 +169,8 @@ void create_cell_types( void )
 	{
 		cell_defaults.phenotype.motility.persistence_time = 10.0;
 		cell_defaults.phenotype.motility.migration_speed = 1.0;
-		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 1.25;
-		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 25.0;
+		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
+		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
 		cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
 		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
@@ -243,8 +243,8 @@ void create_cell_types( void )
 	{
 		leader_cell.phenotype.motility.persistence_time = 10.0;
 		leader_cell.phenotype.motility.migration_speed = 1.0;
-		leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = 1.25;
-		leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = 25.0;
+		leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
+		leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		leader_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
 		leader_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
 		leader_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
@@ -277,8 +277,8 @@ void create_cell_types( void )
 	{
 		follower_cell.phenotype.motility.persistence_time = 10.0;
 		follower_cell.phenotype.motility.migration_speed = 1.0;
-		follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = 1.25;
-		follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = 25.0;
+		follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
+		follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		follower_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
 		follower_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
 		follower_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
@@ -769,6 +769,8 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
 	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
 
+	normalize( &d_motility ); 
+
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
 	
@@ -787,7 +789,10 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
 	// std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
-	normalize( &phenotype.motility.migration_bias_direction ); 
+	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
+	{
+		normalize( &phenotype.motility.migration_bias_direction ); 
+	}
 	// std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 

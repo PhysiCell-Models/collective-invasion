@@ -1,10 +1,10 @@
-id:test_after_changes_to_setup_logic
-status:finished
-startTime:2019-07-11 12:34:58
-endTime:2019-07-11 12:34:57
+id:march_unit_test_changing_orientation_rotating_it
+status:in progress
+startTime:2019-07-11 14:16:45
+endTime:
 performedBy:jpmetzca@indiana.edu
 comments:
-tasks:parameters,clean,sim,imgProc,zip
+tasks:xml,parameters,clean,sim
 computerStrength:1
 ./overall/max_time:7200
 ./domain/x_min:-750
@@ -23,3 +23,7 @@ computerStrength:1
 ./user_parameters/follower_motility_mode:true
 ./user_parameters/follower_repulsion:25
 ./user_parameters/leader_repulsion:25
+./user_parameters/unit_test_setup:1
+./user_parameters/march_unit_test_setup:1
+./user_parameters/initial_anisotropy:1
+./user_parameters/ECM_orientation_setup:oriented to the top
