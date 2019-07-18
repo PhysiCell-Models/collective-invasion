@@ -167,14 +167,15 @@ void create_cell_types( void )
 
 	if( parameters.ints("unit_test_setup") == 1)
 	{
-		cell_defaults.phenotype.motility.persistence_time = 10.0;
+		cell_defaults.phenotype.motility.persistence_time = 10.0; 
 		cell_defaults.phenotype.motility.migration_speed = 1.0;
 		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
 		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
+		cell_defaults.phenotype.secretion.uptake_rates[0] = 0.0;
 		cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
 		cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
-		cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 1.0 );  // Ideal ECM density cell motility
+		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
+		cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
 		cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
 
 		std::cout<< "running unit test setup follower"<<std::endl;
@@ -247,8 +248,8 @@ void create_cell_types( void )
 		leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		leader_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
 		leader_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-		leader_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
-		leader_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 1.0 );  // Ideal ECM density cell motility
+		leader_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
+		leader_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
 		leader_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
 		if (parameters.ints("march_unit_test_setup") == 1){
 		leader_cell.functions.update_migration_bias = rightward_deterministic_cell_march;
@@ -281,14 +282,16 @@ void create_cell_types( void )
 		follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		follower_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
 		follower_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-		follower_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 0.5 );  // Maximum ECM density allowing cell motility
-		follower_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 1.0 );  // Ideal ECM density cell motility
+		follower_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
+		follower_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
 		follower_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
 
 		std::cout<< "running unit test setup follower"<<std::endl;
 
 	}
     
+	std::cout<<"Follower cell migration speed "<<follower_cell.phenotype.motility.migration_speed <<std::endl;
+
 	// Temperarily eliminating leader/follower signal
 
    	// follower_cell.phenotype.secretion.secretion_rates[2] = 50; // follower signal
@@ -716,6 +719,7 @@ double sign_function (double number)
 
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
 
 	
 	if(phenotype.death.dead == true)
@@ -762,19 +766,23 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	// get vector for chemotaxis (sample uE)
 	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
 
-	// std::cout<<chemotaxis_grad<<std::endl;
+	std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
 
 	normalize( &chemotaxis_grad ); 
 
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
 	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+	// normalize( &d_motility ); 
 
-	normalize( &d_motility ); 
+
+	std::cout<<"D motiliyt "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
+
+	std::cout<<"D perp"<<d_perp<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
 	double c_1 = dot_product( d_motility , d_perp ); 
@@ -788,13 +796,20 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
-	// std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
 		normalize( &phenotype.motility.migration_bias_direction ); 
 	}
-	// std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
+
+	double magnitude = norm( phenotype.motility.motility_vector);
+
+	if(magnitude > 0.00000001)
+	{
+		std::cout<<"Cell is moving!!!!"<<std::endl;
+	}
 
 	/****************************************END new migration direction update****************************************/
 
@@ -846,10 +861,21 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		pCell->phenotype.motility.migration_speed = 0.0;
 	}
 
+	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
+	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
+	
+	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+
 	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
 	// std::cout<<"cell adhesion = "<<pCell->phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
 	// std::cout<<"cell repulsion = "<<pCell->phenotype.mechanics.cell_cell_repulsion_strength <<std::endl;
 	// std::cout<<"cell persistence time ="<<pCell->phenotype.motility.persistence_time <<std::endl;
+	// std::cout<<"cell transition rates = "<<phenotype.death.rates[apoptosis_index] <<std::endl;
+	// std::cout<<"cell death rates = "<<phenotype.death.rates[necrosis_index] <<std::endl;
+
+    // leader_cell.phenotype.death.rates[apoptosis_index] = 0.0;
+	// leader_cell.phenotype.death.rates[necrosis_index] = 0.0;
 	
 	// END New speed update 
 
@@ -871,6 +897,8 @@ void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , do
 	pCell->phenotype.motility.migration_bias_direction[0] = 1.0;
    	pCell->phenotype.motility.migration_bias_direction[1] = 0.0;
     pCell->phenotype.motility.migration_bias_direction[2] = 0.0;
+
+	// std::cout<<"Am I running?"<<std::endl;
 
 	return;
 }
@@ -902,7 +930,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 
 	if(phenotype.death.dead == true)
 	{
-		phenotype.motility.is_motile==false;
+		phenotype.motility.is_motile=false;
 		pCell->functions.update_phenotype = NULL;
 		pCell->functions.update_migration_bias = NULL;
 
@@ -1059,7 +1087,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 
 	if(phenotype.death.dead == true)
 	{
-		phenotype.motility.is_motile==false;
+		phenotype.motility.is_motile=false;
 		pCell->functions.update_phenotype = NULL;
 		pCell->functions.update_migration_bias = NULL;
 		// std::cout<<"Follower is dead"<<std::endl;
