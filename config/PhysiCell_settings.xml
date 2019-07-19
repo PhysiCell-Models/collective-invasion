@@ -69,7 +69,7 @@
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
-		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
+		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">true</normalize_ECM_influenced_motility_vector>
 		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
 		<cell_setup description="Specifies the initial cell setup: random, lesion, cells at y = 0, or cells at left boundary/march" type="string">cells at y = 0</cell_setup>

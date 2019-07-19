@@ -3,7 +3,7 @@ PROGRAM_NAME := AMIGOS-invasion
 
 # CC := g++
 # CC := g++-mp-7 # typical macports compiler name
-CC := g++ -g # typical homebrew compiler name
+CC := g++ # typical homebrew compiler name
 
 # Check for environment definitions of compiler 
 # e.g., on CC = g++-7 on OSX
@@ -30,7 +30,8 @@ ARCH := native # best auto-tuning
 # ARCH := nocona #64-bit pentium 4 or later 
 
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
-CFLAGS := -g -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+#CFLAGS := -g -march=$(ARCH) -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 
 COMPILE_COMMAND := $(CC) $(CFLAGS) 
 

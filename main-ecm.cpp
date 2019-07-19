@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
-	SeedRandom(); 
+	SeedRandom(0); 
 	
 	// time setup 
 	std::string time_units = "min"; 

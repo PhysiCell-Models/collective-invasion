@@ -1,5 +1,5 @@
-lastTest:None
-userName:jpmetzca@indiana.edu
+lastTest:
+userName:
 spreedsheetID:17QJFFXto0MbOX5dH9GFP3NevNHiuxj7eZf7Pevcg96U
 client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
 client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0
@@ -8,8 +8,8 @@ boxFolderZipID:80251609030
 removeZip:True
 removeMovie:True
 resetTime:172800
-numOfRuns:2
+numOfRuns:-1
 computerStrength:2
-accessToken:oRbzsTIugRCwOJoBfVzOobNWICgGj2N9
-refressToken:rFNqhxWz6qMjidInJg3HJR3GIPQ1PLWbbwdgYUqxsg8knjKXRrzuo2J4A9AeKX3S
+accessToken:
+refressToken:
 refressTokenExpires:

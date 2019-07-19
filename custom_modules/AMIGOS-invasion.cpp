@@ -772,10 +772,10 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
 	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
-	// normalize( &d_motility ); 
+	normalize( &d_motility ); 
 
 
-	std::cout<<"D motiliyt "<<d_motility<<std::endl;
+	std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
@@ -788,23 +788,25 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double c_1 = dot_product( d_motility , d_perp ); 
 	double c_2 = dot_product( d_motility, f ); 
 
-	// std::cout<<"D_mot dot d_perp "<<c_1<<std::endl;
-	// std::cout<<"D_mot dot f "<<c_2<<std::endl;
+	std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
-	std::cout<<"before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
 		normalize( &phenotype.motility.migration_bias_direction ); 
 	}
-	std::cout<<"after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
 	double magnitude = norm( phenotype.motility.motility_vector);
+
+	std::cout<<"Cell speed is "<< magnitude<<std::endl;
 
 	if(magnitude > 0.00000001)
 	{
