@@ -693,6 +693,21 @@ void setup_tissue( void )
 
 		/*To come later*/
 
+		/************************************Circle of cells at R = 300 initialization***************************************/
+
+		else if(parameters.strings("cell_setup") == "circle of cells")
+		{
+			double theta2 = 0.0;
+			for (int a = 0; a<42; a++)
+			{
+				Cell* pCell = NULL;
+				pCell = create_cell(follower_cell); 
+				pCell->assign_position( 300 * cos(theta2) , 300 * sin(theta2) , 0.0 );
+				theta2 += 0.14959952;
+			}
+
+		}
+
 		/************************************Line of cells at y = 0, x > 0 initialization***************************************/
 
 		else if(parameters.strings("cell_setup") == "cells at y = 0")
@@ -763,7 +778,7 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
 	for( unsigned int i=0 ; i < v.size() ; i++ )
 	{ out += ( v[i] * w[i] ); }
 
-	if( out < 1e-10)
+	if( abs(out) < 1e-10)
 	{out = 0.0;}
 
 	return out; 
@@ -826,6 +841,8 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double angle = UniformRandom() * 6.283185307179586;
 	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
 
+	// std::cout<<"D random "<<d_random<<std::endl;
+
 	// get vector for chemotaxis (sample uE)
 	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
 
@@ -853,8 +870,8 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double c_1 = dot_product( d_motility , d_perp ); 
 	double c_2 = dot_product( d_motility, f ); 
 
-	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
-	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+	std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
@@ -873,7 +890,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
-	double magnitude = norm( phenotype.motility.motility_vector);
+	// double magnitude = norm( phenotype.motility.motility_vector);	
 
 	// std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
 
