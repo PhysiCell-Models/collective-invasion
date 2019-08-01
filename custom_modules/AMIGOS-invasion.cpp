@@ -823,7 +823,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	// get vector for chemotaxis (sample uE)
 	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
 
-	std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
+	// std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
 
 	normalize( &chemotaxis_grad ); 
 
@@ -832,49 +832,49 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	normalize( &d_motility ); 
 
 
-	std::cout<<"D motility "<<d_motility<<std::endl;
+	// std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
 
-	std::cout<<"D perp"<<d_perp<<std::endl;
+	// std::cout<<"D perp"<<d_perp<<std::endl;
 
-	std::cout<<"Fiber "<<f<<std::endl;
+	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
 	double c_1 = dot_product( d_motility , d_perp ); 
 	double c_2 = dot_product( d_motility, f ); 
 
-	std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
-	std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
 
-	std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
-	std::cout<<"c_2*f"<<c_2*f<<std::endl;
+	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
-	std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
 		normalize( &phenotype.motility.migration_bias_direction ); 
-		std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	}
 	
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
 	double magnitude = norm( phenotype.motility.motility_vector);
 
-	std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
+	// std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
 
-	if(magnitude > 0.00000001)
-	{
-		std::cout<<"Cell is moving!!!!"<<std::endl;
-	}
+	// if(magnitude > 0.00000001)
+	// {
+	// 	std::cout<<"Cell is moving!!!!"<<std::endl;
+	// }
 
 	/****************************************END new migration direction update****************************************/
 
@@ -932,7 +932,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
 	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
 
-	std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
 	// std::cout<<"cell adhesion = "<<pCell->phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
 	// std::cout<<"cell repulsion = "<<pCell->phenotype.mechanics.cell_cell_repulsion_strength <<std::endl;
 	// std::cout<<"cell persistence time ="<<pCell->phenotype.motility.persistence_time <<std::endl;
