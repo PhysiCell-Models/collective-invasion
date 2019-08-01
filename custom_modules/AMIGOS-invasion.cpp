@@ -470,7 +470,7 @@ void setup_microenvironment( void )
 		}
 
 		// for starburst initialization 
-		else if(parameters.strings( "ECM_orientation_setup") == "starburt")
+		else if(parameters.strings( "ECM_orientation_setup") == "starburst")
 		{
 			std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 			normalize( &position ); 
@@ -502,6 +502,8 @@ void setup_microenvironment( void )
 		else
 		{
 			std::cout<<"WARNING: NO ECM ORIENTATION SPECIFIED. FIX THIS!!!"<<std::endl;
+			std::cout<<"Halting program!!!"<<std::endl;
+			abort();
 			return;
 		}
 		
