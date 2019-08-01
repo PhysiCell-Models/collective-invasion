@@ -13,4 +13,3 @@ computerStrength:2
 accessToken:
 refressToken:
 refressTokenExpires:
-    
