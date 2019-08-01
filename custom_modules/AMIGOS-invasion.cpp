@@ -717,7 +717,11 @@ void setup_tissue( void )
 			int n = default_microenvironment_options.X_range[0] + 10.0; 
 			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
 			{
-				pCell = create_cell(leader_cell); 
+				if (parameters.ints("march_unit_test_setup") == 1)
+				{pCell = create_cell(leader_cell);}
+
+				else 
+				{pCell = create_cell(follower_cell);}
 				pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
 				n = n + 10.0;
 			}

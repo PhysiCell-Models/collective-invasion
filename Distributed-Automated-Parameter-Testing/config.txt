@@ -1,5 +1,5 @@
-lastTest:test_simulation_with_new_code
-userName:jpmetzca@indiana.edu
+lastTest:
+userName:
 spreedsheetID:17QJFFXto0MbOX5dH9GFP3NevNHiuxj7eZf7Pevcg96U
 client_id:zxgemq9mq26su60nlmp9uybkjzuljnxy
 client_secret:gzdrtOwb2UYNgPsfBCJahQtY151S4ip0

@@ -72,7 +72,7 @@
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
 		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
-		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, or cells at left boundary/march" type="string">cells at y = 0</cell_setup>
+		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, or cells at left boundary/march" type="string">cells at left boundary/march</cell_setup>
 		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">vertical</ECM_orientation_setup>
 		<chemical_field_setup description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, or angle" type="string">vertical up</chemical_field_setup>
 		<angle_of_chemical_field_gradient description="Angle of chemical field gradient orientation, specified in degrees" type="double">45.0</angle_of_chemical_field_gradient>
