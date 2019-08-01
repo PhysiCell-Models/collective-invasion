@@ -597,6 +597,10 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
 
 	pCell->update_motility_vector(dt); 
 	pCell->velocity += phenotype.motility.motility_vector; 
+
+	// std::cout<<"Raw raw desired cell speed - "<<phenotype.motility.migration_speed<<std::endl;
+
+	// std::cout<<"Velocity = "<<pCell->velocity<<std::endl;
 	
 	return; 
 }
