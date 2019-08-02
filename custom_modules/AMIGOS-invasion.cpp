@@ -335,7 +335,7 @@ void setup_microenvironment( void )
 	if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
 	{
 
-		bc_vector = { 38.0 , 0.5, 1.0 , 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
+		bc_vector = { 38.0 , 0.5, parameters.doubles("initial_anisotropy") , 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
 		default_microenvironment_options.X_range[0] = -500.0;
 		default_microenvironment_options.X_range[1] = 500.0;
 		default_microenvironment_options.Y_range[0] = -500.0;
@@ -558,7 +558,7 @@ void setup_tissue( void )
 			Cell* pC;
 			pC = create_cell();
 			pC->assign_position(0.0, 0.0, 0.0);
-			std::cin.get();
+			// std::cin.get();
 
 		}
 
@@ -870,13 +870,15 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double c_1 = dot_product( d_motility , d_perp ); 
 	double c_2 = dot_product( d_motility, f ); 
 
-	std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
-	std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
-
+	// std::cout<<"anisotropy = "<<a<<std::endl;
+	// std::cout<<"ECM sensitivity index = "<<pCell->custom_data[ECM_sensitivity_index]<<std::endl;
+	// std::cout<<"gamma = "<< gamma <<std::endl;
 	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
 	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
 
@@ -885,7 +887,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
 		normalize( &phenotype.motility.migration_bias_direction ); 
-		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	}
 	
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
