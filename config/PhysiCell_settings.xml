@@ -62,7 +62,7 @@
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
 		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
-		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">1</default_chemotaxis_bias>
+		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
 		<oxygen_migration_bias_for_leaders description="Chemotaxis bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
@@ -70,9 +70,9 @@
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">true</normalize_ECM_influenced_motility_vector>
-		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">0</unit_test_setup>
-		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">1</march_unit_test_setup>
-		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">circle oF cells</cell_setup>
+		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
+		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
+		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">cells at y = 0</cell_setup>
 		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">circular</ECM_orientation_setup>
 		<chemical_field_setup description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, angle, or none" type="string">none</chemical_field_setup>
 		<angle_of_chemical_field_gradient description="Angle of chemical field gradient orientation, specified in degrees" type="double">45.0</angle_of_chemical_field_gradient>

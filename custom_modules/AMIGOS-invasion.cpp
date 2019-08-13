@@ -572,6 +572,18 @@ void run_biotransport( double t_max ) // used to set up initial chemical conditi
 	return; 
 }
 
+void set_cell_motility_vectors( void )
+{
+	for( int i=0 ; i < (*all_cells).size() ; i++ )
+	{
+		Cell* pCell = (*all_cells)[i];
+		pCell->update_motility_vector( 20 );
+		std::cout<<"Initial Motility vector "<<pCell->phenotype.motility.motility_vector<<std::endl;
+
+	}
+}
+
+
 void setup_tissue( void )
 {	
 
