@@ -886,9 +886,17 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
-		normalize( &phenotype.motility.migration_bias_direction ); 
-		std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		// normalize( &phenotype.motility.migration_bias_direction ); // only needed if not running through the update_migration_bias code/bias not set to 1.0
+		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		pCell->phenotype.motility.migration_speed = 1.0;
 	}
+
+	else
+	{
+		pCell->phenotype.motility.migration_speed = norm( phenotype.motility.migration_bias_direction);
+		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+	
 	
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
@@ -930,7 +938,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low));
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -943,7 +951,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high));
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
