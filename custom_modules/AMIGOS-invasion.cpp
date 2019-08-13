@@ -359,8 +359,9 @@ void setup_microenvironment( void )
 
 	else
 	{
-		std::cout<<"ECM density and anisotropy not cell correctly!!!! WARNING!!!"<<std::endl;
-
+		std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+		std::cout<<"Halting!"<<std::endl;
+		abort();
 		return;
 	}
 	
@@ -375,6 +376,12 @@ void setup_microenvironment( void )
 	initialize_microenvironment(); 
 
 	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
+
+	// Catching if chemical field gradient not specified for unit testing - if chemical_field_setup_specified_bool is true, there is a string match in the chemical field setup, else, the field is not specified. Program halts in this condition if unit testing IS specified and displays message requesting user specify the chemical field set up.
+
+	bool chemical_field_setup_specified_bool = (parameters.strings("chemical_field_setup")== "starburst" ||  parameters.strings("chemical_field_setup")== "vertical up" || parameters.strings("chemical_field_setup") == "horizontal right" || parameters.strings("chemical_field_setup") == "angle" || parameters.strings("chemical_field_setup") == "none");
+
+	// std::cout<<"Chemical field specified? "<<chemical_field_setup_specified_bool<<std::endl;
 
 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "starburst")
 	{
@@ -425,6 +432,24 @@ void setup_microenvironment( void )
 		}
 	}
 
+	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "none")
+	{
+
+		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+		{
+			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+			microenvironment.gradient_vector(i)[0] = { 0,0,0}; 
+		}
+
+	}
+
+	else if( parameters.ints("unit_test_setup") == 1 && chemical_field_setup_specified_bool == 0)
+	{
+		std::cout<<"WARNING: NO CHEMICAL FIELD ORIENTATION SPECIFIED for unit testing. FIX THIS!!!"<<std::endl;
+		std::cout<<"Halting program!!!"<<std::endl;
+		abort();
+		return;
+	}
 
 
 	// run to get a decent starting conditoin (refers to code no longer present but will be added back for leader-follower signaling models)
@@ -745,7 +770,10 @@ void setup_tissue( void )
 
 		else
 		{
-			std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION"<<std::endl;
+			std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION and FIX"<<std::endl;
+			std::cout<<"Halting program!!!"<<std::endl;
+			abort();
+			return;
 		}
 	}
 
@@ -766,6 +794,9 @@ void setup_tissue( void )
 	else
 	{
 		std::cout<<"RUN MODE (TESTING OR NOT TESTING) NOT SPECIFIED!!!!! WARNING!!!!"<<std::endl;
+		std::cout<<"Halting program!!!"<<std::endl;
+		abort();
+		return;
 	}
 	
 
