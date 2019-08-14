@@ -153,7 +153,11 @@ int main( int argc, char* argv[] )
 	display_citations(); 
 	
 	run_biotransport( 5.0 ); 
-	
+
+	if(parameters.ints("unit_test_setup")==1)
+	{
+		set_cell_motility_vectors();
+	}
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();

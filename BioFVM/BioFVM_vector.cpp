@@ -205,8 +205,12 @@ void normalize( std::vector<double>* v )
 {
  double norm = 1e-32; 
 
+//  (*v)[0] += 1e-32;
+//  (*v)[1] += 1e-32;
+// (*v)[2] += 1e-32;
+
  for( unsigned int i=0; i < v->size(); i++ )
- { norm += ( (*v)[i] * (*v)[i] ); }
+ { norm += ( (*v)[i] * (*v)[i]); }
  norm = sqrt( norm ); 
 
  for( unsigned int i=0; i < v->size(); i++ )

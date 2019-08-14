@@ -274,6 +274,8 @@ void create_cell_types( void )
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
 	follower_cell.functions.update_migration_bias = ECM_informed_motility_update; // NEW!
 
+	// Why do these lines not overwrite the cell defaults?
+
 	if( parameters.ints("unit_test_setup") == 1)
 	{
 		follower_cell.phenotype.motility.persistence_time = 10.0;
@@ -333,7 +335,7 @@ void setup_microenvironment( void )
 	if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
 	{
 
-		bc_vector = { 38.0 , 0.5, 1.0 , 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
+		bc_vector = { 38.0 , 0.5, parameters.doubles("initial_anisotropy") , 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
 		default_microenvironment_options.X_range[0] = -500.0;
 		default_microenvironment_options.X_range[1] = 500.0;
 		default_microenvironment_options.Y_range[0] = -500.0;
@@ -357,8 +359,9 @@ void setup_microenvironment( void )
 
 	else
 	{
-		std::cout<<"ECM density and anisotropy not cell correctly!!!! WARNING!!!"<<std::endl;
-
+		std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+		std::cout<<"Halting!"<<std::endl;
+		abort();
 		return;
 	}
 	
@@ -374,7 +377,13 @@ void setup_microenvironment( void )
 
 	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
 
-	if( parameters.ints("unit_test_setup") == 1)
+	// Catching if chemical field gradient not specified for unit testing - if chemical_field_setup_specified_bool is true, there is a string match in the chemical field setup, else, the field is not specified. Program halts in this condition if unit testing IS specified and displays message requesting user specify the chemical field set up.
+
+	bool chemical_field_setup_specified_bool = (parameters.strings("chemical_field_setup")== "starburst" ||  parameters.strings("chemical_field_setup")== "vertical up" || parameters.strings("chemical_field_setup") == "horizontal right" || parameters.strings("chemical_field_setup") == "angle" || parameters.strings("chemical_field_setup") == "none");
+
+	// std::cout<<"Chemical field specified? "<<chemical_field_setup_specified_bool<<std::endl;
+
+	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "starburst")
 	{
 
 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
@@ -385,6 +394,64 @@ void setup_microenvironment( void )
 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
 		}
 	}
+
+	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "vertical up")
+	{
+
+		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+		{
+			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+			microenvironment.gradient_vector(i)[0] = { 0,1,0}; 
+			normalize(&microenvironment.gradient_vector(i)[0]);
+			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+		}
+	}
+
+	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "horizontal right")
+	{
+
+		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+		{
+			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+			microenvironment.gradient_vector(i)[0] = { 1,0,0}; 
+			normalize(&microenvironment.gradient_vector(i)[0]);
+			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+		}
+	}
+
+	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "angle")
+	{
+		
+
+		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+		{
+			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+			microenvironment.gradient_vector(i)[0] = { cos ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180) , sin ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180),0}; 
+			normalize(&microenvironment.gradient_vector(i)[0]);
+			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+		}
+	}
+
+	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "none")
+	{
+
+		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+		{
+			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+			microenvironment.gradient_vector(i)[0] = { 0,0,0}; 
+		}
+
+	}
+
+	else if( parameters.ints("unit_test_setup") == 1 && chemical_field_setup_specified_bool == 0)
+	{
+		std::cout<<"WARNING: NO CHEMICAL FIELD ORIENTATION SPECIFIED for unit testing. FIX THIS!!!"<<std::endl;
+		std::cout<<"Halting program!!!"<<std::endl;
+		abort();
+		return;
+	}
+
+
 	// run to get a decent starting conditoin (refers to code no longer present but will be added back for leader-follower signaling models)
 	
 	// now, let's set the leader signal to 1, so we don't hvae early swiching 
@@ -428,7 +495,7 @@ void setup_microenvironment( void )
 		}
 
 		// for starburst initialization 
-		else if(parameters.strings( "ECM_orientation_setup") == "starburt")
+		else if(parameters.strings( "ECM_orientation_setup") == "starburst")
 		{
 			std::vector<double> position = microenvironment.mesh.voxels[n].center; 
 			normalize( &position ); 
@@ -445,13 +512,13 @@ void setup_microenvironment( void )
 			normalize(&ECM_fiber_alignment[n]);
 		}
 
-		else if(parameters.strings( "ECM_orientation_setup") == "oriented to the right")
+		else if(parameters.strings( "ECM_orientation_setup") == "horizontal")
 		{
 			ECM_fiber_alignment[n] =  { 1.0, 0.0, 0.0}; 
 			normalize(&ECM_fiber_alignment[n]);
 		}
 
-		else if(parameters.strings( "ECM_orientation_setup") == "oriented to the top")
+		else if(parameters.strings( "ECM_orientation_setup") == "vertical")
 		{
 			ECM_fiber_alignment[n] =  { 0.0, 1.0, 0.0}; 
 			normalize(&ECM_fiber_alignment[n]);
@@ -460,6 +527,8 @@ void setup_microenvironment( void )
 		else
 		{
 			std::cout<<"WARNING: NO ECM ORIENTATION SPECIFIED. FIX THIS!!!"<<std::endl;
+			std::cout<<"Halting program!!!"<<std::endl;
+			abort();
 			return;
 		}
 		
@@ -503,11 +572,33 @@ void run_biotransport( double t_max ) // used to set up initial chemical conditi
 	return; 
 }
 
+void set_cell_motility_vectors( void )
+{
+	for( int i=0 ; i < (*all_cells).size() ; i++ )
+	{
+		Cell* pCell = (*all_cells)[i];
+		pCell->update_motility_vector( 20 );
+		std::cout<<"Initial Motility vector "<<pCell->phenotype.motility.motility_vector<<std::endl;
+
+	}
+}
+
+
 void setup_tissue( void )
 {	
 
 	if (parameters.ints("march_unit_test_setup") == 0)
 	{
+
+		if(parameters.strings("cell_setup") == "single")
+		{
+			Cell* pC;
+			pC = create_cell();
+			pC->assign_position(0.0, 0.0, 0.0);
+			// std::cin.get();
+
+		}
+
 		if(parameters.strings("cell_setup") == "random")
 		{
 			std::cout<<"string worked"<<std::endl;
@@ -569,6 +660,7 @@ void setup_tissue( void )
 			if( parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 0)
 			{
 				leader_cell_fraction = 0.0;
+				cell_spacing = 1.90 * cell_radius;
 			}
 
 			else
@@ -638,6 +730,21 @@ void setup_tissue( void )
 
 		/*To come later*/
 
+		/************************************Circle of cells at R = 300 initialization***************************************/
+
+		else if(parameters.strings("cell_setup") == "circle of cells")
+		{
+			double theta2 = 0.0;
+			for (int a = 0; a<42; a++)
+			{
+				Cell* pCell = NULL;
+				pCell = create_cell(follower_cell); 
+				pCell->assign_position( 300 * cos(theta2) , 300 * sin(theta2) , 0.0 );
+				theta2 += 0.14959952;
+			}
+
+		}
+
 		/************************************Line of cells at y = 0, x > 0 initialization***************************************/
 
 		else if(parameters.strings("cell_setup") == "cells at y = 0")
@@ -662,7 +769,11 @@ void setup_tissue( void )
 			int n = default_microenvironment_options.X_range[0] + 10.0; 
 			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
 			{
-				pCell = create_cell(leader_cell); 
+				if (parameters.ints("march_unit_test_setup") == 1)
+				{pCell = create_cell(leader_cell);}
+
+				else 
+				{pCell = create_cell(follower_cell);}
 				pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
 				n = n + 10.0;
 			}
@@ -671,7 +782,10 @@ void setup_tissue( void )
 
 		else
 		{
-			std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION"<<std::endl;
+			std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION and FIX"<<std::endl;
+			std::cout<<"Halting program!!!"<<std::endl;
+			abort();
+			return;
 		}
 	}
 
@@ -692,6 +806,9 @@ void setup_tissue( void )
 	else
 	{
 		std::cout<<"RUN MODE (TESTING OR NOT TESTING) NOT SPECIFIED!!!!! WARNING!!!!"<<std::endl;
+		std::cout<<"Halting program!!!"<<std::endl;
+		abort();
+		return;
 	}
 	
 
@@ -700,10 +817,14 @@ void setup_tissue( void )
 
 double dot_product( const std::vector<double>& v , const std::vector<double>& w )
 {
- double out = 0.0; 
- for( unsigned int i=0 ; i < v.size() ; i++ )
- { out += ( v[i] * w[i] ); }
- return out; 
+	double out = 0.0; 
+	for( unsigned int i=0 ; i < v.size() ; i++ )
+	{ out += ( v[i] * w[i] ); }
+
+	if( abs(out) < 1e-10)
+	{out = 0.0;}
+
+	return out; 
 }
 
 double sign_function (double number)
@@ -763,10 +884,12 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	double angle = UniformRandom() * 6.283185307179586;
 	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
 
+	// std::cout<<"D random "<<d_random<<std::endl;
+
 	// get vector for chemotaxis (sample uE)
 	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
 
-	std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
+	// std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
 
 	normalize( &chemotaxis_grad ); 
 
@@ -775,43 +898,59 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	normalize( &d_motility ); 
 
 
-	std::cout<<"D motility "<<d_motility<<std::endl;
+	// std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
 
-	std::cout<<"D perp"<<d_perp<<std::endl;
+	// std::cout<<"D perp"<<d_perp<<std::endl;
+
+	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
 	double c_1 = dot_product( d_motility , d_perp ); 
 	double c_2 = dot_product( d_motility, f ); 
 
-	std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
-	std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
+	// std::cout<<"anisotropy = "<<a<<std::endl;
+	// std::cout<<"ECM sensitivity index = "<<pCell->custom_data[ECM_sensitivity_index]<<std::endl;
+	// std::cout<<"gamma = "<< gamma <<std::endl;
+	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
 
 	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
-	std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
-		normalize( &phenotype.motility.migration_bias_direction ); 
+		// normalize( &phenotype.motility.migration_bias_direction ); // only needed if not running through the update_migration_bias code/bias not set to 1.0
+		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		pCell->phenotype.motility.migration_speed = 1.0;
 	}
-	std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+
+	else
+	{
+		pCell->phenotype.motility.migration_speed = norm( phenotype.motility.migration_bias_direction);
+		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+	
+	
 	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
 
-	double magnitude = norm( phenotype.motility.motility_vector);
+	// double magnitude = norm( phenotype.motility.motility_vector);	
 
-	std::cout<<"Cell speed is "<< magnitude<<std::endl;
+	// std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
 
-	if(magnitude > 0.00000001)
-	{
-		std::cout<<"Cell is moving!!!!"<<std::endl;
-	}
+	// if(magnitude > 0.00000001)
+	// {
+	// 	std::cout<<"Cell is moving!!!!"<<std::endl;
+	// }
 
 	/****************************************END new migration direction update****************************************/
 
@@ -842,7 +981,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low));
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -855,7 +994,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high));
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
@@ -989,10 +1128,16 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
 		return output; 
 	} 
 
-
 	// followers are yellow
     if( pCell->type == 2 )
     {
+		if( pCell->ID % 5 == 0)
+		{
+			output[0] = "red";
+        	output[2] = "red";
+        	return output;
+		}
+
         output[0] = "yellow";
         output[2] = "yellow";
         return output;
