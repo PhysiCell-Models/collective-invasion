@@ -821,7 +821,7 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
 	for( unsigned int i=0 ; i < v.size() ; i++ )
 	{ out += ( v[i] * w[i] ); }
 
-	if( abs(out) < 1e-10)
+	if( fabs(out) < 1e-10)
 	{out = 0.0;}
 
 	return out; 
