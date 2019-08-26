@@ -1128,9 +1128,20 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
 		return output; 
 	} 
 
-	// followers are yellow
-    if( pCell->type == 2 )
+	// followers are yellow except for the marker cells when running testing mode (then 20 % of cells are red)
+    
+	if( pCell->type == 2 )
     {
+		output[0] = "yellow";
+        output[2] = "yellow";	
+		
+		// Return yellow for followers and exit statement
+
+		if(parameters.ints("unit_test_setup")==0)
+		{return output;}
+
+		// Return red for 20% of followers if unit test is called for	
+
 		if( pCell->ID % 5 == 0)
 		{
 			output[0] = "red";
@@ -1138,8 +1149,8 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
         	return output;
 		}
 
-        output[0] = "yellow";
-        output[2] = "yellow";
+		// If doing unit testing AND cell not selected as marker cell, return yellow (assigned prior to first if statement)
+
         return output;
     }
 	
