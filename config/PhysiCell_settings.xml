@@ -43,11 +43,11 @@
 	<user_parameters>
 		<Model_Initialization description="This is a spacer" type="double" units="dimensionless">0</Model_Initialization>
 		<ECM_initialization_parameters description="ECM_initialization_parameters" type="double" units="dimensionless">0</ECM_initialization_parameters>
-        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">1</initial_anisotropy>
+        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">0</initial_anisotropy>
 		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
 
 		<Lesion_intialization description="Lesion_intialization" type="double" units="dimensionless">0</Lesion_intialization>
-        <tumor_radius description="Initial cell mass radius" type="double" units="microns">175</tumor_radius>
+        <tumor_radius description="Initial cell mass radius" type="double" units="microns">50</tumor_radius>
 		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.2</initial_leader_cell_fraction>
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
@@ -60,7 +60,7 @@
 		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
 		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
-		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
+		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">0.0</default_persistence_time>
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
 		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
@@ -68,12 +68,15 @@
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
 
+		<Microenvironment_parameters descriptions="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
+		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">10.1</chemotactic_substrate_decay_rate>
+
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">true</normalize_ECM_influenced_motility_vector>
-		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
+		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">0</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
-		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">cells at y = 0</cell_setup>
-		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">circular</ECM_orientation_setup>
+		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">lesion</cell_setup>
+		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">random</ECM_orientation_setup>
 		<chemical_field_setup description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, angle, or none" type="string">none</chemical_field_setup>
 		<angle_of_chemical_field_gradient description="Angle of chemical field gradient orientation, specified in degrees" type="double">45.0</angle_of_chemical_field_gradient>
 		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>

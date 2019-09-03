@@ -312,7 +312,12 @@ void setup_microenvironment( void )
 
 	// Turn on gradients - oxygen chemotaxis
 	
-	default_microenvironment_options.calculate_gradients = false; 
+	default_microenvironment_options.calculate_gradients = true; 
+
+	// let BioFVM use oxygen as the default 
+	
+	default_microenvironment_options.use_oxygen_as_first_field = true; 
+	
 
 	// Temperarily eliminating leader/follower signal (except here)
     
@@ -321,10 +326,6 @@ void setup_microenvironment( void )
     microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 	// Temperarily eliminating leader/follower signal	
-    
-	// let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = true; 
 	
 	// set Dirichlet conditions 
 	
@@ -374,6 +375,8 @@ void setup_microenvironment( void )
 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
     
 	initialize_microenvironment(); 
+
+	microenvironment.decay_rates[0] = parameters.doubles("chemotactic_substrate_decay_rate");
 
 	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
 

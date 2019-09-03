@@ -142,6 +142,9 @@
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
 
+		<Microenvironment_parameters descriptions="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
+		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>
+
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
 		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
