@@ -238,7 +238,7 @@ void create_cell_types( void )
 	
 	leader_cell.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
-    leader_cell.functions.update_phenotype = leader_cell_phenotype_model; //NULL; // leader_cell_phenotype_model;
+    leader_cell.functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
 	if( parameters.ints("unit_test_setup") == 1)
 	{
@@ -265,7 +265,7 @@ void create_cell_types( void )
 	follower_cell.name = "follower cell"; 
 	follower_cell.type = 2;
     
-    follower_cell.functions.update_phenotype = follower_cell_phenotype_model;//NULL;// follower_cell_phenotype_model;
+    follower_cell.functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
 	follower_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("follower_adhesion");
 	std::cout<<follower_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
@@ -571,6 +571,7 @@ void run_biotransport( double t_max ) // used to set up initial chemical conditi
 		}
 		t += diffusion_dt; 
 	}
+	
 	std::cout << "done!" << std::endl; 
 	return; 
 }
@@ -586,7 +587,19 @@ void set_cell_motility_vectors( void )
 	}
 }
 
+void alter_cell_uptake_secretion_saturation ( void )
+{
+	for( int i=0 ; i < (*all_cells).size() ; i++ )
+		{
+			Cell* pCell = (*all_cells)[i];
+			
+			// This assumes that the first substrate is the substrate of interest.
+			pCell->phenotype.secretion.secretion_rates[0] = 0; 
+			pCell->phenotype.secretion.uptake_rates[0] = 0; 
+			pCell->phenotype.secretion.saturation_densities[0] = 0; 
+		}
 
+}
 void setup_tissue( void )
 {	
 
@@ -853,6 +866,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 		pCell->functions.update_migration_bias = NULL;
 		pCell->functions.update_phenotype = NULL;
 		std::cout<<2<<std::endl;
+		std::cout<<"Cell is dead"<<std::endl;
 	}
 	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
 	
@@ -1031,7 +1045,7 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 
 	/*********************************************END speed update***************************************************/
 
-
+	// std::cout<<"Volume= "<<phenotype.volume.total<<std::endl;
 	return; 
 }
 
@@ -1077,10 +1091,11 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 		phenotype.motility.is_motile=false;
 		pCell->functions.update_phenotype = NULL;
 		pCell->functions.update_migration_bias = NULL;
+		std::cout<<"Cell is dead"<<std::endl;
 
 
 	}	
-
+	// std::cout<<"Volume= "<<phenotype.volume.total<<std::endl;
    	// std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
 	
 	return; 
@@ -1251,7 +1266,7 @@ void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double 
 		phenotype.motility.is_motile=false;
 		pCell->functions.update_phenotype = NULL;
 		pCell->functions.update_migration_bias = NULL;
-		// std::cout<<"Follower is dead"<<std::endl;
+		std::cout<<"Follower is dead"<<std::endl;
 		// std::cout<<"Is it motile?"<<std::endl;
 		// if(phenotype.motility.is_motile==true)
 		// {

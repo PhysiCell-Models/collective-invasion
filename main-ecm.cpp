@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
-
+	// SeedRandom(0);
 	if( parameters.ints("unit_test_setup") == 1) 
 	{SeedRandom(0);}
 	
@@ -154,7 +154,12 @@ int main( int argc, char* argv[] )
 	
 	display_citations(); 
 	
-	run_biotransport( 5.0 ); 
+	run_biotransport( parameters.doubles("duration_of_uE_conditioning") ); 
+
+	if(parameters.bools("freeze_uE_profile")==true)
+	{
+		alter_cell_uptake_secretion_saturation();
+	}
 
 	if(parameters.ints("unit_test_setup")==1)
 	{
@@ -235,7 +240,9 @@ int main( int argc, char* argv[] )
 		
 			// update the microenvironment
 
-			if( parameters.ints("unit_test_setup") == 0) // Is there a way to set this only once??
+			// if(parameters.bools("freeze_uE_profile")==true)
+
+			if( parameters.ints("unit_test_setup") == 0 && parameters.bools("freeze_uE_profile")==0 ) // Is there a way to set this only once??
 			{
 				microenvironment.simulate_diffusion_decay( diffusion_dt );
 			}
