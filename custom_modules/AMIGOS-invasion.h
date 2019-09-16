@@ -118,6 +118,7 @@ std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
+void alter_cell_uptake_secretion_saturation ( void );
 void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
 void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt );
 void write_ECM_Data_matlab( std::string filename );

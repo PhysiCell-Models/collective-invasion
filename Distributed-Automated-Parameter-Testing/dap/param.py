@@ -30,6 +30,7 @@ class Param:
         records = self.sheet.getRecords()
 
         if "lastTest" in self.conf and self.conf["lastTest"] != "None":
+            pass
             print("Using lastTest from config.txt")
             for i in range(0, len(records)):
                 if str(self.conf["lastTest"]) == str(records[i]["id"]):
