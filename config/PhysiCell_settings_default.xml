@@ -145,6 +145,9 @@
 		<Microenvironment_parameters descriptions="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
 		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">10.1</chemotactic_substrate_decay_rate>
 
+		<Model_Selection_Parameters description="Allows selection of various cell motility-ECM models" type="double">0</Model_Selection_Parameters>
+		<cell_motility_ECM_interaction_model_selector descriptions="Specifies the cell-ECM interaction model: no hysteresis, constant hysteresis" type="string">constant hysteresis</cell_motility_ECM_interaction_model_selector>
+
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
 		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10.0</duration_of_uE_conditioning>
