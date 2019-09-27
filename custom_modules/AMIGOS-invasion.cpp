@@ -184,7 +184,7 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
 	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
-
+	cell_defaults.custom_data.add_variable( "Base hysteresis bias", "dimensionless", parameters.doubles( "default_hysteresis_bias") );
 			// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
 
 	if( parameters.ints("unit_test_setup") == 1)
@@ -302,9 +302,14 @@ void create_cell_types( void )
 		follower_cell.functions.update_migration_bias = ECM_informed_motility_update;
 	}
 
-	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "constant hysteresis")
+	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "previous motility vector based memory")
 	{
 		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_model_2;
+	}
+
+	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "previous velocity based memory")
+	{
+		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_model_3;
 	}
 
 	else
@@ -1120,7 +1125,7 @@ void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, d
 	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
 	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
 	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
-	
+	static int base_motility_hysteresis_bias = pCell->custom_data.find_variable_index( "Base hysteresis bias");
 	// sample ECM 
 	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
 	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
@@ -1152,7 +1157,7 @@ void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, d
 	// get vector for hysteris (get previous motility vector)
 
 	// hysterises bias (should put in custom data ***)
-	double b_h = 1.0;
+	// double b_h = 1.0;
 
 	std::vector<double> previous_motility_direction = phenotype.motility.migration_bias_direction; // double check this ***
 
@@ -1160,8 +1165,11 @@ void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, d
 
 	// I am not sure how to still incorporatea chemotaxis - ask Paul. For testing, I am moving on and just replace chemotaxis with the other. 
 
+	// Scale the cells sensitivity to previous direction by the amount of previous direction (a) there is available to remember!!!!
+	double delta = pCell->custom_data[base_motility_hysteresis_bias]* a;
+
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
-	std::vector<double> d_motility = (1-b_h)*d_random + b_h*previous_motility_direction;
+	std::vector<double> d_motility = (1-delta)*d_random + delta*previous_motility_direction;
 	normalize( &d_motility ); 
 
 
@@ -1298,6 +1306,216 @@ void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, d
 	return; 
 }
 
+void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+	if(phenotype.death.dead == true)
+	{
+		
+		phenotype.motility.is_motile = false;
+		pCell->functions.update_migration_bias = NULL;
+		pCell->functions.update_phenotype = NULL;
+		std::cout<<2<<std::endl;
+		std::cout<<"Cell is dead"<<std::endl;
+	}
+	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
+	
+	// find location of variables and base parameter values
+	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
+
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
+	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
+	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
+	static int base_motility_hysteresis_bias = pCell->custom_data.find_variable_index( "Base hysteresis bias");
+	// sample ECM 
+	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
+	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
+	int n = pCell->get_current_voxel_index();
+	std::vector<double> f = ECM_fiber_alignment[n];
+	
+	
+	/****************************************Begin new migration direction update****************************************/
+
+	// Select random direction (for random portion of motility vector) and begin building updated motility direction vector
+	// (note - there is NO memeory of previous direction in this model - previous ECM-based motility used the current 
+	// velocity vector to build off, not a random one - this could produce divergent behaviors between models)
+
+	// See lab note book for more notes - MUST start with random vector. In the old method I defintiely used the previous motility vector in the method, but makes no sense here!
+
+	// get random vector - cell's "intended" or chosen random direction
+	double angle = UniformRandom() * 6.283185307179586;
+	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
+
+	// std::cout<<"D random "<<d_random<<std::endl;
+
+	// get vector for chemotaxis (sample uE)
+	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
+
+	// std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
+
+	normalize( &chemotaxis_grad ); 
+
+	// get vector for hysteris (get previous motility vector)
+
+	// hysterises bias (should put in custom data ***)
+	// double b_h = 1.0;
+
+	std::vector<double> previous_motility_direction = phenotype.motility.migration_bias_direction; // double check this ***
+
+	std::vector<double> previous_direction = pCell->velocity;
+
+	 normalize( &previous_direction ); 
+
+	// std::vector<double> d_random_plus_previous = b_h * previous_motility_direction + pCell->custom_data[chemotaxis_bias_index] * chemotaxis_grad;
+
+	// I am not sure how to still incorporatea chemotaxis - ask Paul. For testing, I am moving on and just replace chemotaxis with the other. 
+
+	// Scale the cells sensitivity to previous direction by the amount of previous direction (a) there is available to remember!!!!
+	double delta = pCell->custom_data[base_motility_hysteresis_bias]* a;
+
+	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
+	std::vector<double> d_motility = (1-delta)*d_random + delta*previous_motility_direction;
+	normalize( &d_motility ); 
+
+
+	// std::cout<<"D motility "<<d_motility<<std::endl;
+
+	// to determine direction along f, find part of d_choice that is perpendicular to f; 
+	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+	normalize( &d_perp ); 
+
+	// std::cout<<"D perp"<<d_perp<<std::endl;
+
+	// std::cout<<"Fiber "<<f<<std::endl;
+	
+	// find constants to span d_choice with d_perp and f
+	double c_1 = dot_product( d_motility , d_perp ); 
+	double c_2 = dot_product( d_motility, f ); 
+
+	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+
+	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
+
+	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
+	// std::cout<<"anisotropy = "<<a<<std::endl;
+	// std::cout<<"ECM sensitivity index = "<<pCell->custom_data[ECM_sensitivity_index]<<std::endl;
+	// std::cout<<"gamma = "<< gamma <<std::endl;
+	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
+
+	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
+	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
+	{
+		// normalize( &phenotype.motility.migration_bias_direction ); // only needed if not running through the update_migration_bias code/bias not set to 1.0
+		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		pCell->phenotype.motility.migration_speed = 1.0;
+	}
+
+	else
+	{
+		pCell->phenotype.motility.migration_speed = norm( phenotype.motility.migration_bias_direction);
+		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+	
+	
+	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
+
+	// double magnitude = norm( phenotype.motility.motility_vector);	
+
+	// std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
+
+	// if(magnitude > 0.00000001)
+	// {
+	// 	std::cout<<"Cell is moving!!!!"<<std::endl;
+	// }
+
+	/****************************************END new migration direction update****************************************/
+
+
+	/*********************************************Begin speed update***************************************************/
+	
+	// New speed update (06.18.19) - piece wise continous
+	
+	double rho_low = pCell->custom_data[min_ECM_mot_den_index];
+	double rho_high = pCell->custom_data[max_ECM_mot_den_index];
+	double rho_ideal = pCell->custom_data[ideal_ECM_mot_den_index];
+
+	// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
+
+	if (ECM_density <= rho_low)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+
+	}
+
+	else if (rho_low < ECM_density && ECM_density <= rho_ideal)
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+	}
+
+	else if (rho_ideal < ECM_density && ECM_density < rho_high )
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+	}
+
+	else //if (ECM_density >= rho_high)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+	}
+
+	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
+	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
+	
+	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	// std::cout<<"cell adhesion = "<<pCell->phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
+	// std::cout<<"cell repulsion = "<<pCell->phenotype.mechanics.cell_cell_repulsion_strength <<std::endl;
+	// std::cout<<"cell persistence time ="<<pCell->phenotype.motility.persistence_time <<std::endl;
+	// std::cout<<"cell transition rates = "<<phenotype.death.rates[apoptosis_index] <<std::endl;
+	// std::cout<<"cell death rates = "<<phenotype.death.rates[necrosis_index] <<std::endl;
+
+    // leader_cell.phenotype.death.rates[apoptosis_index] = 0.0;
+	// leader_cell.phenotype.death.rates[necrosis_index] = 0.0;
+	
+	// END New speed update 
+
+	// Old parabolic update  - just the one line!
+
+	// pCell->phenotype.motility.migration_speed = (-(4.0)*pow((ECM_density-0.5),2.0) + 1.0) * pCell->custom_data[max_cell_speed_index];
+	//   std::cout<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+
+	/*********************************************END speed update***************************************************/
+
+	// std::cout<<"Volume= "<<phenotype.volume.total<<std::endl;
+	return; 
+}
 
 void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt )
 {
