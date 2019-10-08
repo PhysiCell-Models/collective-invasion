@@ -1095,8 +1095,8 @@ void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt 
 	return; 
 }
 
-// This model incorporates previous direction into the none fiber direction - at the some location as chemotaxis can be included. 
-// This ia accomplisehd with a b_h (bias to hysteriasis), which can dial in how much of the previous motility direction vector
+// This model (ECM_informed_motility_update_model_2) incorporates previous direction into the none fiber direction - at the some location as chemotaxis can be included. 
+// This ia accomplisehd with a b_h (bias to hysteriasis), which can dial in how much of the previous MOTILITY direction vector
 // gets used compared to another vector (chemotaxis)
 
 void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, double dt )
@@ -1305,6 +1305,10 @@ void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, d
 	// std::cout<<"Volume= "<<phenotype.volume.total<<std::endl;
 	return; 
 }
+
+// This model (ECM_informed_motility_update_model_3) incorporates previous direction into the non-fiber direction - at the some location as chemotaxis can be included. 
+// This ia accomplisehd with a b_h (bias to hysteriasis), which can dial in how much of the previous VELOCITY direction vector
+// gets used compared to another vector (chemotaxis)
 
 void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt )
 {
