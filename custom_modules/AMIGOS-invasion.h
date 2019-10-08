@@ -116,6 +116,8 @@ void setup_microenvironment( void );  // done
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
 std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19
+void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, double dt ); // Uses previous migration bias direction
+void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous velocity vector
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
 void alter_cell_uptake_secretion_saturation ( void );

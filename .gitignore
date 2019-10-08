@@ -16,3 +16,4 @@ AMIGOS-invasion
 *.exe
 .vscode*
 *.ipch
+*.pyc
