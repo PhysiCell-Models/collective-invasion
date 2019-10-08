@@ -17,3 +17,4 @@ AMIGOS-invasion
 .vscode*
 *.ipch
 *.pyc
+Distributed-Automated-Parameter-Testing/dap/__pycache__/
