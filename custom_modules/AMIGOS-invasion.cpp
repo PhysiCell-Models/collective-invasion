@@ -357,8 +357,16 @@ void setup_microenvironment( void )
 	microenvironment.add_density( "ECM anisotropy" , "dimensionless" , 0.0 , 0.0 ); 
 
 	// Turn on gradients - oxygen chemotaxis
+
+	if(parameters.ints("unit_test_setup")==1)
+	{
+		default_microenvironment_options.calculate_gradients = false; 
+	}
 	
-	default_microenvironment_options.calculate_gradients = true; 
+	else
+	{
+		default_microenvironment_options.calculate_gradients = true; 
+	}
 
 	// let BioFVM use oxygen as the default 
 	
