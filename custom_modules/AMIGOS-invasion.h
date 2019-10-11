@@ -90,6 +90,10 @@ void leader_cell_motility_model0( Cell* pCell , Phenotype& phenotype , double dt
 
 void switching_phenotype_model( Cell* pCell, Phenotype& phenotype, double dt ); 
 
+void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt );
+
+void reset_cell_position(void);
+
 class Options 
 {
  public: 
@@ -111,6 +115,13 @@ void setup_microenvironment( void );  // done
 
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
 std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // NOTE - not currently supporting ECM density increasing or anisotropy decreasing!!! 03.30.18
+void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19
+void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, double dt ); // Uses previous migration bias direction
+void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous velocity vector
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
+void alter_cell_uptake_secretion_saturation ( void );
+void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
+void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt );
+void write_ECM_Data_matlab( std::string filename );
+double sign_function (double number);

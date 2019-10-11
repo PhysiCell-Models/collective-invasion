@@ -232,6 +232,10 @@ void Cell::update_motility_vector( double dt_ )
 		axpy( &(phenotype.motility.motility_vector), one_minus_bias, randvec ); // motility = (1-bias)*randvec + bias*bias_vector
 		
 		normalize( &(phenotype.motility.motility_vector) ); 
+
+		// std::cin.get();
+
+		// std::cout<<" cell speed in real update "<<phenotype.motility.migration_speed<<std::endl;
 		
 		phenotype.motility.motility_vector *= phenotype.motility.migration_speed; 
 	}	
