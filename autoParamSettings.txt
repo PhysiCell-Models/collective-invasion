@@ -1,42 +1,9 @@
-./user_parameters/unit_test_setup:1
-./domain/dz:20
-./domain/dy:20
-tasks:clean,xml,sim,imgProc,upload,zip
-./user_parameters/duration_of_uE_conditioning:
-./user_parameters/ECM_orientation_setup:horizontal
-./user_parameters/leader_adhesion:6.5
-./user_parameters/follower_motility_mode:true
-./save/full_data/interval:6
-./domain/y_min:-750
-./domain/dx:20
-./user_parameters/march_unit_test_setup:0
-./user_parameters/tumor_radius:175
-./domain/x_min:-750
-id:gradient_up_ECM_horizontal
-./user_parameters/default_cell_speed:0.3
-./user_parameters/leader_repulsion:25
-./user_parameters/default_chemotaxis_bias:1
-./domain/x_max:750
-./user_parameters/initial_anisotropy:1
-computerStrength:1
-./user_parameters/follower_adhesion:6.5
-comments:test possibly crashed
-./overall/max_time:1440
-performedBy:
+id:gradient_up_ECM_up
 status:in progress
-./user_parameters/leader_motility_mode:true
-./save/SVG/interval:6
-./user_parameters/follower_repulsion:25
-./user_parameters/chemical_field_setup:vertical up
-./user_parameters/oxygen_uptake:0
-./user_parameters/freeze_uE_profile:
-startTime:2019-09-16 16:13:24
-./user_parameters/initial_density_ecm:0.5
-./user_parameters/cell_setup:cells at y = 0
-./domain/y_max:750
-./user_parameters/normalize_ECM_influenced_motility_vector:false
-./user_parameters/initial_leader_cell_fraction:NA
-./parallel/omp_num_threads:1
-./user_parameters/chemotactic_substrate_decay_rate:0.1
-endTime:2019-08-23 16:11:30
-./user_parameters/enable_ecm_outputs:true
+start-time:2019-10-11 21:50:17
+end-time:
+performed-by:bendugga@iu.edu
+comments:
+tasks:clean,xml,sim,imgProc,upload,zip
+computer-strength:1
+./overall/max_time:1440
