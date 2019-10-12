@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Delimited file &mdash; DAPT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Box" href="box.html" />
+    <link rel="prev" title="Database" href="database.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> DAPT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="param.html">Param</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sheet.html">Sheets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html">Database</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Delimited file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="box.html">Box</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Config</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DAPT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="documentation.html">Documentation</a> &raquo;</li>
+        
+      <li>Delimited file</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/documentation/delimited_file.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-dapt.delimited_file"><span id="delimited-file"></span></span><div class="section" id="id1">
+<h1>Delimited file<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>Create a CSV instance which can be used by param to get and run param sets</p>
+<dl class="class">
+<dt id="dapt.delimited_file.Delimited_file">
+<em class="property">class </em><code class="sig-prename descclassname">dapt.delimited_file.</code><code class="sig-name descname">Delimited_file</code><span class="sig-paren">(</span><em class="sig-param">csv_file</em>, <em class="sig-param">delimiter='</em>, <em class="sig-param">'</em><span class="sig-paren">)</span><a class="headerlink" href="#dapt.delimited_file.Delimited_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>An interface for accessing and setting paramater set data.</p>
+<dl class="method">
+<dt id="dapt.delimited_file.Delimited_file.get_keys">
+<code class="sig-name descname">get_keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dapt.delimited_file.Delimited_file.get_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the keys of the paramater set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Array of strings with each element being a key (order is preserved if possible)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dapt.delimited_file.Delimited_file.get_row_index">
+<code class="sig-name descname">get_row_index</code><span class="sig-paren">(</span><em class="sig-param">column_key</em>, <em class="sig-param">row_value</em><span class="sig-paren">)</span><a class="headerlink" href="#dapt.delimited_file.Delimited_file.get_row_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the row index given the column to look through and row value to match to.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column_key</strong> (<em>str</em>) – the column to use.</p></li>
+<li><p><strong>row_value</strong> (<em>str</em>) – the row value to match with in the file and determin the row index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The index or -1 if it could not be determined</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dapt.delimited_file.Delimited_file.get_table">
+<code class="sig-name descname">get_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dapt.delimited_file.Delimited_file.get_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the table from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An array with each element being a dictionary of the key-value pairs for the row in the database.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dapt.delimited_file.Delimited_file.update_cell">
+<code class="sig-name descname">update_cell</code><span class="sig-paren">(</span><em class="sig-param">row_index</em>, <em class="sig-param">key</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#dapt.delimited_file.Delimited_file.update_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the keys of the paramater set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row_index</strong> (<em>int</em>) – the row id to replace</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – the key of the value to replace</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – the value to insert into the cell</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A boolean that is True if successfully inserted and False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dapt.delimited_file.Delimited_file.update_row">
+<code class="sig-name descname">update_row</code><span class="sig-paren">(</span><em class="sig-param">row_index</em>, <em class="sig-param">values</em><span class="sig-paren">)</span><a class="headerlink" href="#dapt.delimited_file.Delimited_file.update_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the keys of the paramater set</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row_index</strong> (<em>int</em>) – the row id to replace</p></li>
+<li><p><strong>values</strong> (<em>OrderedDict</em>) – the key-value pairs that should be inserted</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A boolean that is True if successfully inserted and False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="box.html" class="btn btn-neutral float-right" title="Box" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="database.html" class="btn btn-neutral float-left" title="Database" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Ben Duggan
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
