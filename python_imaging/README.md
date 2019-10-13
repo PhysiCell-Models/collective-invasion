@@ -7,6 +7,7 @@ In an effort to create some better imaging to view cells, ECM components and oth
 
 * `basic_cell_plot.py`: create a plot with Cells plotted.
 * `basic_oxygen_density.py`: Plot the density of oxygen.  
+* `basic_ecm_density.py`: Plot the ECM density.
 
 ## ToDo
 * Read in data

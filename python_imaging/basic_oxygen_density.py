@@ -4,11 +4,11 @@ from pyMCDS import pyMCDS
 import numpy as np
 import matplotlib.pyplot as plt
 
-file_name = 'final.xml'
-output_path = 'example_output'
+sim_frame = 'output00001192' # The name of the simulation frame (eg. `initial`, `output00001192`).  This is not the file name
+output_path = 'example_output' # The folder with all the output data
 
 # load data
-mcds = pyMCDS(file_name, output_path)
+mcds = pyMCDS(sim_frame + '.xml', output_path)
 
 # Set our z plane and get our substrate values along it
 z_val = 0.00
