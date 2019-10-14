@@ -1,4 +1,4 @@
-# Plot the density of oxygen
+# Plot the anisotropy of ecm
 
 from pyMCDS import pyMCDS
 import numpy as np
@@ -12,7 +12,7 @@ mcds = pyMCDS(sim_frame + '.xml', output_path)
 
 # Set our z plane and get our substrate values along it
 z_val = 0.00
-plane_oxy = mcds.get_concentrations('oxygen', z_slice=z_val)
+plane_ecm = mcds.get_concentrations('ECM anisotropy', z_slice=z_val)
 
 # Get the 2D mesh for contour plotting
 xx, yy = mcds.get_mesh(flat=True)
@@ -22,8 +22,8 @@ num_levels = 21
 
 # set up the figure area and add data layers
 fig, ax = plt.subplots()
-cs = ax.contourf(xx, yy, plane_oxy, levels=num_levels)
-ax.contour(xx, yy, plane_oxy, color='black', levels = num_levels, linewidths=0.5)
+cs = ax.contourf(xx, yy, plane_ecm, levels=num_levels)
+ax.contour(xx, yy, plane_ecm, color='black', levels = num_levels, linewidths=0.5)
 
 # Now we need to add our color bar
 cbar1 = fig.colorbar(cs, shrink=0.75)
