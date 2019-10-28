@@ -6,7 +6,7 @@ Class which allows for Google Sheets to be used as paramater set database.
 """
 
 
-import gspread
+import gspread, time
 from oauth2client.service_account import ServiceAccountCredentials
 from . import database
 
@@ -73,9 +73,12 @@ class Sheet(database.Database):
                 A boolean that is True if successfully inserted and False otherwise.
         """
 
+        current_db = self.get_table()[row_id]
+
         for i in values:
             try:
-                self.sheet().update_cell(row_id+2, self.get_key_index(i), str(values[i]))
+                if str(current_db[i]) != str(values[i]):
+                    self.sheet().update_cell(row_id+2, self.get_key_index(i), str(values[i]))
             except:
                 return False
         return True
