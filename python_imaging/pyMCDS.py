@@ -316,6 +316,37 @@ class pyMCDS:
         vox_df = cell_df[inside_voxel]
         return vox_df
 
+    #### ADDITIONAL LOADING
+
+    def load_ecm(self, ecm_file, output_path='.'):
+        """
+        load the *_ecm.mat file
+        """
+        self.data['ecm'] = {}
+        read_file = Path(output_path) / ecm_file
+        ecm_arr = sio.loadmat(read_file)['ECM_Data']
+
+        xx, yy, zz = self.get_mesh()
+        X, Y, Z = np.unique(xx), np.unique(yy), np.unique(zz)
+
+        self.data['ecm']['x_vec'] = np.zeros(xx.shape)
+        self.data['ecm']['y_vec'] = np.zeros(xx.shape)
+        self.data['ecm']['z_vec'] = np.zeros(xx.shape)
+
+        for vox_idx in range(self.data['mesh']['voxels']['centers'].shape[1]):
+                # find the center
+                center = self.data['mesh']['voxels']['centers'][:, vox_idx]
+
+                i = np.where(np.abs(center[0] - X) < 1e-10)[0][0]
+                j = np.where(np.abs(center[1] - Y) < 1e-10)[0][0]
+                k = np.where(np.abs(center[2] - Z) < 1e-10)[0][0]
+
+                self.data['ecm']['x_vec'][j, i, k] = ecm_arr[5, vox_idx]
+                self.data['ecm']['y_vec'][j, i, k] = ecm_arr[6, vox_idx]
+                self.data['ecm']['z_vec'][j, i, k] = ecm_arr[7, vox_idx]
+        
+
+
     def _read_xml(self, xml_file, output_path='.'):
         """
         Does the actual work of initializing MultiCellDS by parsing the xml
