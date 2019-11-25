@@ -114,5 +114,5 @@ def create_gif(data_path, save_path, save_name):
 
 if __name__ == '__main__':
     #create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=True)
-    create_gif('21_03_leader_follower_model_3_test/', 'test1/', 'test l=38')
+    create_gif('.', '.', 'test l=38')
     
