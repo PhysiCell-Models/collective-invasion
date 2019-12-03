@@ -5,11 +5,11 @@ An extracellular matrix (ECM) model based on leader-follower (K14+/K14-) interac
 
 ## Overview:
 
-The ECM model is built using [PhysiCell](https://github.com/MathCancer/PhysiCell), an agent-based, multicellular 3-D modeling framework written in c++.  If you are not already familiar with PhysiCell then you should do so before looking at the code or trying to modify it.  The ECM model has three components: `density` (thickness of the fibers), `anisotropy` (agreement of alignment) and `fiber alignment` (three coordinate vector of overall fiber direction).  There are two different cell types in the model: leader cells (K14+) and follower cells (K14-).  In the model, leader cells can influence the ECM but are not affected by the ECM while follower cells are effected by the ECM but cannot change it.
+The ECM model is built using [PhysiCell](https://github.com/MathCancer/PhysiCell), an agent-based, multicellular 3-D modeling framework written in C++.  If you are not already familiar with PhysiCell then you should do so before looking at the code or trying to modify it.  The ECM model has three components: `density` (thickness of the fibers), `anisotropy` (agreement of alignment) and `fiber alignment` (three coordinate vector of overall fiber direction).  There are two different cell types in the model: leader cells (K14+) and follower cells (K14-).  In the model, leader cells can influence the ECM but are not affected by the ECM while follower cells are effected by the ECM but cannot change it.
 
-The philosophy behind the model is that ECM `density` (from 0-1) remains constant, the `fiber alignment` vector gives the overall alignment of the fiber and `anisotropy` (0-1) represents how aligned the ECM fibers are.  An `anisotropy` value closer to 0 mean the fibers are less aligned and values closer to 1 mean the ECM fibers are more aligned (the `fiber alignment` vector accurately represents the direction of all fibers).  
+The philosophy behind the model is that ECM `density` (from 0-1) remains constant, the `fiber alignment` vector gives the overall alignment of the fiber and `anisotropy` (0-1) represents how aligned the ECM fibers are.  An `anisotropy` value closer to 0 mean the fibers are less aligned and values closer to 1 mean the ECM fibers are more aligned.  The `fiber alignment` vector represents the average fiber direction.  As leader cells move through the ECM, they align the fibers in the direction of their moment, increasing the anisotropy in proportion to the cells speed.  Follower cells "read" the ECM and use the fibers to influence their direction.  Density influences cell speed as the cell gets stuck if the fibers are too thick and if the fibers are too thin then the cells have nothing to "grab".  The fiber direction influences the motility vector of the cells and the amount of influence is controlled by the anisotropy.
 
-The model was developed by Paul Macklin, John Metzcar, Brandon xxx, Brendon Murphy and Ben Duggan.  Significant help was provided by Randy Heiland and xxx at Johns Hopkins University.
+The model was developed by Paul Macklin, John Metzcar, Brandon Fischer, Daniel Murphy and Ben Duggan.  Significant help was provided by Randy Heiland and xxx at Johns Hopkins University.
 
 
 **Reference:** A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
@@ -55,7 +55,7 @@ This data can be visualized using the scripts in [python_imaing](python_imaging/
 
 ## Release summary:
 
-* k
+* ECM model for UROC poster
 
 See [changes.md](changes.md) for the full change log. 
  
