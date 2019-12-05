@@ -75,6 +75,4 @@ This data can be visualized using the scripts in [python_imaging](python_imaging
 ## Release summary:
 
 * ECM model for UROC poster
-
-[//]:# (See [changes.md](changes.md) for the full change log.)
  

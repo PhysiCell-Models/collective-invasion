@@ -1,5 +1,9 @@
 from pyMCDS import *
 import numpy as np
+
+######## If using on remote system, uncomment this line below to load correct matplotlib backend ################
+#matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 import math, os, sys, re
