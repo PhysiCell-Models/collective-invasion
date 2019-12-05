@@ -1,3 +1,3 @@
 # Matlab scripts
 
-Most of the matlab scripts found in this folder are the same as the standard PhysiCell release.  There were some additional scripts written to analyse the ECM data.  If you would like to better visualize the ECM outputs, it is recommended that you use the [python_imaging](/python_imaging/finished-combined-plot.py) script.
+Most of the matlab scripts found in this folder are the same as the standard PhysiCell release.  There were some additional scripts written to analyse the ECM data.  If you would like to better visualize the ECM outputs, it is recommended that you use the [python_imaging](/python_imaging/finished-combined-plot.py) script. Currently, these Matlab scripts are not being supported within the scope of the ECM modeling and addition to PhysiCell.
