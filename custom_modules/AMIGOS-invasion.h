@@ -116,12 +116,13 @@ void setup_microenvironment( void );  // done
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
 std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19
-void ECM_informed_motility_update_model_2 ( Cell* pCell, Phenotype& phenotype, double dt ); // Uses previous migration bias direction
-void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous velocity vector
+void ECM_informed_motility_update_w_chemotaxis ( Cell* pCell, Phenotype& phenotype, double dt );
+void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& phenotype, double dt ); // Uses previous migration bias direction
+// void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous velocity vector
+// void ECM_informed_motility_update_model_4 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous migration bias direction AND previous anisotropy
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
 void alter_cell_uptake_secretion_saturation ( void );
 void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
-void ECM_informed_motility_update( Cell* pCell, Phenotype& phenotype, double dt );
 void write_ECM_Data_matlab( std::string filename );
 double sign_function (double number);

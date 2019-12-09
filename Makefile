@@ -139,15 +139,22 @@ AMIGOS-invasion.o: ./custom_modules/AMIGOS-invasion.cpp
 
 # cleanup
 
-reset:
-	rm -f *.cpp 
-	cp ./sample_projects/Makefile-default Makefile 
-	rm -f ./custom_modules/*
-	touch ./custom_modules/empty.txt 
+#reset:
+#	rm -f *.cpp 
+#	cp ./sample_projects/Makefile-default Makefile 
+#	rm -f ./custom_modules/*
+#	touch ./custom_modules/empty.txt 
 	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
+
+data-cleanup:
+	rm -f *.mat
+	rm -f *.xml
+	rm -f *.svg
+	rm -f ./output/*
+	touch ./output/empty.txt
 
 data-cleanup-all:
 	rm -f *.mat
