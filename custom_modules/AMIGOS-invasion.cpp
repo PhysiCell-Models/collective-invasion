@@ -299,13 +299,13 @@ void create_cell_types( void )
 	
 	// Selecting cell-ECM interaction wrt to hyteriss
 	
-	if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follow hysteresis" || parameters.ints("unit_test_setup") == 1)
+	if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
 		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
 		std::cout<<"I selected follower chemotaxsis" << std::endl;
 	}
 
-	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follow hysteresis/no follower chemotaxis")
+	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")
 	{
 		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
 		std::cout<<"I selected follower hysteresis" << std::endl;
