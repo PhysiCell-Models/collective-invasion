@@ -93,7 +93,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>1</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -126,9 +126,9 @@
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
 		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10</oxygen_uptake>
-        <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">3.0</leader_adhesion>
+        <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</leader_adhesion>
         <leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
-        <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">3.0</follower_adhesion>
+        <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
         <follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25</follower_repulsion>
         <default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.3</default_cell_speed>
 		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
@@ -143,16 +143,16 @@
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
 
-		<Microenvironment_parameters descriptions="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
-		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">10.1</chemotactic_substrate_decay_rate>
+		<Microenvironment_parameters description="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
+		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>
 
 		<Model_Selection_Parameters description="Allows selection of various cell motility-ECM models" type="double">0</Model_Selection_Parameters>
-		<cell_motility_ECM_interaction_model_selector descriptions="Specifies the cell-ECM interaction model: follower chemotaxis/no follow hysteresis, follow hysteresis/no follower chemotaxis" type="string">follow hysteresis/no follower chemotaxis</cell_motility_ECM_interaction_model_selector>
+		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follow hysteresis, follow hysteresis/no follower chemotaxis" type="string">follow hysteresis/no follower chemotaxis</cell_motility_ECM_interaction_model_selector>
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
-		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10.0</duration_of_uE_conditioning>
-		<freeze_uE_profile hidden="false" type="bool">false</freeze_uE_profile>
+		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10</duration_of_uE_conditioning>
+		<freeze_uE_profile hidden="false" type="bool">0</freeze_uE_profile>
 		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">0</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
 		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">lesion</cell_setup>
