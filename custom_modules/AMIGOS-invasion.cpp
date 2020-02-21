@@ -149,6 +149,7 @@ void create_cell_types( void )
 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
 	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
+	
 
 	// if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "no hysteresis")
 	// {
@@ -186,6 +187,8 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
 	cell_defaults.custom_data.add_variable( "Base hysteresis bias", "dimensionless", parameters.doubles( "default_hysteresis_bias") );
 	cell_defaults.custom_data.add_variable( "previous anisotropy", "dimensionless", 0 );
+	cell_defaults.custom_data.add_variable( "Anisotropy increase rate", "1/min", parameters.doubles( "anisotropy_increase_rate") );
+	cell_defaults.custom_data.add_variable( "Fiber realignment rate", "1/min", parameters.doubles( "fiber_realignment_rate") );
 
 	// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
 
@@ -929,7 +932,7 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
-
+	
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
 	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
 	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
@@ -1623,6 +1626,8 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
+	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy increase rate");
+	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber realignment rate");
     
     // Cell-ECM density interaction
     double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
@@ -1640,9 +1645,9 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 
 	double anisotropy = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
     double migration_speed = pCell->phenotype.motility.migration_speed;
-
-    double r_0 = 1/1.0*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
-
+	
+    double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+	// std::cout<<r_0<<std::endl;
     double r_realignment = r_0 * (1-anisotropy);
 
 	double ddotf;
@@ -1674,7 +1679,8 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     
     // Cell-ECM Anisotrophy Modification
     
-    double r_a0 = 1.0/1000.0; // min-1
+    double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
+	
     double r_anisotropy = r_a0 * migration_speed;
    	
     pCell->nearest_density_vector()[ECM_anisotropy_index] = anisotropy + r_anisotropy * dt  * (1- anisotropy);
