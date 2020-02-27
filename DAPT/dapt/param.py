@@ -87,7 +87,7 @@ class Param:
                     if "performed-by" in records[i]:
                         records[i]["performed-by"] = self.performed_by
 
-                    self.db.update_row(i, records[i])
+                    self.db.update_row(i+1, records[i])
 
                     return records[i]
 
@@ -101,7 +101,7 @@ class Param:
                     records[i]["start-time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 if "performed-by" in records[i]:
                     records[i]["performed-by"] = self.performed_by
-                self.db.update_row(i, records[i])
+                self.db.update_row(i+1, records[i])
 
                 # Save id to local cache
                 if self.config:
@@ -136,7 +136,7 @@ class Param:
             return False
 
         records[index]["status"] = status
-        self.db.update_cell(index, 'status', status)
+        self.db.update_cell(index+1, 'status', status)
 
         return records[index]
 
@@ -170,7 +170,7 @@ class Param:
         if 'end-time' in records[index]:
             records[index]["end-time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        self.db.update_row(index, records[index])
+        self.db.update_row(index+1, records[index])
         
         return records[index]
 
@@ -202,6 +202,6 @@ class Param:
         if 'comments' in records[index]:
             records[index]["comments"] += " failed{ " + err + " };"
 
-        self.db.update_row(index, records[index])
+        self.db.update_row(index+1, records[index])
         
         return records[index]

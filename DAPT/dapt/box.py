@@ -36,15 +36,15 @@ class Box:
             self.config=kwargs['config']
 
             self.oauth = OAuth2(
-                client_id=self.config.config['client_id'],
-                client_secret=self.config.config['client_secret']
+                client_id=self.config.config['client-id'],
+                client_secret=self.config.config['client-secret']
             )
         elif len(kwargs) == 2:
             self.config = None
 
             self.oauth = OAuth2(
-                client_id=kwargs['client_id'],
-                client_secret=kwargs['client_secret']
+                client_id=kwargs['client-id'],
+                client_secret=kwargs['client-secret']
             )
             
         else:
@@ -73,7 +73,7 @@ class Box:
             return
 
         # If not, then we check to see if the access and refresh token are in the config file.
-        if self.config and len(self.config.config['access-token']) > 0 and len(self.config.config['refress-token']) > 0:
+        if self.config and self.config.config['access-token'] and self.config.config['refress-token']:
             try:
                 print('Trying to get new access and refresh token from ' + self.config.path)
                 self.oauth._refresh_token = self.config.config['refress-token']
@@ -211,16 +211,3 @@ class Box:
         print(os.getcwd()+path, name)
         return self.client.folder(folderID).upload(os.getcwd()+path, name)
 
-    
-    
-
-if __name__ == '__main__':
-    os.chdir("../")
-    app.run()
-
-    items = client.folder(folder_id='0').get_items(limit=100, offset=0)
-
-    for i in items:
-        print(i)
-
-    #uploadFile('\\DistributedAutomaticParameterTesting\\', "testPayload.zip")

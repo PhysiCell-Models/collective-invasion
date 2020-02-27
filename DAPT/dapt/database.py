@@ -36,13 +36,13 @@ class Database:
 
 		pass
 
-	def update_row(self, row_id, values):
+	def update_row(self, row_index, values):
 		"""
             Get the keys of the parameter set
 
             Args:
-                row_id (int): the row id to replace
-                values (OrderedDict): the key-value pairs that should be inserted
+                row_index (int): the index of the row to replace
+                values (Dict): the key-value pairs that should be inserted
             
             Returns:
                 A boolean that is True if successfully inserted and False otherwise.
