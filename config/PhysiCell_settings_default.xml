@@ -144,6 +144,7 @@
 		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">1.0</fiber_realignment_rate>
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
+		<elastic_coefficient type="double" units="1/min">0.01</elastic_coefficient>
 
 		<Microenvironment_parameters description="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
 		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>

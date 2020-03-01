@@ -189,6 +189,10 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable( "previous anisotropy", "dimensionless", 0 );
 	cell_defaults.custom_data.add_variable( "Anisotropy increase rate", "1/min", parameters.doubles( "anisotropy_increase_rate") );
 	cell_defaults.custom_data.add_variable( "Fiber realignment rate", "1/min", parameters.doubles( "fiber_realignment_rate") );
+	Parameter<double> paramD; 
+	paramD = parameters.doubles[ "elastic_coefficient" ]; 
+	cell_defaults.custom_data.add_variable( "elastic coefficient" , paramD.units, paramD.value ); 
+		// "1/min" , 0.01 );  /* param */ 
 
 	// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
 
@@ -1821,6 +1825,7 @@ long fibonacci(unsigned n) // just being used for timing.
 
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
+	leader_follower_cell_check_neighbors_for_attachment( pCell, dt);
 
 	// Find correct fields
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
@@ -1889,6 +1894,177 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
     
     return;
 
+}
+
+void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant )
+{
+	std::vector<double> displacement = pAttachedTo->position - pActingOn->position; 
+	axpy( &(pActingOn->velocity) , elastic_constant , displacement ); 
+	
+	return; 
+}
+
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	for( int i=0; i < pCell->state.neighbors.size() ; i++ )
+	{
+		add_elastic_velocity( pCell, pCell->state.neighbors[i], pCell->custom_data["elastic coefficient"] ); 
+	}
+
+	return; 
+}	
+
+void attach_cells( Cell* pCell_1, Cell* pCell_2 )
+{
+	#pragma omp critical
+	{
+		
+	bool already_attached = false; 
+	for( int i=0 ; i < pCell_1->state.neighbors.size() ; i++ )
+	{
+		if( pCell_1->state.neighbors[i] == pCell_2 )
+		{ already_attached = true; }
+	}
+	if( already_attached == false )
+	{ pCell_1->state.neighbors.push_back( pCell_2 ); }
+	
+	already_attached = false; 
+	for( int i=0 ; i < pCell_2->state.neighbors.size() ; i++ )
+	{
+		if( pCell_2->state.neighbors[i] == pCell_1 )
+		{ already_attached = true; }
+	}
+	if( already_attached == false )
+	{ pCell_2->state.neighbors.push_back( pCell_1 ); }
+
+	}
+
+	return; 
+}
+
+void dettach_cells( Cell* pCell_1 , Cell* pCell_2 )
+{
+	#pragma omp critical
+	{
+		bool found = false; 
+		int i = 0; 
+		while( !found && i < pCell_1->state.neighbors.size() )
+		{
+			// if cell 2 is in cell 1's list, remove it
+			if( pCell_1->state.neighbors[i] == pCell_2 )
+			{
+				int n = pCell_1->state.neighbors.size(); 
+				// copy last entry to current position 
+				pCell_1->state.neighbors[i] = pCell_1->state.neighbors[n-1]; 
+				// shrink by one 
+				pCell_1->state.neighbors.pop_back(); 
+				found = true; 
+			}
+			i++; 
+		}
+	
+		found = false; 
+		i = 0; 
+		while( !found && i < pCell_2->state.neighbors.size() )
+		{
+			// if cell 1 is in cell 2's list, remove it
+			if( pCell_2->state.neighbors[i] == pCell_1 )
+			{
+				int n = pCell_2->state.neighbors.size(); 
+				// copy last entry to current position 
+				pCell_2->state.neighbors[i] = pCell_2->state.neighbors[n-1]; 
+				// shrink by one 
+				pCell_2->state.neighbors.pop_back(); 
+				found = true; 
+			}
+			i++; 
+		}
+
+	}
+	
+	return; 
+}
+
+// beginning altered spring attachment functions: need to change all the names - there is no attacker!!!
+
+Cell* leader_follower_cell_check_neighbors_for_attachment( Cell* pCell , double dt )
+{
+	std::vector<Cell*> nearby = pCell->cells_in_my_container(); 
+	int i = 0; 
+	while( i < nearby.size() )
+	{
+		// don't try to attache to yourself 
+		if( nearby[i] != pCell )
+		{
+			
+			// std::cout<<nearby[i]->ID<<std::endl;
+
+			if( leader_follower_cell_attempt_attachment( pCell, nearby[i] , dt ) )
+			{ return nearby[i]; }
+		}
+		i++; 
+	}
+	
+	return NULL; 
+}
+
+bool leader_follower_cell_attempt_attachment( Cell* pCell, Cell* pTarget , double dt )
+{
+	
+	
+	if( UniformRandom() < 1.0 )
+	{
+		std::cout << "\t attach!" << " " << pTarget->ID << std::endl; 
+		attach_cells( pCell, pTarget ); 
+	}
+
+	return true;
+	
+	// static int oncoprotein_i = pTarget->custom_data.find_variable_index( "oncoprotein" ); 
+	// static int attach_rate_i = pCell->custom_data.find_variable_index( "attachment rate" ); 
+
+	// static double oncoprotein_saturation = 
+	// 	parameters.doubles("oncoprotein_saturation"); // 2.0; 
+	// static double oncoprotein_threshold =  
+	// 	parameters.doubles("oncoprotein_threshold"); // 0.5; // 0.1; 
+	// static double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
+	
+	// static double max_attachment_distance = 
+	// 	parameters.doubles("max_attachment_distance"); // 18.0; 
+	// static double min_attachment_distance = 
+	// 	parameters.doubles("min_attachment_distance"); // 14.0; 
+	// static double attachment_difference = max_attachment_distance - min_attachment_distance; 
+	
+	// if( pTarget->custom_data[oncoprotein_i] > oncoprotein_threshold && pTarget->phenotype.death.dead == false )
+	// {
+	// 	std::vector<double> displacement = pTarget->position - pCell->position;
+	// 	double distance_scale = norm( displacement ); 
+	// 	if( distance_scale > max_attachment_distance )
+	// 	{ return false; } 
+	
+	// 	double scale = pTarget->custom_data[oncoprotein_i];
+	// 	scale -= oncoprotein_threshold; 
+	// 	scale /= oncoprotein_difference;
+	// 	if( scale > 1.0 )
+	// 	{ scale = 1.0; } 
+		
+	// 	distance_scale *= -1.0; 
+	// 	distance_scale += max_attachment_distance; 
+	// 	distance_scale /= attachment_difference; 
+	// 	if( distance_scale > 1.0 )
+	// 	{ distance_scale = 1.0; } 
+		
+	// 	if( UniformRandom() < pCell->custom_data[attach_rate_i] * scale * dt * distance_scale )
+	// 	{
+	// 		std::cout << "\t attach!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
+	// 		attach_cells( pCell, pTarget ); 
+	// 	}
+		
+	// 	return true; 
+	// }
+	
+	// return false; 
 }
     
 void write_ECM_Data_matlab( std::string filename )

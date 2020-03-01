@@ -127,3 +127,17 @@ void alter_cell_uptake_secretion_saturation ( void );
 void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
 void write_ECM_Data_matlab( std::string filename );
 double sign_function (double number);
+
+// New hookean spring mechanics functions
+
+void attach_cells( Cell* pCell_1, Cell* pCell_2 ); // used in immune_cell_attempt_attachment - copying directly
+void dettach_cells( Cell* pCell_1 , Cell* pCell_2 ); // used in immune_cell_rule - copying directly
+
+void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant ); // calculation for velocity - copying directly
+void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt ); // calls the calculation - copying directly
+
+Cell* leader_follower_cell_check_neighbors_for_attachment( Cell* pCell , double dt ); // Used to get nearby cell pointers - cells the cell of interest could attach too
+bool leader_follower_cell_attempt_attachment( Cell* pCell, Cell* pTarget , double dt ); // used in  immune_cell_check_neighbors_for_attachment - uses a probability based on oncoprotein amount
+
+void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // wrapts them all together as a custom cell rule
+
