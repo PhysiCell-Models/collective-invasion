@@ -174,6 +174,7 @@ data-cleanup-light:
 	rm -f ./Output/*.svg
 	rm -f ./Output/*.png
 	rm -f ./SVG/*
+	touch ./output/empty.txt
 
 # archival 
 	

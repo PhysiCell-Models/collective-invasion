@@ -118,6 +118,7 @@ std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19
 void ECM_informed_motility_update_w_chemotaxis ( Cell* pCell, Phenotype& phenotype, double dt );
 void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& phenotype, double dt ); // Uses previous migration bias direction
+void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt ); // Sets speed based on fiber alignment. If chemo senstivitty set to 1, then cells will chemotax with speed varying strictly with alignemnt.
 // void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous velocity vector
 // void ECM_informed_motility_update_model_4 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous migration bias direction AND previous anisotropy
 void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
