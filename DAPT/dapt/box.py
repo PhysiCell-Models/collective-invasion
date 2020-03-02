@@ -11,14 +11,12 @@ from flask import *
 
 class Box:
     """
-        Class which allows for connection to box API.  You must either provide a Config object or client_id and client_secret.
+    Class which allows for connection to box API.  You must either provide a Config object or client_id and client_secret.
 
-        Keyword Args:
-            config (Config): A Config object which contains the client_id and client_secret. 
-            client_id (str): The Box client ID.
-            client_secret (str): The Box client secret.
-            
-            
+    Keyword Args:
+        config (Config): A Config object which contains the client_id and client_secret. 
+        client_id (str): The Box client ID.
+        client_secret (str): The Box client secret.
     """
 
     def __init__(self, *args, **kwargs):
@@ -53,14 +51,14 @@ class Box:
 
     def connect(self, access_token = None, refresh_token = None):
         """
-            Tries to connect to box using arguments provided in Config and starts server for authorization if not.
+        Tries to connect to box using arguments provided in Config and starts server for authorization if not.
 
-            Args:
-                access_token (str): Optional argument that allows DAPT to connect to box without going through web authentification (assuming refresh_token is given and not expired).
-                refresh_token (str): Optional argument that allows DAPT to connect to box without going through web authentification (assuming access_token is given and not expired).
-            
-            Returns:
-                Box client if successful
+        Args:
+            access_token (str): Optional argument that allows DAPT to connect to box without going through web authentification (assuming refresh_token is given and not expired).
+            refresh_token (str): Optional argument that allows DAPT to connect to box without going through web authentification (assuming access_token is given and not expired).
+        
+        Returns:
+            Box client if successful
         """
 
         # First check to see if the user gave us the access and refresh token
@@ -98,10 +96,10 @@ class Box:
 
     def __startServer(self):
         """
-            Method that starts flask to start authorization process
+        Method that starts flask to start authorization process
 
-            Returns:
-                Box client which can be used to access authorized user data
+        Returns:
+            Box client which can be used to access authorized user data
         """
 
         print("Starting server.  Go to 127.0.0.1:5000 to authenticate box.  It can only be ended by completing authentification or going to 127.0.0.1:5000/end")
@@ -114,10 +112,10 @@ class Box:
 
     def __index(self):
         """
-            Flask page: index of the web server and serves as the start point for authentication
+        Flask page: index of the web server and serves as the start point for authentication
 
-            Returns:
-                String containing HTML to be displayed
+        Returns:
+            String containing HTML to be displayed
         """
         self.auth_url, self.csrf_token = self.oauth.get_authorization_url("http://127.0.0.1:5000/return")
 
@@ -125,10 +123,10 @@ class Box:
     
     def __capture(self):
         """
-            Flask page: box redirect url which contains the code and state used to get access and refress token
+        Flask page: box redirect url which contains the code and state used to get access and refress token
 
-            Returns:
-                String containing HTML to be displayed with box login credentials
+        Returns:
+            String containing HTML to be displayed with box login credentials
         """
 
         # Capture auth code and csrf token via state
@@ -160,10 +158,10 @@ class Box:
 
     def __end(self):
         """
-            Flask page: shuts down flask server
+        Flask page: shuts down flask server
 
-            Returns:
-                String containing HTML to be displayed
+        Returns:
+            String containing HTML to be displayed
         """
 
         func = request.environ.get('werkzeug.server.shutdown')
@@ -174,13 +172,13 @@ class Box:
 
     def updateTokens(self, access_token):
         """
-            Refresh the access and refresh token given a valid access token
+        Refresh the access and refresh token given a valid access token
 
-            Args:
-                access_token (string): box access token to be refreshed
+        Args:
+            access_token (string): box access token to be refreshed
 
-            Returns:
-                Box client
+        Returns:
+            Box client
         """
 
         self.access_token, self.refresh_token = self.oauth.refresh(access_token)
@@ -197,12 +195,12 @@ class Box:
 
     def uploadFile(self, folderID, path, name):
         """
-            Upload a file to box using the current client
+        Upload a file to box using the current client
 
-            Args:
-                folderID (string): the box folder ID that the file should be added to (found in URL)
-                path (string): the path to the file on your local machine
-                file (string): the name of the file you wish to upload
+        Args:
+            folderID (string): the box folder ID that the file should be added to (found in URL)
+            path (string): the path to the file on your local machine
+            file (string): the name of the file you wish to upload
         """
 
         # If the access token is expired (or about to be), then update it

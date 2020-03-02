@@ -11,13 +11,13 @@ import sys, os, platform, zipfile, datetime, time
 
 def create_XML(parameters, default_settings="PhysiCell_settings_default.xml", save_settings="PhysiCell_settings.xml", off_limits=[]):
     """
-        Create a PhysiCell XML settings file given a dictionary of paramaters.  This function works by having a ``default_settings`` file which contains the generic XML structure.  Each key in ``parameters` then contains the paths to each XML tag in the ``default_settings`` file.  The value of that tag is then set to the value in the associated key.  If a key in ``parameters`` does not exist in the ``default_settings`` XML file then it is ignored.  If a key in ``parameters`` also exists in ``off_limits`` then it is ignored.
+    Create a PhysiCell XML settings file given a dictionary of paramaters.  This function works by having a ``default_settings`` file which contains the generic XML structure.  Each key in ``parameters` then contains the paths to each XML tag in the ``default_settings`` file.  The value of that tag is then set to the value in the associated key.  If a key in ``parameters`` does not exist in the ``default_settings`` XML file then it is ignored.  If a key in ``parameters`` also exists in ``off_limits`` then it is ignored.
 
-        Args:
-            paramaters (dict): A dictionary of paramaters where the key is the path to the xml variable and the value is the desired value in the XML file.
-            default_settings (str): the path to the default xml file
-            save_settings (str): the path to the output xml file
-            off_limits (list): a list of keys that should not be inserted into the XML file.
+    Args:
+        paramaters (dict): A dictionary of paramaters where the key is the path to the xml variable and the value is the desired value in the XML file.
+        default_settings (str): the path to the default xml file
+        save_settings (str): the path to the output xml file
+        off_limits (list): a list of keys that should not be inserted into the XML file.
     """
 
     parameters = dict(parameters)
@@ -37,10 +37,10 @@ def create_XML(parameters, default_settings="PhysiCell_settings_default.xml", sa
 
 def data_cleanup(config=None):
     """
-        Emulating make data-cleanup-light: remove .mat, .xml, .svg, .txt, .pov.  You can optionally remove zipped files by setting ``remove-zip`` equal to ``True`` or remove ``*.mp4`` by setting ``remove-movie`` to ``True`` in the config file.
+    Emulating make data-cleanup-light: remove .mat, .xml, .svg, .txt, .pov.  You can optionally remove zipped files by setting ``remove-zip`` equal to ``True`` or remove ``*.mp4`` by setting ``remove-movie`` to ``True`` in the config file.
 
-        Args:
-            config (Config): A config object, optionally given.
+    Args:
+        config (Config): A config object, optionally given.
     """
 
     for file in os.listdir("."):
@@ -59,11 +59,11 @@ def data_cleanup(config=None):
 
 def create_settings_file(parameters, pid=None):
     """
-        Creates a file where each line contains a key from the parameter file and the associated key, separated by a semicolon.
+    Creates a file where each line contains a key from the parameter file and the associated key, separated by a semicolon.
 
-        Args:
-            parameters (dict): the paramaters to be saved in the file
-            pid (str): the parameter id of the current parameter run.  If you don't give an id then the id in ``parameters`` will be used.
+    Args:
+        parameters (dict): the paramaters to be saved in the file
+        pid (str): the parameter id of the current parameter run.  If you don't give an id then the id in ``parameters`` will be used.
     """
 
     data = ""
@@ -79,13 +79,13 @@ def create_settings_file(parameters, pid=None):
 
 def create_zip(pid):
     """
-        Zip all of the important PhysiCell items.
+    Zip all of the important PhysiCell items.
 
-        Args:
-            pid (str): the id of the current parameter run
+    Args:
+        pid (str): the id of the current parameter run
 
-        Returns:
-            The name of the zipped file
+    Returns:
+        The name of the zipped file
     """
 
     fileName = str(pid) + '_test_' + datetime.datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S') + '.zip'

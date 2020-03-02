@@ -1,47 +1,47 @@
 """
-    Param
-    =====
+Param
+=====
 
-    This is the main class which interact with the database to get and manage parameter sets.  The ``Param`` class links all the other classes together enabling a paramater set to be run
+This is the main class which interact with the database to get and manage parameter sets.  The ``Param`` class links all the other classes together enabling a paramater set to be run
 
 
-    Database
-    --------
+Database
+--------
 
-    In order to get the paramaters, the ``Param`` class needs to be given a ``Database`` instance (e.g. ``Sheets`` or ``Delimited_file``).  Regardless of the which database option is used, it must be set up in a particular way as shown below.
+In order to get the paramaters, the ``Param`` class needs to be given a ``Database`` instance (e.g. ``Sheets`` or ``Delimited_file``).  Regardless of the which database option is used, it must be set up in a particular way as shown below.
 
-    Fields
-    ^^^^^^
+Fields
+^^^^^^
 
-    A field is the key (or identifier) used to get the value when a parameter set is returned.  Each database is required to have and ``id`` and ``status`` field.  There are many optional fields which can be used to give additionally information about the run such as start time and who performed the run.  Below are the fields that are used with parsing parameter sets.  Required parameters are marked with an astrict(*).
+A field is the key (or identifier) used to get the value when a parameter set is returned.  Each database is required to have and ``id`` and ``status`` field.  There are many optional fields which can be used to give additionally information about the run such as start time and who performed the run.  Below are the fields that are used with parsing parameter sets.  Required parameters are marked with an astrict(*).
 
-    +---------------------------+-----------------------------------------------------------------------------------------+
-    | Fields                    | Description                                                                             |
-    +===========================+=========================================================================================+
-    | ``id``\* (str)            | Unique parameter set installed                                                          |
-    +---------------------------+-----------------------------------------------------------------------------------------+
-    | ``status``\* (str)        | The current status of the parameter set. Blank values are unran (default),              |
-    |                           | ``finished`` have finished and ``failed`` have failed.                                  |
-    +---------------------------+-----------------------------------------------------------------------------------------+
-    | ``start-time`` (str)      | The time that the parameter set began.  Times are in UTC time format.                   |
-    +---------------------------+-----------------------------------------------------------------------------------------+
-    | ``end-time`` (str)        | The time that the parameter set finished.  Times are in UTC time format.                |
-    +---------------------------+-----------------------------------------------------------------------------------------+
-    | ``performed-by`` (str)    | The username of the person that ran the parameter set.                                  |
-    +---------------------------+-----------------------------------------------------------------------------------------+
-    | ``comments`` (str)        | Any comments such as error messages relating to the parameter set.                      |
-    +---------------------------+-----------------------------------------------------------------------------------------+
++---------------------------+-----------------------------------------------------------------------------------------+
+| Fields                    | Description                                                                             |
++===========================+=========================================================================================+
+| ``id``\* (str)            | Unique parameter set installed                                                          |
++---------------------------+-----------------------------------------------------------------------------------------+
+| ``status``\* (str)        | The current status of the parameter set. Blank values are unran (default),              |
+|                           | ``finished`` have finished and ``failed`` have failed.                                  |
++---------------------------+-----------------------------------------------------------------------------------------+
+| ``start-time`` (str)      | The time that the parameter set began.  Times are in UTC time format.                   |
++---------------------------+-----------------------------------------------------------------------------------------+
+| ``end-time`` (str)        | The time that the parameter set finished.  Times are in UTC time format.                |
++---------------------------+-----------------------------------------------------------------------------------------+
+| ``performed-by`` (str)    | The username of the person that ran the parameter set.                                  |
++---------------------------+-----------------------------------------------------------------------------------------+
+| ``comments`` (str)        | Any comments such as error messages relating to the parameter set.                      |
++---------------------------+-----------------------------------------------------------------------------------------+
 """
 
 import datetime
 
 class Param:
     """
-        Create a Param instance with a database and optional config file.
+    Create a Param instance with a database and optional config file.
 
-        Args:
-            database (Database): a Database instance (such as Sheets or Delimited_file)
-            config (Config): a config object which allows for more features.  This is optional.
+    Args:
+        database (Database): a Database instance (such as Sheets or Delimited_file)
+        config (Config): a config object which allows for more features.  This is optional.
     """
 
     def __init__(self, database, config=None):
@@ -63,10 +63,10 @@ class Param:
 
     def next_parameters(self):
         """
-            Get the next parameter set if one exists
-            
-            Returns:
-                An OrderedDict containing the key-value pairs from that parameter set or None if there are no more to sets.
+        Get the next parameter set if one exists
+        
+        Returns:
+            An OrderedDict containing the key-value pairs from that parameter set or None if there are no more to sets.
         """
 
         if self.number_of_runs == -1 or self.runs_performed < self.number_of_runs:
@@ -87,7 +87,7 @@ class Param:
                     if "performed-by" in records[i]:
                         records[i]["performed-by"] = self.performed_by
 
-                    self.db.update_row(i+1, records[i])
+                    self.db.update_row(i, records[i])
 
                     return records[i]
 
@@ -101,7 +101,7 @@ class Param:
                     records[i]["start-time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 if "performed-by" in records[i]:
                     records[i]["performed-by"] = self.performed_by
-                self.db.update_row(i+1, records[i])
+                self.db.update_row(i, records[i])
 
                 # Save id to local cache
                 if self.config:
@@ -114,19 +114,17 @@ class Param:
 
     def update_status(self, id, status):
         """
-            Update the status of the selected parameter.  If status is not included in the parameter set keys then nothing will be updated.
+        Update the status of the selected parameter.  If status is not included in the parameter set keys then nothing will be updated.
 
-            Args:
-                id (str): the id of the parameter set to use
-            
-            Returns:
-                The new parameter set that has been updated or False if not able to update.
+        Args:
+            id (str): the id of the parameter set to use
+        
+        Returns:
+            The new parameter set that has been updated or False if not able to update.
         """
 
         records = self.db.get_table()
         index = -1
-
-        # Remove id from local cache
 
         for i in range(0, len(records)):
             if str(records[i]["id"]) == str(id):
@@ -136,19 +134,19 @@ class Param:
             return False
 
         records[index]["status"] = status
-        self.db.update_cell(index+1, 'status', status)
+        self.db.update_cell(index, 'status', status)
 
         return records[index]
 
     def successful(self, id):
         """
-            Mark a parameter set as successfully completed.
+        Mark a parameter set as successfully completed.
 
-            Args:
-                id (str): the id of the parameter set to use
-            
-            Returns:
-                The new parameter set that has been updated or False if not able to update.
+        Args:
+            id (str): the id of the parameter set to use
+        
+        Returns:
+            The new parameter set that has been updated or False if not able to update.
         """
 
         records = self.db.get_table()
@@ -170,20 +168,20 @@ class Param:
         if 'end-time' in records[index]:
             records[index]["end-time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        self.db.update_row(index+1, records[index])
+        self.db.update_row(index, records[index])
         
         return records[index]
 
     def failed(self, id, err=''):
         """
-            Mark a parameter set as failed to completed.
-            
-            Args:
-                id (str): the id of the parameter set to use
-                err (str): the error message.  Empty by default.
-            
-            Returns:
-                The new parameter set that has been updated or False if not able to update.
+        Mark a parameter set as failed to completed.
+        
+        Args:
+            id (str): the id of the parameter set to use
+            err (str): the error message.  Empty by default.
+        
+        Returns:
+            The new parameter set that has been updated or False if not able to update.
         """
 
         records = self.db.get_table()
@@ -202,6 +200,6 @@ class Param:
         if 'comments' in records[index]:
             records[index]["comments"] += " failed{ " + err + " };"
 
-        self.db.update_row(index+1, records[index])
+        self.db.update_row(index, records[index])
         
         return records[index]
