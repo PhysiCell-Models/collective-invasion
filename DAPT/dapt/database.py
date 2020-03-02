@@ -5,6 +5,11 @@ Database
 The ``Database`` class is the basic interface for adding parameter set hosting services.  The idea is that the core methods (``get_table``, ``get_keys``, ``update_row`` and ``update_cell``) stay the same so that the inner workings can use multiple sources to access the parameter sets.  In general, there shouldn't be any more arguments added.  The exception to this is ``__init__``.  It may be necessary or desirable to add additional, optional, arguments.  This should be done by overloading the method or providing a default option to the argument.  
 
 When prepareing for a parameter sweep the collection of parameter sets can be thought of as a database where the name of each paramate is a column name, each row is a paramater set and the value at the i-th column and j-th row is the value.  This is the approach of DAPT.
+
+Indexing
+--------
+
+All indexes should be from 0.
 """
 
 class Database:
@@ -36,13 +41,13 @@ class Database:
 
 		pass
 
-	def update_row(self, row_id, values):
+	def update_row(self, row_index, values):
 		"""
             Get the keys of the parameter set
 
             Args:
-                row_id (int): the row id to replace
-                values (OrderedDict): the key-value pairs that should be inserted
+                row_index (int): the index of the row to replace
+                values (Dict): the key-value pairs that should be inserted
             
             Returns:
                 A boolean that is True if successfully inserted and False otherwise.

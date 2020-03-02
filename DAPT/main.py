@@ -71,10 +71,10 @@ def createZip(parameters):
 
 
 def main():
-    conf = dapt.config.Config('DAPT/config.json')
-    sheet = dapt.sheets.Sheet(conf.config['spreedsheet-id'], 'DAPT/credentials.json')
-    ap = dapt.param.Param(sheet, conf)
-    boxy = dapt.box.Box(config = conf)
+    conf = dapt.Config('DAPT/config.json')
+    sheet = dapt.Sheet(config=conf, creds='DAPT/credentials.json')
+    ap = dapt.Param(sheet, conf)
+    boxy = dapt.Box(config = conf)
     boxy.connect()
 
     print("Starting main script")
@@ -150,7 +150,7 @@ def main():
                     print(boxy.uploadFile(conf.config['boxFolderZipID'], '\\', zipName))
                 else:
                     print(boxy.uploadFile(conf.config['boxFolderID'], '/'+fileName, fileName))
-                    print(boxy.uploadFile(conf.config['boxFolderZipID'], '/'+fileName, zipName))
+                    print(boxy.uploadFile(conf.config['boxFolderZipID'], '/'+zipName, zipName))
 
                 ap.update_status(parameters['id'], 'upload')
 
