@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2800</max_time> 
+		<max_time units="min">7200</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -100,12 +100,12 @@
 		<folder>output</folder>  
 
 		<full_data>
-			<interval units="min">120</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		 
 		<SVG>
-			<interval units="min">120</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -125,7 +125,7 @@
 		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.2</initial_leader_cell_fraction>
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
-		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10</oxygen_uptake>
+		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">0</oxygen_uptake>
         <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</leader_adhesion>
         <leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
         <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
