@@ -263,7 +263,7 @@ void create_cell_types( void )
 
     // modify ECM
     
-    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // Only leaders can modify ECM (phenotype -> ECM)
+    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; //leader_cell_rule; // Only leaders can modify ECM (phenotype -> ECM)
 
 	// set functions
 	
@@ -303,6 +303,7 @@ void create_cell_types( void )
 	follower_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("follower_repulsion");
    	std::cout<<follower_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
 	follower_cell.phenotype.motility.is_motile = parameters.bools("follower_motility_mode");
+	// follower_cell.functions.custom_cell_rule =  follower_cell_rule;
 	
 	// Selecting cell-ECM interaction wrt to hyteriss
 	
@@ -1823,9 +1824,164 @@ long fibonacci(unsigned n) // just being used for timing.
     return fibonacci(n-1) + fibonacci(n-2);
 }
 
+
+void follower_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	// ecm_update_from_cell( pCell, phenotype, dt );
+	
+	// static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment lifetime" ); 
+
+	std::cout<<"Hello"<<std::endl;
+	
+	if( phenotype.death.dead == true )
+	{
+		// the cell death functions don't automatically turn off custom functions, 
+		// since those are part of mechanics. 
+		
+		// Let's just fully disable now. 
+		pCell->functions.custom_cell_rule = NULL; 
+		return; 
+	}
+	
+	// if I'm docked
+	if( pCell->state.neighbors.size() > 0 )
+	{
+		double number_of_neighbors = pCell->state.neighbors.size(); 
+		
+
+		for (int i = 0; i<number_of_neighbors ; i++)
+		{
+			if (check_for_detachment( pCell, pCell->state.neighbors[i], dt ))
+			{
+				std::cout<<"Hello 2"<<std::endl;
+				
+				dettach_cells( pCell, pCell->state.neighbors[i] );
+				
+			} // why would it be the zero position of neighbors???
+
+
+		}
+		extra_elastic_attachment_mechanics( pCell, phenotype, dt );
+		
+		// check for detachment
+		
+		// bool dettach_me = false; 
+		
+		// if( immune_cell_attempt_apoptosis( pCell, pCell->state.neighbors[0], dt ) )
+		// {
+		// 	immune_cell_trigger_apoptosis( pCell, pCell->state.neighbors[0] ); 
+		// 	dettach_me = true; 
+		// }
+		
+		// // decide whether ot dettach 
+		
+		// if( UniformRandom() < dt / ( pCell->custom_data[attach_lifetime_i] + 1e-15 ) )
+		// { dettach_me = true; }
+		
+		// // if I dettach, resume motile behavior 
+		
+		// if( dettach_me )
+		// {
+		// 	dettach_cells( pCell, pCell->state.neighbors[0] ); 
+		// 	phenotype.motility.is_motile = true; 
+		// }
+		// return; 
+	}
+	
+	// I'm not docked, look for cells nearby and try to docked
+	
+	// if this returns non-NULL, we're now attached to a cell 
+	if( leader_follower_cell_check_neighbors_for_attachment( pCell , dt) )
+	{
+		// set motility off 
+		// phenotype.motility.is_motile = false; 
+		std::cout<<"Hello 3"<<std::endl;
+		return; 
+	}
+	phenotype.motility.is_motile = true; 
+	
+	return; 
+}
+
+void leader_cell_rule( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	ecm_update_from_cell( pCell, phenotype, dt );
+	
+	// static int attach_lifetime_i = pCell->custom_data.find_variable_index( "attachment lifetime" ); 
+	
+	if( phenotype.death.dead == true )
+	{
+		// the cell death functions don't automatically turn off custom functions, 
+		// since those are part of mechanics. 
+		
+		// Let's just fully disable now. 
+		pCell->functions.custom_cell_rule = NULL; 
+		return; 
+	}
+	
+	// if I'm docked
+	if( pCell->state.neighbors.size() > 0 )
+	{
+		double number_of_neighbors = pCell->state.neighbors.size(); 
+		
+
+		for (int i = 0; i<number_of_neighbors ; i++)
+		{
+			if (check_for_detachment( pCell, pCell->state.neighbors[i], dt ))
+			{
+				// std::cout<<"Hello"<<std::endl;
+				
+				dettach_cells( pCell, pCell->state.neighbors[i] );
+				
+			} // why would it be the zero position of neighbors???
+
+
+		}
+		extra_elastic_attachment_mechanics( pCell, phenotype, dt );
+		
+		// check for detachment
+		
+		// bool dettach_me = false; 
+		
+		// if( immune_cell_attempt_apoptosis( pCell, pCell->state.neighbors[0], dt ) )
+		// {
+		// 	immune_cell_trigger_apoptosis( pCell, pCell->state.neighbors[0] ); 
+		// 	dettach_me = true; 
+		// }
+		
+		// // decide whether ot dettach 
+		
+		// if( UniformRandom() < dt / ( pCell->custom_data[attach_lifetime_i] + 1e-15 ) )
+		// { dettach_me = true; }
+		
+		// // if I dettach, resume motile behavior 
+		
+		// if( dettach_me )
+		// {
+		// 	dettach_cells( pCell, pCell->state.neighbors[0] ); 
+		// 	phenotype.motility.is_motile = true; 
+		// }
+		// return; 
+	}
+	
+	// I'm not docked, look for cells nearby and try to docked
+	
+	// if this returns non-NULL, we're now attached to a cell 
+	if( leader_follower_cell_check_neighbors_for_attachment( pCell , dt) )
+	{
+		// set motility off 
+		// phenotype.motility.is_motile = false; 
+		return; 
+	}
+	phenotype.motility.is_motile = true; 
+	
+	return; 
+}
+
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 {
-	leader_follower_cell_check_neighbors_for_attachment( pCell, dt);
 
 	// Find correct fields
 	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
@@ -1924,7 +2080,10 @@ void attach_cells( Cell* pCell_1, Cell* pCell_2 )
 	for( int i=0 ; i < pCell_1->state.neighbors.size() ; i++ )
 	{
 		if( pCell_1->state.neighbors[i] == pCell_2 )
-		{ already_attached = true; }
+		{ 
+			already_attached = true; 
+			// std::cout<<"already attached"<<std::endl;
+		}
 	}
 	if( already_attached == false )
 	{ pCell_1->state.neighbors.push_back( pCell_2 ); }
@@ -2013,13 +2172,13 @@ bool leader_follower_cell_attempt_attachment( Cell* pCell, Cell* pTarget , doubl
 {
 	
 	
-	if( UniformRandom() < 1.0 )
-	{
-		std::cout << "\t attach!" << " " << pTarget->ID << std::endl; 
-		attach_cells( pCell, pTarget ); 
-	}
+	// if( UniformRandom() < 1.0 )
+	// {
+	// 	std::cout << "\t attach!" << " " << pTarget->ID << std::endl; 
+	// 	attach_cells( pCell, pTarget ); 
+	// }
 
-	return true;
+	// return true;
 	
 	// static int oncoprotein_i = pTarget->custom_data.find_variable_index( "oncoprotein" ); 
 	// static int attach_rate_i = pCell->custom_data.find_variable_index( "attachment rate" ); 
@@ -2030,41 +2189,64 @@ bool leader_follower_cell_attempt_attachment( Cell* pCell, Cell* pTarget , doubl
 	// 	parameters.doubles("oncoprotein_threshold"); // 0.5; // 0.1; 
 	// static double oncoprotein_difference = oncoprotein_saturation - oncoprotein_threshold;
 	
-	// static double max_attachment_distance = 
-	// 	parameters.doubles("max_attachment_distance"); // 18.0; 
-	// static double min_attachment_distance = 
-	// 	parameters.doubles("min_attachment_distance"); // 14.0; 
-	// static double attachment_difference = max_attachment_distance - min_attachment_distance; 
+	static double max_attachment_distance = 
+		parameters.doubles("max_attachment_distance"); // 18.0; 
+	static double min_attachment_distance = 
+		parameters.doubles("min_attachment_distance"); // 14.0; 
+	static double attachment_difference = max_attachment_distance - min_attachment_distance; 
 	
 	// if( pTarget->custom_data[oncoprotein_i] > oncoprotein_threshold && pTarget->phenotype.death.dead == false )
 	// {
-	// 	std::vector<double> displacement = pTarget->position - pCell->position;
-	// 	double distance_scale = norm( displacement ); 
-	// 	if( distance_scale > max_attachment_distance )
-	// 	{ return false; } 
+		std::vector<double> displacement = pTarget->position - pCell->position;
+		double distance_scale = norm( displacement ); // Difference between 
+		if( distance_scale > max_attachment_distance )
+		{ return false; } 
 	
-	// 	double scale = pTarget->custom_data[oncoprotein_i];
-	// 	scale -= oncoprotein_threshold; 
-	// 	scale /= oncoprotein_difference;
-	// 	if( scale > 1.0 )
-	// 	{ scale = 1.0; } 
+		// double scale = pTarget->custom_data[oncoprotein_i];
+		// scale -= oncoprotein_threshold; 
+		// scale /= oncoprotein_difference;
+		// if( scale > 1.0 )
+		// { scale = 1.0; } 
 		
-	// 	distance_scale *= -1.0; 
-	// 	distance_scale += max_attachment_distance; 
-	// 	distance_scale /= attachment_difference; 
-	// 	if( distance_scale > 1.0 )
-	// 	{ distance_scale = 1.0; } 
+		distance_scale *= -1.0; 
+		distance_scale += max_attachment_distance; 
+		distance_scale /= attachment_difference; 
+		// distance_scale = -)distance_scale + max_attachment_distance)/attachment_difference. 
+		if( distance_scale > 1.0 )
+		{ distance_scale = 1.0; } 
+		if( UniformRandom() <0.2 * dt * distance_scale )
+		// if( UniformRandom() < pCell->custom_data[attach_rate_i] * dt * distance_scale )
+		{
+			// std::cout << "\t attach!" << " " << attachment_difference << std::endl; 
+			attach_cells( pCell, pTarget ); 
+		}
 		
-	// 	if( UniformRandom() < pCell->custom_data[attach_rate_i] * scale * dt * distance_scale )
-	// 	{
-	// 		std::cout << "\t attach!" << " " << pTarget->custom_data[oncoprotein_i] << std::endl; 
-	// 		attach_cells( pCell, pTarget ); 
-	// 	}
-		
-	// 	return true; 
+		return true; 
 	// }
 	
-	// return false; 
+	return false; 
+}
+
+bool check_for_detachment( Cell* pCell, Cell* pTarget , double dt )
+{
+
+	static double max_attachment_distance = 
+		parameters.doubles("max_attachment_distance"); // 18.0; 
+	static double min_attachment_distance = 
+		parameters.doubles("min_attachment_distance"); // 14.0; 
+	static double attachment_difference = max_attachment_distance - min_attachment_distance; 
+	
+	std::vector<double> displacement = pTarget->position - pCell->position;
+	double distance_scale = norm( displacement ); // Difference between 
+	// std::cout << "\t current distance to neighbor" << " " << attachment_difference << std::endl; 
+	// if cells are further apart than the max displacement - dettach them
+	if( distance_scale > max_attachment_distance )
+	{ 
+		// std::cout << "\t detattach!" << " " << attachment_difference << std::endl; 
+		return true; 
+	} 
+
+	return false;
 }
     
 void write_ECM_Data_matlab( std::string filename )

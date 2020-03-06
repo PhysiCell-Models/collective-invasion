@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200</max_time> 
+		<max_time units="min">4320</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
@@ -47,11 +47,11 @@
 		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
 
 		<Lesion_intialization description="Lesion_intialization" type="double" units="dimensionless">0</Lesion_intialization>
-        <tumor_radius description="Initial cell mass radius" type="double" units="microns">20</tumor_radius>
-		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">1.0</initial_leader_cell_fraction>
+        <tumor_radius description="Initial cell mass radius" type="double" units="microns">175</tumor_radius>
+		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.2</initial_leader_cell_fraction>
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
-		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10</oxygen_uptake>
+		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">0</oxygen_uptake>
         <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</leader_adhesion>
         <leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
         <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
@@ -70,7 +70,12 @@
 		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">1.0</fiber_realignment_rate>
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
+		<!-- Spring model constants -->
 		<elastic_coefficient type="double" units="1/min">0.01</elastic_coefficient>
+		<max_attachment_distance type="double" units="micron">18.0</max_attachment_distance>
+			<!-- cells do not remain attached beyond this distance --> 
+		<min_attachment_distance type="double" units="micron">14.0</min_attachment_distance>
+			<!-- analogous ot resting spring length --> 
 
 		<Microenvironment_parameters description="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
 		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>

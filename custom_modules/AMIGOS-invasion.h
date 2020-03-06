@@ -130,14 +130,16 @@ double sign_function (double number);
 
 // New hookean spring mechanics functions
 
-void attach_cells( Cell* pCell_1, Cell* pCell_2 ); // used in immune_cell_attempt_attachment - copying directly
+void attach_cells( Cell* pCell_1, Cell* pCell_2 ); // used in immune_cell_attempt_attachment - copying directly. Tests to see if they are already attached using "state" What is state?
 void dettach_cells( Cell* pCell_1 , Cell* pCell_2 ); // used in immune_cell_rule - copying directly
 
 void add_elastic_velocity( Cell* pActingOn, Cell* pAttachedTo , double elastic_constant ); // calculation for velocity - copying directly
 void extra_elastic_attachment_mechanics( Cell* pCell, Phenotype& phenotype, double dt ); // calls the calculation - copying directly
 
-Cell* leader_follower_cell_check_neighbors_for_attachment( Cell* pCell , double dt ); // Used to get nearby cell pointers - cells the cell of interest could attach too
+Cell* leader_follower_cell_check_neighbors_for_attachment( Cell* pCell , double dt ); // Used to get nearby cell pointers - cells the cell of interest could attach too - copied directly form Immun example
+bool check_for_detachment( Cell* pCell , Cell* pAttachedTo , double dt ); // used to see if cells should detach - if true, dettach_cells is called. It is simple fthan than leader_follower_cell_check_neighbors_for_attachment b/c we already know a cell is attached if it is getting called. 
 bool leader_follower_cell_attempt_attachment( Cell* pCell, Cell* pTarget , double dt ); // used in  immune_cell_check_neighbors_for_attachment - uses a probability based on oncoprotein amount
 
-void immune_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // wrapts them all together as a custom cell rule
+void leader_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // wrapts them all together as a custom cell rule
+void follower_cell_rule( Cell* pCell, Phenotype& phenotype, double dt ); // wrap them all together as a custom cell rule
 
