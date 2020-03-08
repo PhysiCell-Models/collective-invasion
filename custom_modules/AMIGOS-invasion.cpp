@@ -259,7 +259,21 @@ void create_cell_types( void )
 
     // modify ECM
     
-    leader_cell.functions.custom_cell_rule = ecm_update_from_cell; // Only leaders can modify ECM (phenotype -> ECM)
+	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
+    	leader_cell.functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only leaders can modify ECM (phenotype -> ECM)
+
+	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
+	{
+		leader_cell.functions.custom_cell_rule = ecm_update_from_cell_velocity_vector; // Only leaders can modify ECM (phenotype -> ECM)
+	}
+	
+	else
+	{
+		std::cout<<"no reorientation model specified!!@!!!!!! Halting!!!!!!"<<std::endl;
+		abort();
+		return;
+	}
+	
 
 	// set functions
 	
@@ -310,8 +324,8 @@ void create_cell_types( void )
 
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")
 	{
-		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
-		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
+		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
 		std::cout<<"I selected follower hysteresis" << std::endl;
 	}
@@ -1819,7 +1833,9 @@ long fibonacci(unsigned n) // just being used for timing.
     return fibonacci(n-1) + fibonacci(n-2);
 }
 
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
+// uses cell motility vector for fiber reorientation
+
+void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , double dt)
 {
 
 	// Find correct fields
@@ -1868,6 +1884,81 @@ void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt)
 	for(int i = 0; i < 3; i++)
 	{
 		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
+		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; 
+	}
+	
+	
+    normalize(&(ECM_fiber_alignment[n])); // why by reference??
+
+
+    // End Cell-ECM Fiber realingment
+    
+    // Cell-ECM Anisotrophy Modification
+    
+    double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
+	
+    double r_anisotropy = r_a0 * migration_speed;
+   	
+    pCell->nearest_density_vector()[ECM_anisotropy_index] = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+    
+    // END Cell-ECM Anisotropy Modification
+    
+    return;
+
+}
+
+
+// uses cell velocity vector for fiber reorientation
+
+void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , double dt)
+{
+
+	// Find correct fields
+	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
+	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy increase rate");
+	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber realignment rate");
+    
+    // Cell-ECM density interaction
+    double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
+    double r = 1.0;
+    
+    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
+    
+    // END Cell-ECM density interaction
+    
+    // Cell-ECM Fiber realingment
+
+	// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
+	int n = pCell->get_current_voxel_index();
+	std::vector<double> ECM_orientation = ECM_fiber_alignment[n];
+
+	double anisotropy = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
+    double migration_speed = pCell->phenotype.motility.migration_speed;
+	
+    double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+	// std::cout<<r_0<<std::endl;
+    double r_realignment = r_0 * (1-anisotropy);
+
+	double ddotf;
+	std::vector<double> norm_cell_velocity;
+	norm_cell_velocity.resize(3,0.0);
+	norm_cell_velocity = pCell->velocity;
+	normalize(&norm_cell_velocity);
+
+	ddotf = dot_product(ECM_orientation, norm_cell_velocity);
+	
+	ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
+	
+	std::vector<double> f_minus_d;
+	f_minus_d.resize(3,0.0);
+
+	// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
+
+	for(int i = 0; i < 3; i++)
+	{
+		f_minus_d[i] = ECM_orientation[i] - norm_cell_velocity[i]; // 06.05.19 - fixed 
 		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; 
 	}
 	
