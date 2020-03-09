@@ -71,10 +71,10 @@ class Box:
             return
 
         # If not, then we check to see if the access and refresh token are in the config file.
-        if self.config and self.config.config['access-token'] and self.config.config['refress-token']:
+        if self.config and self.config.config['access-token'] and self.config.config['refresh-token']:
             try:
                 print('Trying to get new access and refresh token from ' + self.config.path)
-                self.oauth._refresh_token = self.config.config['refress-token']
+                self.oauth._refresh_token = self.config.config['refresh-token']
                 self.access_token, self.refresh_token = self.oauth._refresh(self.config.config['access-token'])
                 self.client = Client(self.oauth)
                 self.refreshTime = time.time() + 60*60
@@ -82,7 +82,7 @@ class Box:
                 if self.config:
                     self.config.config['performed-by'] = self.client.user(user_id='me').get()['login'] #Save username to config
                     self.config.config['access-token'] = self.access_token #Save access token to config
-                    self.config.config['refress-token'] = self.refresh_token #Save refresn token to config
+                    self.config.config['refresh-token'] = self.refresh_token #Save refresn token to config
                     self.config.update_config()
 
                 print('Got new access and refresh token from existing')
@@ -123,7 +123,7 @@ class Box:
     
     def __capture(self):
         """
-        Flask page: box redirect url which contains the code and state used to get access and refress token
+        Flask page: box redirect url which contains the code and state used to get access and refresh token
 
         Returns:
             String containing HTML to be displayed with box login credentials
@@ -150,7 +150,7 @@ class Box:
         if self.config:
             self.config.config['performed-by'] = self.client.user(user_id='me').get()['login'] #Save username to config
             self.config.config['access-token'] = self.access_token #Save access token to config
-            self.config.config['refress-token'] = self.refresh_token #Save refresn token to config
+            self.config.config['refresh-token'] = self.refresh_token #Save refresn token to config
             self.config.update_config()
 
 
@@ -188,7 +188,7 @@ class Box:
         if self.config:
             self.config.config['performed-by'] = self.client.user(user_id='me').get()['login'] #Save username to config
             self.config.config['access-token'] = self.access_token #Save access token to config
-            self.config.config['refress-token'] = self.refresh_token #Save refresn token to config
+            self.config.config['refresh-token'] = self.refresh_token #Save refresn token to config
             self.config.update_config()
 
         return self.client
