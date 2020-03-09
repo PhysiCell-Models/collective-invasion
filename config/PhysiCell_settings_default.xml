@@ -126,11 +126,12 @@
 
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
 		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">0</oxygen_uptake>
-        <leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</leader_adhesion>
-        <leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
-        <follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
-        <follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25</follower_repulsion>
-        <default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.3</default_cell_speed>
+
+		<leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</leader_adhesion>
+		<leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
+   		<follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
+    	<follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25</follower_repulsion>
+    	<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.3</default_cell_speed>
 		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
 		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
@@ -139,8 +140,8 @@
 		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
 		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">1.0</default_hysteresis_bias>
-		<oxygen_migration_bias_for_leaders description="Chemotaxis bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
-		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.0001</anisotropy_increase_rate>
+		<oxygen_migration_bias_for_leaders description="Chemotaxis 	bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
+		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.001</anisotropy_increase_rate>
 		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">1.0</fiber_realignment_rate>
 		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
         <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
@@ -152,7 +153,7 @@
 		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower hysteresis/no follower chemotaxis</cell_motility_ECM_interaction_model_selector>
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
-		<ecm_update_model decription="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector" type="string">ecm_update_from_cell_velocity_vector</ecm_update_model>
+		<ecm_update_model decription="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector" type="string">ecm_update_from_cell_motility_vector</ecm_update_model>
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
 		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10</duration_of_uE_conditioning>
 		<freeze_uE_profile hidden="false" type="bool">0</freeze_uE_profile>
