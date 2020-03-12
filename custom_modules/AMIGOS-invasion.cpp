@@ -72,11 +72,11 @@ int time_total = 0;
 
 void create_cell_types( void )
 {
-	// use the same random seed so that future experiments have the 
-	// same initial histogram of oncoprotein, even if threading means 
-	// that future division and other events are still not identical 
-	// for all runs 
-	SeedRandom(0); 
+	// // use the same random seed so that future experiments have the 
+	// // same initial histogram of oncoprotein, even if threading means 
+	// // that future division and other events are still not identical 
+	// // for all runs 
+	// SeedRandom(0); 
 	
 	// housekeeping 
 	
@@ -328,6 +328,14 @@ void create_cell_types( void )
 		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
 		std::cout<<"I selected follower hysteresis" << std::endl;
+	}
+
+	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis with variable follower speed")
+	{
+		follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
+		std::cout<<"I selected follower chemotaxis with variable follower speed" << std::endl;
 	}
 
 	else
@@ -674,6 +682,8 @@ void alter_cell_uptake_secretion_saturation ( void )
 }
 void setup_tissue( void )
 {	
+	// Setting seed so cells always start with same initial configuration
+	SeedRandom(0);
 
 	if (parameters.ints("march_unit_test_setup") == 0)
 	{
@@ -1123,7 +1133,8 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	return; 
 }
 
-/* To eliminate memory, set b_h to zero. To eliminate ECM influence, set a to 0 (permanently) or ECM senstiivity to zero */
+/* To eliminate memory, set b_h to zero. To eliminate ECM influence, set a to 0 (permanently) or ECM senstiivity to zero,
+   This model uses memory from previous motility vector AND previous anisotropy location. */
 
 void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -1440,7 +1451,7 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 
 	else
 	{
-		pCell->phenotype.motility.migration_speed = a;
+		pCell->phenotype.motility.migration_speed = a*norm( phenotype.motility.migration_bias_direction);
 		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
 	}
 	
