@@ -74,7 +74,8 @@
 
 // custom user modules 
 
-#include "./custom_modules/AMIGOS-invasion.h" 
+#include "./custom_modules/AMIGOS-invasion_uncoupled.h" 
+// #include "./custom_modules/AMIGOS-invasion.h" 
 // #include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
@@ -83,10 +84,12 @@ using namespace PhysiCell;
 
 // set number of threads for OpenMP (parallel computing)
 
-void ecm_update(void);
+// void ecm_update(void); // I think this from an old implentation. Noted and commented out 09.01.20
+
 
 int main( int argc, char* argv[] )
 {
+	std::cout<<"test"<<std::endl;
 	// load and parse settings file(s)
  
 	bool XML_status = false; 
@@ -109,6 +112,8 @@ int main( int argc, char* argv[] )
 	std::string time_units = "min"; 
 	
 	double t_max = PhysiCell_settings.max_time;  // 1 days
+
+	std::cout<<"test"<<std::endl;
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();

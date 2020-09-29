@@ -19,7 +19,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>1</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -57,7 +57,7 @@
 		<leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
    		<follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">6.5</follower_adhesion>
     	<follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25</follower_repulsion>
-    	<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.3</default_cell_speed>
+    	<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.5</default_cell_speed>
 		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
 		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
@@ -76,7 +76,7 @@
 		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>
 
 		<Model_Selection_Parameters description="Allows selection of various cell motility-ECM models" type="double">0</Model_Selection_Parameters>
-		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower chemotaxis with variable follower speed</cell_motility_ECM_interaction_model_selector>
+		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower hysteresis/no follower chemotaxis</cell_motility_ECM_interaction_model_selector>
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<ecm_update_model decription="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector" type="string">ecm_update_from_cell_motility_vector</ecm_update_model>
