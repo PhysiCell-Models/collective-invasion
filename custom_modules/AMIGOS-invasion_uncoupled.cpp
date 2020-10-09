@@ -442,6 +442,7 @@ void ECM::initialize_ECM( void )
 	if (ecm_mesh.voxels.size() != ecm_voxels.size())
 	{
 		std::cout<<"Resize ECM mesh to match ECM voxels before initializing ECM units to initial values"<<std::endl;
+		std::cout<<" hit Enter to continue:"<<std::flush;
 	 	std::cin.get();
 	}
 
@@ -592,6 +593,7 @@ void setup_microenvironment( void )
 
 	std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
 	std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
+	std::cout<<" hit Enter to continue:"<<std::flush;
 	std::cin.get();
 
 
@@ -683,6 +685,7 @@ void setup_microenvironment( void )
 
 	std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
 	std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
+	std::cout<<" hit Enter to continue:"<<std::flush;
 	std::cin.get();
 
 	microenvironment.decay_rates[0] = parameters.doubles("chemotactic_substrate_decay_rate");
@@ -940,6 +943,7 @@ void setup_tissue( void )
 			}
 
 			std::cout<<"Cell's placed randomly on domain - this function uses a HARD CODED domain size!!!! WARNING!!!!!"<<std::endl;
+			std::cout<<" hit Enter to continue:"<<std::flush;
 			std::cin.get();
 
 		}

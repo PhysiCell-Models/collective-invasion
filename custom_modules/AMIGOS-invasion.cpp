@@ -711,6 +711,7 @@ void setup_tissue( void )
 			}
 
 			std::cout<<"Cell's placed randomly on domain - this function uses a HARD CODED domain size!!!! WARNING!!!!!"<<std::endl;
+			std::cout<<" hit Enter to continue:"<<std::flush;
 			std::cin.get();
 
 		}
