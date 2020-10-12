@@ -47,16 +47,20 @@ def create_plot(snapshot, folder, output_folder = '.', output_plot = True, show_
         #return (V_max * x) / (K_M + x)
         return 0.5 if x > 0.5 else x
 
-    for i in range(len(micro)):
-        for j in range(len(micro[i])):
-            #micro_scaled[i][j] = 10 *  math.log10(micro[i][j] + 1) / math.log10(2)
-            micro_scaled[i][j] = curve(micro[i][j])
+    # for i in range(len(micro)):
+    #     for j in range(len(micro[i])):
+    #         #micro_scaled[i][j] = 10 *  math.log10(micro[i][j] + 1) / math.log10(2)
+    #         micro_scaled[i][j] = curve(micro[i][j])
 
-    micro_scaled = micro
+    # micro_scaled = micro
     #print_stats(micro_scaled)
 
-    dy = mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0] * micro_scaled
-    dx = mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0] * micro_scaled
+    # dy = mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0] * micro_scaled
+    # dx = mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0] * micro_scaled
+
+    dx = np.multiply(mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0], micro_scaled)
+    dy = np.multiply(mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0], micro_scaled)
+
     #print(dx.shape)
     #print('dmag (min, max)', (np.sqrt(dx**2 + dy**2).min(), np.sqrt(dx**2 + dy**2).max()))
 
@@ -69,19 +73,22 @@ def create_plot(snapshot, folder, output_folder = '.', output_plot = True, show_
     dy_unscaled = mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
 
     # mask out zero vectors
-    mask = np.logical_or(dx > 1e-4, dy > 1e-4)
-
+    # mask = np.logical_or(dx > 1e-4, dy > 1e-4)
+    mask = micro_scaled > 0.0001
     # get unique cell types and radii
     cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi))**(1/3)
     types = cell_df['cell_type'].unique()
     colors = ['yellow', 'blue']
 
-    fig, ax = plt.subplots(figsize=(12, 9.725))
-
+    fig, ax = plt.subplots(figsize=(12,12))
+    y_limit_bottom_0, y_limit_top_0 = plt.ylim()
+    x_limit_bottom_0, x_limit_top_0 = plt.xlim()
     # add contour layer
     # cs = plt.contourf(xx, yy, plane_oxy, cmap="Greens_r", levels=levels)
     cs = plt.contourf(xx_ecm, yy_ecm, plane_anisotropy, cmap="Reds", levels = levels_ecm)
 
+    y_limit_bottom_1, y_limit_top_1 = plt.ylim(-800,800)
+    x_limit_bottom_1, x_limit_top_1 = plt.xlim(-800,800)
 
     # Add cells layer
     for i, ct in enumerate(types):
@@ -90,21 +97,30 @@ def create_plot(snapshot, folder, output_folder = '.', output_plot = True, show_
             circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
                         color=colors[i], radius=plot_df.loc[j, 'radius'], alpha=0.7)
             ax.add_artist(circ)
+    y_limit_bottom_2, y_limit_top_2 = plt.ylim()
+    x_limit_bottom_2, x_limit_top_2 = plt.xlim()
 
     # add quiver layer with scaled arrows ###
     # plt.quiver(xx_ecm[mask], yy_ecm[mask], dx[mask], dy[mask], pivot='middle', angles='xy', units='width', headwidth=0, width=.0015)
-    plt.quiver(xx_ecm, yy_ecm, dx, dy, pivot='middle', angles='xy', units='width', headwidth=0,
+    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], dx[mask], dy[mask], pivot='middle', angles='uv', units='width', headwidth=0,
                width=.0015) ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
     # add unscaled arrows ###
     # plt.quiver(xx[mask], yy[mask], dx_unscaled[mask], dy_unscaled[mask], 
                 # pivot='mid', angles='xy', headwidth=3)
+    y_limit_bottom_3, y_limit_top_3 = plt.ylim()
+    x_limit_bottom_3, x_limit_top_3 = plt.xlim()
+    # ax.axis('scaled') #used to be 'equal' https://stackoverflow.com/questions/45057647/difference-between-axisequal-and-axisscaled-in-matplotlib
+        # This changes teh axis from -750,750 to ~-710,730. It looks better with scaled compared to axix, but either way it changes the plot limits
+    y_limit_bottom_4, y_limit_top_4 = plt.ylim()
+    x_limit_bottom_4, x_limit_top_4 = plt.xlim()
 
-    ax.axis('equal')
     ax.set_xlabel('x [micron]')
     ax.set_ylabel('y [micron]')
-    fig.colorbar(cs, ax=ax)
+    fig.colorbar(cs, ax=ax) # --> this makes the plot super whonky and squishes our physicially realistic plot. Have to plot differnently.
     plt.title(snapshot)
-
+    ax.axis('scaled')
+    y_limit_bottom_4, y_limit_top_4 = plt.ylim(-800,800)
+    x_limit_bottom_4, x_limit_top_4 = plt.xlim(-800,800)
     if output_plot is True:
         plt.savefig(output_folder + snapshot + '.png')
     if show_plot is True:

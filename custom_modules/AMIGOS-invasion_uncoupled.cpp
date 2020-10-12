@@ -579,7 +579,7 @@ void setup_microenvironment( void )
 	
 	std::cout<<ecm.ecm_mesh.voxels.size()<<std::endl;
 	std::cout<<ecm.ecm_voxels.size()<<std::endl;
-	ecm.ecm_mesh.resize(-750.0,750.0,-750.0,750.0,-10.0,10.0,80.0,80.0,20.0);
+	ecm.ecm_mesh.resize(-800.0,800.0,-800.0,800.0,-10.0,10.0,80.0,80.0,20.0);
 	ecm.resize_ecm_units_from_ecm_mesh();
 
 	std::cout<<ecm.ecm_mesh.voxels.size()<<std::endl;

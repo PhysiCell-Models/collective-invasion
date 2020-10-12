@@ -320,35 +320,43 @@ class pyMCDS:
         vox_df = cell_df[inside_voxel]
         return vox_df
 
-    #### ADDITIONAL LOADING
+    #### ADDITIONAL LOADING: ECM data. Call load_ecm to call the individual methods en bloc and load the ECM data.
+    #### The individual functions procede load_ecm in this file. load_ecm is followed by the more "public" methods used
+    # ## to call up the pre-loaded data.
     
     def make_ECM_mesh(self, ecm_arr):
         """
         Creates the ECM mesh from the original ECM data exported in custom ECM script to a .mat file. In theory, 
-        this should only need called once, as ECM mesh does not change with time. 
-        
-        REQUIRES .mat file loading prior to calling. 
-        
-        REQUIRES that ecm dictionary has already been added to self.data
-        
+        this should only need called once, as ECM mesh does not change with time.
+
+        REQUIRES .mat file loading prior
+        to calling. --> done in load_ecm.
+
+        REQUIRES that ecm dictionary has already been added to self.data --> done in load_ecm.
+
         Parameters
         ----------
-        Requires the array from the loaded ECM file. 
+        ecm_arr : Ndarray
+                loaded from .mat file.
         
         Returns
         -------
-        Nothing. Makes the ECM mesh (grid) and loads it in as specific x, y, and z coordinates into dictionaries under 'ecm'/'mesh'/
-        'x_coordinates', and 'y_coordinates', and 'z_coordinates'
+        Nothing :
+                Makes the ECM mesh (grid) and loads it in as specific x, y, and z coordinates into dictionaries under
+                'ecm'/'mesh'/'x_coordinates', and 'y_coordinates', and 'z_coordinates'
         """
-        
+
+        # Make mesh dict
         self.data['ecm']['mesh'] = {}
-        
+
+        # Generate and store unique coordinates from the ECM mesh coordinates
         x_coords, y_coords, z_coords = np.unique(ecm_arr[0,:]), np.unique(ecm_arr[1,:]), np.unique(ecm_arr[2,:])#, np.unique(zz)
 
         self.data['ecm']['mesh']['x_coordinates_vec'] = x_coords
         self.data['ecm']['mesh']['y_coordinates_vec'] = y_coords
         self.data['ecm']['mesh']['z_coordinates_vec'] = z_coords
 
+        # Generate and store coordinates as meshgrid arrays
         xx, yy, zz = np.meshgrid(x_coords, y_coords, z_coords)
 
         self.data['ecm']['mesh']['x_coordinates_mesh'] = xx
@@ -358,18 +366,21 @@ class pyMCDS:
     def load_ECM_centers(self, ecm_arr):
         """
         Loads ECM unit/voxel center from the original ECM data exported in custom ECM script to a .mat file. 
-        REQUIRES .mat file loading prior to calling. 
+        requires .mat file loading prior to calling. In theory load_ECM_centers should only need called once,
+        as ECM mesh does not change with time.
+
         REQUIRES that ECM mesh dictionary already created (call 'make_ECM_mesh' to do this)
-        In theory load_ECM_centers should only need called once, as ECM mesh does not change with time. 
+
 
         Parameters
         ----------
-        Requires the array from the loaded ECM file. 
+        ecm_arr : 'Ndarray'
+                loaded from .mat file.
         
         Returns
         -------
-        Nothing. Loads the ECM centers into dictionary under 'ecm'/'mesh'/
-        'centers'
+        Nothing :
+            Loads the ECM centers into dictionary under 'ecm'/'mesh'/'centers'
         """
         
         self.data['ecm']['mesh']['centers'] = {}
@@ -380,25 +391,36 @@ class pyMCDS:
     def load_ECM_volumes(self, ecm_arr):
         """
         NOT CURRENTLY IMPLEMENTED - not currently writing out ECM unit volumes. If it is decided to export volumes and one wants
-        them, follow the same pattern as the function load_ECM_centers
+        them, follow the same pattern as the function 'load_ECM_centers'
         
-        Loads ECM unit/voxel volume from the original ECM data exported in custom ECM script to a .mat file. REQUIRES .mat file
+        Would loads ECM unit/voxel volume from the original ECM data exported  in custom ECM script to a .mat file. REQUIRES .mat file
         loading prior to calling. In theory, this should only need called once, as ECM mesh does not change with time. 
 
         Parameters
         ----------
-        Requires the array from the loaded ECM file. 
-        
-        REQUIRES that ecm dictionary has already been added to self.data
+        ecm_arr : 'Ndarray'
+                loaded from .mat file.
         
         Returns
         -------
-        Nothing. Loads the ECM centers into dictionary under 'ecm'/'mesh'/
-        'volumes'
+        Nothing :
+            Loads the ECM centers into dictionary under 'ecm'/'mesh'/'volumes'
         """        
 
         
     def load_ECM_data_as_vectors(self, ecm_arr):
+
+        """
+        Loads actual ECM data - the anisotropy, density, and orientation vectors. This function stores them as
+        straight vectors, versus meshgrid arrays. REQUIRES that 'ecm' dictionary already be made. Call load_ecm to do this.
+
+        :param ecm_arr:
+            loaded from .mat file.
+        :return: Nothing
+            Loads ECM data into the dictionary 'ECM_field_vectors' keyed under each field name. ECM orientation is stored
+            as 3 sets of scalar fields.
+        """
+
         self.data['ecm']['ECM_field_vectors'] = {}
         self.data['ecm']['ECM_field_vectors']['anisotropy'] = {}
         self.data['ecm']['ECM_field_vectors']['density'] = {}
@@ -413,6 +435,18 @@ class pyMCDS:
         self.data['ecm']['ECM_field_vectors']['z_fiber_orientation'] = ecm_arr[7,:]
 
     def load_ECM_data_as_meshgrid(self, ecm_arr):
+        """
+
+
+        :param ecm_arr:
+            loaded from .mat file.
+        :return: Nothing
+            Loads ECM data into the dictionary 'ECM_fields' keyed under each field name. ECM orientation is stored
+            as 3 sets of scalar fields.
+        """
+
+
+
         self.data['ecm']['ECM_fields'] = {}
 
         # store data from microenvironment file as numpy array
@@ -449,7 +483,10 @@ class pyMCDS:
         
     def load_ecm(self, ecm_file, output_path='.'):
         """
-        load the *_ecm.mat file
+        Does the actual work of initializing and loading the ECM data by starting the ecm data (data['ecm']) dictionary
+        and calling various functions to load into the *_ecm.mat file into that dictionary.
+
+        When executed, all ECM information - the ECM attributes and mesh data - will be loaded into memory.
         """
         self.data['ecm'] = {}
         read_file = Path(output_path) / ecm_file
