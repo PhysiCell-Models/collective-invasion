@@ -1,122 +1,210 @@
-from pyMCDS import *
+from pyMCDS_ECM import *
 import numpy as np
 
+# Script REQUIRES ffmpeg to make movei!!!!!!!
+
 ######## If using on remote system, uncomment this line below to load correct matplotlib backend ################
-#matplotlib.use('Agg')
+# matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 import math, os, sys, re
 import scipy
 
+
 def print_stats(arr):
+    """
+    Produces relevant statistical output to screen given an array of any dimension. It flattens the in row-major style,
+    the default np.flatten behavior.
+
+    :param arr: any dimensional array, but it probably makes the most sense to be a 2-d array
+    :return: Prints to termminal the array mean, quartiles, min, and max.
+    """
+
     print("Mean: ", np.mean(arr.flatten()))
-    print("Q2 quantile of arr : ", np.quantile(arr, .50)) 
-    print("Q1 quantile of arr : ", np.quantile(arr, .25)) 
+    print("Q2 quantile of arr : ", np.quantile(arr, .50))
+    print("Q1 quantile of arr : ", np.quantile(arr, .25))
     print("Q3 quantile of arr : ", np.quantile(arr, .75))
     print("Min : ", arr.min())
     print("Max : ", arr.max())
 
-def create_plot(snapshot, folder, output_folder = '.', output_plot = True, show_plot = False):
+
+def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot=False):
+    """
+    Creates a plot as per instructions inside the function. As of 10.13.20 this was a plot of ECM-organoid simulations:
+    a base layer of a contour plot of either the anisotropy or the oxygen, the cells in the smulation as a scatter plot,
+    and finally the ECM orientation overlaid with a quiver plot.
+
+    Parameters
+    ----------
+    snapshot :
+        Base name of PhysiCell output files - eg 'output00000275' --> 'output' + '%08d'
+    folder : str
+        Path to input data
+    output_folder : str
+        Path for image output
+    output_plot : bool
+        True = image file will be made. Image output is required for movie production.
+    show_plot : bool
+        True = plot is displayed. Expected to be false for large batches.
+    Returns
+    -------
+    Nothing :
+        Produces a png image from the input PhysiCell data.
+    """
+    ####################################################################################################################
+    ####################################            Load data                                   ########################
+    ####################################################################################################################
     # load cell and microenvironment data
     mcds = pyMCDS(snapshot + '.xml', folder)
-    # load ECM data
+
+    # loads and reads ECM data
     mcds.load_ecm(snapshot + '_ECM.mat', folder)
 
+    # Get cell positions and attributes, microenvironment, and ECM data for plotting.
+
+    # Cells
     cell_df = mcds.get_cell_df()
-    xx, yy = mcds.get_2D_mesh()
-    micro = mcds.get_concentrations('ECM anisotropy', 0.0)
 
-    # find levels for microenvironment
-    plane_oxy = mcds.get_concentrations('oxygen', 0.0)
-    num_levels = 25
-    #levels = np.linspace(plane_oxy.min()+1e-14, plane_oxy.max(), num_levels)
-    levels = np.linspace(1e-14, 38, num_levels)
+    #### Diffusion microenvironment
+    xx, yy = mcds.get_2D_mesh()  # Mesh
+    plane_oxy = mcds.get_concentrations('oxygen', 0.0)  # Oxyen (used for contour plot)
 
-    # arrow lengths depend on anisotropy
-    micro_scaled = micro
-    #print_stats(micro_scaled)
-    #mean = np.mean(micro_scaled.flatten())
-    V_max = 4
-    #K_M = mean
-    K_M = 0.4
-    def curve(x):
-        #return (V_max * x) / (K_M + x)
-        return 0.5 if x > 0.5 else x
+    #### ECM microenvironment
+    xx_ecm, yy_ecm = mcds.get_2D_ECM_mesh()  # Mesh
+    plane_anisotropy = mcds.get_ECM_field('anisotropy', 0.0)  # Anistropy (used for scaling and contour plot)
+    # plane_anisotropy = micro # Used for contour plot
 
-    for i in range(len(micro)):
-        for j in range(len(micro[i])):
-            #micro_scaled[i][j] = 10 *  math.log10(micro[i][j] + 1) / math.log10(2)
-            micro_scaled[i][j] = curve(micro[i][j])
-            
-    micro_scaled = micro
-    #print_stats(micro_scaled)
+    ####################################################################################################################
+    ####################################            Preprocessing                               ########################
+    ####################################################################################################################
 
-    dy = mcds.data['ecm']['y_vec'][:, :, 0] * micro_scaled
-    dx = mcds.data['ecm']['x_vec'][:, :, 0] * micro_scaled
-    #print(dx.shape)
-    #print('dmag (min, max)', (np.sqrt(dx**2 + dy**2).min(), np.sqrt(dx**2 + dy**2).max()))
+    #### Helper varialbes and functions ######
 
-    # normalize lengths -- this needs some fiddling
-    #dx = dx / dx.std()
-    #dy = dy / dy.std()
+    # Number of contours (could include as a parameter)
+    num_levels = 25  # 25 works well for ECM, 38 works well for oxygen
+
+    # Make levels for contours
+    levels_o2 = np.linspace(1e-14, 38, num_levels)
+    levels_ecm = np.linspace(1e-14, 1.0, num_levels)
+
+    # Old function and scripting to scale and threshold anisotorpy values for later use in scaling lenght of ECM fibers
+    # for visualization purposes.
+
+    # micro = plane_anisotropy
+    # micro_scaled = micro
+    #
+    # def curve(x):
+    #     #return (V_max * x) / (K_M + x)
+    #     return 0.5 if x > 0.5 else x
+
+    # for i in range(len(micro)):
+    #     for j in range(len(micro[i])):
+    #         #micro_scaled[i][j] = 10 *  math.log10(micro[i][j] + 1) / math.log10(2)
+    #         micro_scaled[i][j] = curve(micro[i][j])
+
+    ##### Process data for plotting - weight fibers by anisotropy, mask out 0 anisotropy ECM units, get cell radii and types
+
+    # Anisotropy strictly runs between 0 and 1. Element by element mulitplication produces weighted lengths between 0 - 1
+    # for vizualization
+
+    scaled_ECM_x = np.multiply(mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0], plane_anisotropy)
+    scaled_ECM_y = np.multiply(mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0], plane_anisotropy)
 
     # if we want the arrows the same length instead
-    dx_unscaled = mcds.data['ecm']['x_vec'][:, :, 0]
-    dy_unscaled = mcds.data['ecm']['y_vec'][:, :, 0]
+    # ECM_x = mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0]
+    # ECM_y = mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
 
     # mask out zero vectors
-    mask = np.logical_or(dx > 1e-4, dy > 1e-4)
+    mask = plane_anisotropy > 0.0001
 
     # get unique cell types and radii
-    cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi))**(1/3)
+    cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi)) ** (1 / 3)
     types = cell_df['cell_type'].unique()
     colors = ['yellow', 'blue']
 
-    fig, ax = plt.subplots(figsize=(12, 10))
+    ####################################################################################################################
+    ####################################            Plotting                                    ########################
+    ####################################################################################################################
+
+    # start plot and make correct size
+    fig, ax = plt.subplots(figsize=(12, 12))
+    plt.ylim(-800, 800)
+    plt.xlim(-800, 800)
 
     # add contour layer
-    cs = plt.contourf(xx, yy, plane_oxy, cmap="Greens_r", levels=levels)
+    # cs = plt.contourf(xx, yy, plane_oxy, cmap="Greens_r", levels=levels)
+    cs = plt.contourf(xx_ecm, yy_ecm, plane_anisotropy, cmap="Reds", levels=levels_ecm)
 
     # Add cells layer
     for i, ct in enumerate(types):
         plot_df = cell_df[cell_df['cell_type'] == ct]
         for j in plot_df.index:
             circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
-                        color=colors[i], radius=plot_df.loc[j, 'radius'], alpha=0.7)
+                          color=colors[i], radius=plot_df.loc[j, 'radius'], alpha=0.7)
             ax.add_artist(circ)
 
     # add quiver layer with scaled arrows ###
-    plt.quiver(xx[mask], yy[mask], dx[mask], dy[mask], pivot='middle', angles='xy', units='width', headwidth=0, width=.0015)
+    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='uv',
+                  units='width', headwidth=0,
+                  width=.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
 
     # add unscaled arrows ###
-    # plt.quiver(xx[mask], yy[mask], dx_unscaled[mask], dy_unscaled[mask], 
-                # pivot='mid', angles='xy', headwidth=3)
+    # plt.quiver(xx[mask], yy[mask], ECM_x[mask], ECM_y[mask],
+    # pivot='mid', angles='xy', headwidth=3)
 
-    ax.axis('equal')
+    # ax.axis('scaled') #used to be 'equal' https://stackoverflow.com/questions/45057647/difference-between-axisequal-and-axisscaled-in-matplotlib
+    # This changes teh axis from -750,750 to ~-710,730. It looks better with scaled compared to axix, but either way it changes the plot limits
+
+    # Labels and title
     ax.set_xlabel('x [micron]')
     ax.set_ylabel('y [micron]')
     fig.colorbar(cs, ax=ax)
     plt.title(snapshot)
 
-    if output_plot:
+    # Carefully place the command to make the plot square AFTER the color bar has been added.
+    ax.axis('scaled')
+
+    # Plot output
+    if output_plot is True:
         plt.savefig(output_folder + snapshot + '.png')
-    if show_plot:
+    if show_plot is True:
         plt.show()
     plt.close()
 
-def create_gif(data_path, save_path, save_name):
+
+def create_movie(data_path: str, save_path: str, save_name: str):
+    """
+    Generates the list of files in data_path, finds the ones with ECM data, makes plots from them, then outputs an
+    ffmpeg generated movie to save_path, naming the movie save_name.
+
+    This function requires ffmpeg be installed at the command line.
+
+    :param data_path: Path to direcotry containing data
+    :param save_path: Path to save generated image and movie to
+    :param save_name: Save name for movie
+    :return:
+    """
+
+    # generate list of files in the directory
     files = os.listdir(data_path)
-    #files = list(filter(re.compile(r'output*ECM\.mat').search, files))
+    # files = list(filter(re.compile(r'output*ECM\.mat').search, files))
+
+    # For all files in the directory, process only those with with 'ECM.mat' in the names. I am not sure why there is a
+    # period at the beginning of the search pattern.
     for i in range(len(files)):
         if not re.search('.ECM\.mat', files[i]):
             continue
 
-        create_plot(files[i].split('_')[0], data_path, output_folder=save_path, output_plot=True, show_plot=False)
-        #exit()
-    os.system('ffmpeg -y -framerate 24 -i ' + save_path + 'output%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
+        # Sample call with meaningful variables:
+        # create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=True)
+        create_plot(files[i].split('_')[0], data_path, output_folder=save_path, output_plot=True, show_plot=True)
+
+    # make the movie - see ffmpeg documentation for more information
+    os.system(
+        'ffmpeg -y -framerate 24 -i ' + save_path + 'output%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
+
 
 if __name__ == '__main__':
-    #create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=True)
-    create_gif('.', '.', 'test l=38')
-    
+    # auto call the create movive function using the current directory as the data path and save path, and with teh given name.
+    create_movie('.', '', 'anisotropy_2')

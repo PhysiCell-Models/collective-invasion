@@ -421,6 +421,7 @@ class pyMCDS:
             as 3 sets of scalar fields.
         """
 
+        # Make dictionary names
         self.data['ecm']['ECM_field_vectors'] = {}
         self.data['ecm']['ECM_field_vectors']['anisotropy'] = {}
         self.data['ecm']['ECM_field_vectors']['density'] = {}
@@ -436,57 +437,73 @@ class pyMCDS:
 
     def load_ECM_data_as_meshgrid(self, ecm_arr):
         """
+        Loads ECM data as meshgrdi arrays.
 
+        REQUIRES the fields be loaded as vectors - that is where the key names come
+        from. See 'load_ECM_data_as_vectors'.
+
+        REQUIRES that the ECM coordinates/mesh is loaded. See 'make_ECM_mesh'
+
+        REQUIRES that teh ECM centers are loaded. See 'load_ECM_centers'
 
         :param ecm_arr:
             loaded from .mat file.
         :return: Nothing
             Loads ECM data into the dictionary 'ECM_fields' keyed under each field name. ECM orientation is stored
-            as 3 sets of scalar fields.
+            as 3 sets of scalar fields. All fields are loaded as mesh grids.
         """
 
-
-
+        # Set up storage
         self.data['ecm']['ECM_fields'] = {}
 
-        # store data from microenvironment file as numpy array
-        # iterate over each voxel
+        # the first three fields are the x, y, and z coordinates respectively so they need jumped over
         ecm_field_number = 3
+
+        # iterate over each data field
         for field in self.data['ecm']['ECM_field_vectors']:
 
+            #Set up data structure
             self.data['ecm']['ECM_fields'][field] = np.zeros(self.data['ecm']['mesh']['x_coordinates_mesh'].shape)
 
+            # iterate over each voxel
             for vox_idx in range(self.data['ecm']['mesh']['centers'].shape[1]):
+
                 # find the center
-
-                # print(self.data['ecm']['mesh']['centers'].shape[1])
-
                 center = self.data['ecm']['mesh']['centers'][:, vox_idx]
-                # X = self.data['ecm']['mesh']['x_coordinates_vec']
 
+                # use the center to find the cartesian indices of the voxel
                 i = np.where(np.abs(center[0] - self.data['ecm']['mesh']['x_coordinates_vec']) < 1e-10)[0][0]
                 j = np.where(np.abs(center[1] - self.data['ecm']['mesh']['y_coordinates_vec']) < 1e-10)[0][0]
                 k = np.where(np.abs(center[2] - self.data['ecm']['mesh']['z_coordinates_vec']) < 1e-10)[0][0]
 
-                # Use this to make a dictionary with teh Cartesian indices as keys to a dictionary containing the values
+                # Use this to make a dictionary with the Cartesian indices as keys to a dictionary containing the values
                 # if you declare the field to be a dictionary. Otherwise, as written and declared as a np array, it gives one a meshgric
+                # Note that pyMCDS stores meshgrids as 'cartesian'(indexing='xy' in np.meshgrid) which means that we
+                # will have to use these indices as [j, i, k] on the actual meshgrid objects
+
                 self.data['ecm']['ECM_fields'][field][j, i, k] \
                     = ecm_arr[ecm_field_number, vox_idx]
 
             ecm_field_number = ecm_field_number + 1
 
-
-
-        # Might need Cartesian indices of teh ECM meash
-        
-        
-        
     def load_ecm(self, ecm_file, output_path='.'):
         """
         Does the actual work of initializing and loading the ECM data by starting the ecm data (data['ecm']) dictionary
         and calling various functions to load into the *_ecm.mat file into that dictionary.
 
         When executed, all ECM information - the ECM attributes and mesh data - will be loaded into memory.
+
+        Parameters
+        ----------
+        ecm_file : string
+                ecm file name as a string
+        output_path : string
+                Path to ecm data file.
+
+        Returns
+        -------
+        Nothing :
+                Produces ECM data through several function calls.
         """
         self.data['ecm'] = {}
         read_file = Path(output_path) / ecm_file
@@ -496,46 +513,17 @@ class pyMCDS:
         self.load_ECM_centers(ecm_arr)
         self.load_ECM_data_as_vectors(ecm_arr)
         self.load_ECM_data_as_meshgrid(ecm_arr)
-        
-        # print(ecm_arr)
-        
-        # return(ecm_arr)
-
-        # xx, yy = self.get_ECM_mesh(ecm_arr, flat=False)
-        print("Shape of x_coordinates and y_coordinates")
-        # print(self.data['ecm']['anisotropy'].shape, self.data['ecm']['mesh']['y_coordinates'].shape)
-
-        # print(self.data['ecm']['anisotropy'], self.data['ecm']['density'], self.data['ecm']['x_fiber_orientation'], self.data['ecm']['y_fiber_orientation'], self.data['ecm']['z_fiber_orientation'])
-
-        # print(xx[0], yy[0])
-        # X, Y, Z = np.unique(xx), np.unique(yy), np.unique(zz)
-
-        # # self.data['ecm']['x_vec'] = np.zeros(xx.shape)
-        # # self.data['ecm']['y_vec'] = np.zeros(xx.shape)
-        # # self.data['ecm']['z_vec'] = np.zeros(xx.shape)
-
-        # for vox_idx in range(self.data['ecm']['voxels']['centers'].shape[1]):
-        #         # find the center
-        #         center = self.data['ecm']['voxels']['centers'][:, vox_idx]
-
-        #         i = np.where(np.abs(center[0] - X) < 1e-10)[0][0]
-        #         j = np.where(np.abs(center[1] - Y) < 1e-10)[0][0]
-        #         k = np.where(np.abs(center[2] - Z) < 1e-10)[0][0]
-
-        #         self.data['ecm']['x_vec'][j, i, k] = ecm_arr[5, vox_idx]
-        #         self.data['ecm']['y_vec'][j, i, k] = ecm_arr[6, vox_idx]
-        #         self.data['ecm']['z_vec'][j, i, k] = ecm_arr[7, vox_idx]
 
     def get_ECM_field(self, field_name, z_slice=None):
         """
-        Returns the concentration array for the specified chemical species
+        Returns the ECM array for the specified chemical species
         in the microenvironment. Can return either the whole 3D picture, or
         a 2D plane of concentrations.
 
         Parameters
         ----------
         species_name : str
-            Name of the chemical species for which to get concentrations
+            Name of the ECM field of interest
 
         z_slice : float
             z-axis position to use as plane for 2D output. This value must match
@@ -543,7 +531,7 @@ class pyMCDS:
         Returns
         -------
         conc_arr : array (np.float) shape=[nx_voxels, ny_voxels, nz_voxels]
-            Contains the concentration of the specified chemical in each voxel.
+            Contains the quantitity of interest at each voxel.
             The array spatially maps to a meshgrid of the voxel centers.
         """
         if z_slice is not None:
