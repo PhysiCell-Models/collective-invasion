@@ -145,9 +145,8 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
             ax.add_artist(circ)
 
     # add quiver layer with scaled arrows ###
-    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='uv',
-                  units='width', headwidth=0,
-                  width=.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
+    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
+                  width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
 
     # add unscaled arrows ###
     # plt.quiver(xx[mask], yy[mask], ECM_x[mask], ECM_y[mask],
@@ -164,6 +163,9 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
 
     # Carefully place the command to make the plot square AFTER the color bar has been added.
     ax.axis('scaled')
+
+    plt.ylim(-800, 800)
+    plt.xlim(-800, 800)
 
     # Plot output
     if output_plot is True:
@@ -197,14 +199,20 @@ def create_movie(data_path: str, save_path: str, save_name: str):
             continue
 
         # Sample call with meaningful variables:
-        # create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=True)
-        create_plot(files[i].split('_')[0], data_path, output_folder=save_path, output_plot=True, show_plot=True)
+        # create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=False)
+        create_plot(files[i].split('_')[0], data_path, output_folder=save_path, output_plot=True, show_plot=False)
 
     # make the movie - see ffmpeg documentation for more information
+
+    # consider saving as jpegs - https://blender.stackexchange.com/questions/148231/what-image-format-encodes-the-fastest-or-at-least-faster-png-is-too-slow
+    # consider compiling as movie instead of saving the files (all to increase processing speed) (then again, it was teh same speed)
+
+    # consider not loading the unneeded data - and be sure to get rid of the unneeded fields!!!
+
     os.system(
         'ffmpeg -y -framerate 24 -i ' + save_path + 'output%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
 
 
 if __name__ == '__main__':
     # auto call the create movive function using the current directory as the data path and save path, and with teh given name.
-    create_movie('.', '', 'anisotropy_2')
+    create_movie('.', '', 'anisotropy_3')
