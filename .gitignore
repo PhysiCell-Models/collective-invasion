@@ -1,4 +1,10 @@
+# Collective Migration specific ignores
+AMIGOS-invasion
+
+# cpp
 *.o
+
+# PhysiCell
 out*.xml
 out*.mat
 final*.xml
@@ -6,15 +12,16 @@ final*.mat
 initial*.xml
 initial*.mat
 *.mp4
-AMIGOS-invasion
 *.pov
-*.xcworkspace
 *.avi
 *.svg
 *.jpg
 *.png
 *.exe
+
+# Development
+*.xcworkspace
 .vscode*
 *.ipch
 *.pyc
-Distributed-Automated-Parameter-Testing/dap/__pycache__/
+
