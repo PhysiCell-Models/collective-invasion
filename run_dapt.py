@@ -10,11 +10,16 @@ Main script to run the DAPT pipeline to test parameters.
 import os, platform, datetime, zipfile
 import dapt
 
+# Pipeline variables
 box_upload = False
 google_drive_upload = True
+config_path = '../configs/config.json'
+google_sheets_creds_path = '../configs/google-sheets-creds.json'
+google_drive_creds_path = '../configs/google-drive-creds.json'
 
-conf = dapt.Config('../configs/ecm-dapt-test-config.json')
-sheet = dapt.Sheet(config=conf, creds='../configs/credentials.json')
+# Initialize DAPT
+conf = dapt.Config(config_path)
+sheet = dapt.Sheet(config=conf, creds=google_sheets_creds_path)
 ap = dapt.Param(sheet, conf)
 
 # Where should we upload
@@ -22,7 +27,7 @@ if box_upload:
     boxy = dapt.storage.Box(config=conf)
     boxy.connect(access_token=conf["box"]["access-token"], refresh_token=conf["box"]["refresh-token"])
 if google_drive_upload:
-    drive = dapt.storage.Google_Drive(creds_path='../configs/google-drive-creds.json', config=conf)
+    drive = dapt.storage.Google_Drive(creds_path=google_drive_creds_path, config=conf)
     drive.connect()
 
 def createZip(parameters):
