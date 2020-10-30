@@ -117,6 +117,7 @@ int main( int argc, char* argv[] )
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();
+	setup_extracellular_matrix(); // NEW LINE!!!!
 
 	/* PhysiCell setup */ 
  	
