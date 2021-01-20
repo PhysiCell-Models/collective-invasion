@@ -90,7 +90,7 @@
 		<freeze_uE_profile hidden="false" type="bool">0</freeze_uE_profile>
 		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
-		<visual_guideline_pattern description="Specifies pattern of line overlap: none, horizontal lines, vertical lines, or concentric circles" hidden="false" type="string">concentric circles</visual_guideline_pattern>
+		<visual_guideline_pattern description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles" hidden="false" type="string">concentric circles</visual_guideline_pattern>
 		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">cells at y = 0</cell_setup>
 		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">circular</ECM_orientation_setup>
 		<chemical_field_setup description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, angle, or none" type="string">none</chemical_field_setup>
