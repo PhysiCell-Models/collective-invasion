@@ -5,7 +5,7 @@ import glob
 import matplotlib.pyplot as plt
 import math, os, sys, re
 
-def plot_cell_tracks (starting_index, sample_step_interval, number_of_samples, output_plot, show_plot,  naming_index):
+def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_samples: int, output_plot: bool, show_plot: bool,  naming_index: int):
     ####################################################################################################################
     ####################################            Usage example and input loading             ########################
     ####################################################################################################################
@@ -225,7 +225,7 @@ def plot_cell_tracks (starting_index, sample_step_interval, number_of_samples, o
 
 # plot_cell_tracks(0, 1, 10, True, True)
 
-def create_movie(data_path: str, save_path: str, save_name: str):
+def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_file_index: int, end_file_index: int, trail_length: int):
     """
     Generates the list of files in data_path, finds the ones with ECM data, makes plots from them, then outputs an
     ffmpeg generated movie to save_path, naming the movie save_name.
@@ -238,82 +238,111 @@ def create_movie(data_path: str, save_path: str, save_name: str):
     :return:
     """
 
-    # generate list of files in the directory
     files = os.listdir(data_path)
-    # files = list(filter(re.compile(r'output*ECM\.mat').search, files))
 
-    # For all files in the directory, process only those with with 'ECM.mat' in the names. I am not sure why there is a
-    # period at the beginning of the search pattern.
+    list_of_svgs = []
+
     for i in range(len(files)):
-        if not re.search('.\.svg', files[i]):
+        if not re.search('snapshot(.*)\.svg', files[i]):
             continue
 
-        # Sample call with meaningful variables:
-        # create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=False)
-        create_plot(files[i].split('_')[0], data_path, output_folder=save_path, output_plot=True, show_plot=False)
+        # I feel like a dictionary could be used here, but I really need some ordering. A dict might be faster, but I don't
+        # expect huge file lists. So I will just sort as I know how to do that ...
 
-    # make the movie - see ffmpeg documentation for more information
+        list_of_svgs.append(files[i])
 
-    # consider saving as jpegs - https://blender.stackexchange.com/questions/148231/what-image-format-encodes-the-fastest-or-at-least-faster-png-is-too-slow
-    # consider compiling as movie instead of saving the files (all to increase processing speed) (then again, it was teh same speed)
+        print(files[i])
 
-    # consider not loading the unneeded data - and be sure to get rid of the unneeded fields!!!
+    list_of_svgs.sort()
 
+    truncated_list_of_svgs = []
+
+    for i in range(len(list_of_svgs)):
+
+        if i < start_file_index:
+            continue
+
+        if i >= end_file_index:
+            continue
+
+        truncated_list_of_svgs.append(list_of_svgs[i])
+
+    print(list_of_svgs)
+    print(truncated_list_of_svgs)
+
+    ALL_FILES = False
+
+    if ALL_FILES:
+        print('I went into the boolean')
+        truncated_list_of_svgs = list_of_svgs
+
+    max_number_of_samples = trail_length
+
+    # Would be ideal to have a range - that would help with all the starting index, max samples left etc. Also, as written it isn't very flexible
+    # would certainly be ideal to not call plot_cell_tracks every time, but instead store what is available. Could add a function that just
+    # extracts the data from one SVG then appends it to exsisting data structure. could read all the desired data into Pandas DF
+    # then write out images. Etc. Butas is, this is definitely reading the SVGs much to frequently.
+
+    for i in range(len(truncated_list_of_svgs)):
+        j = i + 1
+        print(j)
+        starting_index = j - max_number_of_samples
+        projected_upper_sample_index = max_number_of_samples + starting_index
+        max_samples_left = len(truncated_list_of_svgs) - j
+        print(len(truncated_list_of_svgs))
+
+        # Need to get rid of first frame with zero samples - can't have zero samples.
+        # Need to plot original configuraiton - need to figure that out.
+
+        if j < max_number_of_samples:
+            plot_cell_tracks(0, 1, j, True, False, i)
+            print('early')
+        # elif projected_upper_sample_index > len(list_of_svgs)-1:
+        #     plot_cell_tracks(starting_index, 1, max_samples_left, True, True, i)
+        #     print(max_samples_left)
+        #     print('late')
+        else:
+            plot_cell_tracks(0, 1, j, True, False, i)
+            print('middle')
+    # 11111
+    # So close - need to get the file name right now ...
+    number_frames = end_file_index - start_file_index
+
+    string_of_interest = 'ffmpeg -start_number ' + str(start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"'
+    print(string_of_interest)
     os.system(
-        'ffmpeg -y -framerate 24 -i ' + save_path + 'output%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
+        'ffmpeg -start_number ' + str(start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
 
+    # https://superuser.com/questions/666860/clarification-for-ffmpeg-input-option-with-image-files-as-input
+    # https://superuser.com/questions/734976/ffmpeg-limit-number-of-images-converted-to-video
 
-files = os.listdir('.')
+if __name__ == '__main__':
+    # Execute only if run as a script
+    #
+    if(len(sys.argv) == 1):
+        # Want this to be the equivalent of "run all SVGs present and make a movie out of all of them"
+        # to do this - need a child of or an overload of "create_tracks_movie" that just runs everything
 
-list_of_svgs = []
+        create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
 
-for i in range(len(files)):
-    if not re.search('snapshot(.*)\.svg', files[i]):
-        continue
+    elif (len(sys.argv) == 4):
+        # usage_str = "Usage: %s <start tracking index> <stop tracking index> <# of samples to include>" % (sys.argv[0])
+        # print(usage_str)
+        # print("e.g.,")
+        # eg_str = "%s 0 1 10 indicates start at 0, go up by ones, and stop when you 10 samples" % (sys.argv[0])
+        # print(eg_str)
+        starting_file_index = int(sys.argv[1])
+        end_file_index = int(sys.argv[2])
+        cell_trail_length = int(sys.argv[3]) # length in time steps
+        movie_name = sys.argv[4]
 
-    # I feel like a dictionary could be used here, but I really need some ordering. A dict might be faster, but I don't
-    # expect huge file lists. So I will just sort as I know how to do that ...
-
-    list_of_svgs.append(files[i])
-
-    print(files[i])
-
-list_of_svgs.sort()
-
-print(list_of_svgs)
-
-max_number_of_samples = 10
-
-# Would be ideal to have a range - that would help with all the starting index, max samples left etc. Also, as written it isn't very flexible
-# would certainly be ideal to not call plot_cell_tracks every time, but instead store what is available. Could add a function that just
-# extracts the data from one SVG then appends it to exsisting data structure. could read all the desired data into Pandas DF
-# then write out images. Etc. Butas is, this is definitely reading the SVGs much to frequently.
-
-for i in range(len(list_of_svgs)):
-    j = i + 1
-    print(j)
-    starting_index = j - max_number_of_samples
-    projected_upper_sample_index = max_number_of_samples + starting_index
-    max_samples_left = len(list_of_svgs)-j
-    print(len(list_of_svgs))
-
-    # Need to get rid of first frame with zero samples - can't have zero samples.
-    # Need to plot original configuraiton - need to figure that out.
-
-    if j < max_number_of_samples:
-        plot_cell_tracks(0, 1, j, True, True, i)
-        print('early')
-    # elif projected_upper_sample_index > len(list_of_svgs)-1:
-    #     plot_cell_tracks(starting_index, 1, max_samples_left, True, True, i)
-    #     print(max_samples_left)
-    #     print('late')
+        create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
     else:
-        plot_cell_tracks(0, 1, j, True, True, i)
-        print('middle')
-# 11111
-# So close - need to get the file name right now ...
+        exit(1)
 
-os.system('ffmpeg -y -framerate 6 -i ' + 'output%08d.png -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + 'movie_full_track' + '.mp4"')
+    create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
+
+
 # for fname in glob.glob('snapshot*.svg'):
 #     print(fname)
 #
@@ -327,3 +356,4 @@ os.system('ffmpeg -y -framerate 6 -i ' + 'output%08d.png -pix_fmt yuv420p -vf pa
 #   count += 1
 #   if count > maxCount:
 #     break
+
