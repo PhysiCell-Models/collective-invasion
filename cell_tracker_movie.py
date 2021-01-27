@@ -5,7 +5,9 @@ import glob
 import matplotlib.pyplot as plt
 import math, os, sys, re
 
-def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_samples: int, output_plot: bool, show_plot: bool,  naming_index: int):
+
+def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_samples: int, output_plot: bool,
+                     show_plot: bool, naming_index: int):
     ####################################################################################################################
     ####################################            Usage example and input loading             ########################
     ####################################################################################################################
@@ -25,7 +27,7 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
     #
     # maxCount = starting_index
 
-    d={}   # dictionary to hold all (x,y) positions of cells
+    d = {}  # dictionary to hold all (x,y) positions of cells
 
     """ 
     --- for example ---
@@ -40,7 +42,7 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
     ####################################            Generate list of file indices to load       ########################
     ####################################################################################################################
 
-    endpoint = starting_index + sample_step_interval*number_of_samples
+    endpoint = starting_index + sample_step_interval * number_of_samples
     file_indices = np.linspace(starting_index, endpoint, num=number_of_samples, endpoint=False)
     print(file_indices)
 
@@ -58,22 +60,21 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
     #   if count > maxCount:
     #     break
 
-
     ####################################################################################################################
     ####################################        Main loading and processing loop                ########################
     ####################################################################################################################
 
     for file_index in file_indices:
         fname = "%0.8d" % file_index
-        fname = 'snapshot' + fname + '.svg'# https://realpython.com/python-f-strings/
+        fname = 'snapshot' + fname + '.svg'  # https://realpython.com/python-f-strings/
         # print(fname)
 
         ##### Parse XML tree into a dictionary called 'tree" and get root
         # print('\n---- ' + fname + ':')
-        tree=ET.parse(fname)
+        tree = ET.parse(fname)
 
         # print('--- root.tag, root.attrib ---')
-        root=tree.getroot()
+        root = tree.getroot()
         #  print('--- root.tag ---')
         #  print(root.tag)
         #  print('--- root.attrib ---')
@@ -84,12 +85,18 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
 
         ### Find branches coming from root - tissue parents
         for child in root:
-            #  print(child.tag, child.attrib)
+            # print(child.tag, child.attrib)
             #    print('attrib=',child.attrib)
             #  if (child.attrib['id'] == 'tissue'):
             ##### Find the tissue tag and make it child
+
+            if ('width' in child.attrib.keys()):
+                #### Assumes square domains
+                plot_spatial_length = float(child.attrib['width'])
+                # print(plot_spatial_length)
+
             if ('id' in child.attrib.keys()):
-            #      print('-------- found tissue!!')
+                #      print('-------- found tissue!!')
                 tissue_parent = child
                 break
 
@@ -97,9 +104,9 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
 
         ### find the branch with the cells "id=cells" among all the branches in the XML root
         for child in tissue_parent:
-        #    print('attrib=',child.attrib)
+            #    print('attrib=',child.attrib)
             if (child.attrib['id'] == 'cells'):
-            #      print('-------- found cells!!')
+                #      print('-------- found cells!!')
                 cells_parent = child
                 break
             numChildren += 1
@@ -108,52 +115,53 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
         num_cells = 0
         #  print('------ search cells')
         for child in cells_parent:
-        #    print(child.tag, child.attrib)
-        #    print('attrib=',child.attrib)
+            #    print(child.tag, child.attrib)
+            #    print('attrib=',child.attrib)
 
             # Find the locations of the cells within the cell tags
             for circle in child:
-            #      print('  --- cx,cy=',circle.attrib['cx'],circle.attrib['cy'])
-                  xval = float(circle.attrib['cx'])
+                #      print('  --- cx,cy=',circle.attrib['cx'],circle.attrib['cy'])
+                xval = float(circle.attrib['cx'])
 
-                  # should we test for bogus x,y locations??
-                  if (math.fabs(xval) > 10000.):
-                      print("xval=",xval)
-                      break
-                  yval = float(circle.attrib['cy'])
-                  if (math.fabs(yval) > 10000.):
-                      print("xval=",xval)
-                      break
+                # should we test for bogus x,y locations??
+                if (math.fabs(xval) > 10000.):
+                    print("xval=", xval)
+                    break
+                yval = float(circle.attrib['cy'])
+                if (math.fabs(yval) > 10000.):
+                    print("xval=", xval)
+                    break
 
-                  # Pull out the cell's location. If ID not already in stack to track, put in new cell in dictionary
-                  if (child.attrib['id'] in d.keys()):
-                      d[child.attrib['id']] = np.vstack((d[child.attrib['id']], [ float(circle.attrib['cx']), float(circle.attrib['cy']) ]))
-                  else:
-                      d[child.attrib['id']] = np.array( [ float(circle.attrib['cx']), float(circle.attrib['cy']) ])
-                  break
+                # Pull out the cell's location. If ID not already in stack to track, put in new cell in dictionary
+                if (child.attrib['id'] in d.keys()):
+                    d[child.attrib['id']] = np.vstack(
+                        (d[child.attrib['id']], [float(circle.attrib['cx']), float(circle.attrib['cy'])]))
+                else:
+                    d[child.attrib['id']] = np.array([float(circle.attrib['cx']), float(circle.attrib['cy'])])
+                break
 
-        #    if (child.attrib['id'] == 'cells'):
-        #      print('-------- found cells!!')
-        #      tissue_child = child
+            #    if (child.attrib['id'] == 'cells'):
+            #      print('-------- found cells!!')
+            #      tissue_child = child
 
             #### num_cells becomes total number of cells per frame/sample
             num_cells += 1
-        print(fname,':  num_cells= ',num_cells)
+        print(fname, ':  num_cells= ', num_cells)
 
     ####################################################################################################################
     ####################################        Plot cell tracks and other options              ########################
     ####################################################################################################################
 
-    fig = plt.figure(figsize=(8,8))
+    fig = plt.figure(figsize=(8, 8))
     ax = fig.gca()
     ax.set_aspect("equal")
-    #ax.set_xticks([])
-    #ax.set_yticks([]);
-    #ax.set_xlim(0, 8); ax.set_ylim(0, 8)
+    # ax.set_xticks([])
+    # ax.set_yticks([]);
+    # ax.set_xlim(0, 8); ax.set_ylim(0, 8)
 
-    #print 'dir(fig)=',dir(fig)
-    #fig.set_figwidth(8)
-    #fig.set_figheight(8)
+    # print 'dir(fig)=',dir(fig)
+    # fig.set_figwidth(8)
+    # fig.set_figheight(8)
 
     count = 0
 
@@ -164,40 +172,52 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
     ##### Extract and plot position data for each cell found
     for key in d.keys():
         if (len(d[key].shape) == 2):
-            x = d[key][:,0]
-            y = d[key][:,1]
+            x = d[key][:, 0]
+            y = d[key][:, 1]
 
             # plt.plot(x, y,'-')  # plot doesn't seem to allow weighting or size variation at all in teh connections ...  # https://matplotlib.org/api/_as_gen/matplotlib.pyplot.arrow.html or https://stackoverflow.com/questions/7519467/line-plot-with-arrows-in-matplotlib
             # plt.scatter(x, y, s = weighting) - scatter allows weighting but doens't connect ...
             # plt.scatter(x, y, s=weighting) # could try a non-linear weighting ...
 
             #### Plot cell track as a directed, weighted (by length) path
-            plt.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1, minlength = 0.001, headwidth=1.5, headlength=4)
+            plt.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1,
+                       minlength=0.001, headwidth=1.5, headlength=4)
 
             #### Plot final cell position
-            plt.scatter(x[-1],y[-1], s = 3.5)
+            plt.scatter(x[-1], y[-1], s=3.5)
 
-            # plt.show()
-        # if (len(d[key].shape) == 1):
-        #     x = d[key][:]
-        #     y = d[key][:]
-        #
-        #     plt.scatter(x[-1], y[-1], s=3.5)
+        elif (len(d[key].shape) == 1):
+            x = d[key][0]
+            y = d[key][1]
+
+            plt.scatter(x, y, s=3.5)
 
         else:
             print(key, " has no x,y points")
 
     #### Build plot frame, titles, and save data
-    plt.ylim(0, 1000)
-    plt.xlim(0, 1000)
 
-    title_str = "Starting at frame {}, sample interval of {} for {} total samples".format(starting_index, sample_step_interval, number_of_samples)
+    ####### How do I get 1000 from the data itself???
+
+    # xmlns: dc = "http://purl.org/dc/elements/1.1/"
+    # xmlns: cc = "http://creativecommons.org/ns#"
+    # xmlns: rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    # xmlns: svg = "http://www.w3.org/2000/svg"
+    # xmlns = "http://www.w3.org/2000/svg"
+    # version = "1.1"
+    # width = "1000"
+    # height = "1070"
+    plt.ylim(0, plot_spatial_length)
+    plt.xlim(0, plot_spatial_length)
+
+    title_str = "Starting at frame {}, sample interval of {} for {} total samples".format(starting_index,
+                                                                                          sample_step_interval,
+                                                                                          number_of_samples)
     plt.title(title_str)
 
     output_folder = ''
     snapshot = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
     snapshot = 'output' + f'{naming_index:08}'
-
 
     #### Flags for output
     # output_plot = True
@@ -225,7 +245,8 @@ def plot_cell_tracks (starting_index: int, sample_step_interval: int, number_of_
 
 # plot_cell_tracks(0, 1, 10, True, True)
 
-def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_file_index: int, end_file_index: int, trail_length: int):
+def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_file_index: int, end_file_index: int,
+                        trail_length: int):
     """
     Generates the list of files in data_path, finds the ones with ECM data, makes plots from them, then outputs an
     ffmpeg generated movie to save_path, naming the movie save_name.
@@ -251,7 +272,7 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
 
         list_of_svgs.append(files[i])
 
-        print(files[i])
+        # print(files[i])
 
     list_of_svgs.sort()
 
@@ -267,7 +288,7 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
 
         truncated_list_of_svgs.append(list_of_svgs[i])
 
-    print(list_of_svgs)
+    # print(list_of_svgs)
     print(truncated_list_of_svgs)
 
     ALL_FILES = False
@@ -284,48 +305,69 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
     # then write out images. Etc. Butas is, this is definitely reading the SVGs much to frequently.
 
     for i in range(len(truncated_list_of_svgs)):
-        j = i + 1
+        j = i + 1 # this offsets the index so that we don't report that 0 samples have been taken, while stil producing an image.
         print(j)
         starting_index = j - max_number_of_samples
         projected_upper_sample_index = max_number_of_samples + starting_index
         max_samples_left = len(truncated_list_of_svgs) - j
         print(len(truncated_list_of_svgs))
 
-        # Need to get rid of first frame with zero samples - can't have zero samples.
-        # Need to plot original configuraiton - need to figure that out.
+        if i >= max_number_of_samples:
+            plot_cell_tracks(starting_index, 1, max_number_of_samples, True, True, i)
+            print('middle')
 
-        if j < max_number_of_samples:
-            plot_cell_tracks(0, 1, j, True, False, i)
-            print('early')
+        #### If one wanted to make the trails collapse into the last available location of the cell you would use something
+        #### like this elif block
         # elif projected_upper_sample_index > len(list_of_svgs)-1:
         #     plot_cell_tracks(starting_index, 1, max_samples_left, True, True, i)
         #     print(max_samples_left)
         #     print('late')
         else:
-            plot_cell_tracks(0, 1, j, True, False, i)
-            print('middle')
+            plot_cell_tracks(0, 1, j, True, True, i)
+            print('early')
+
+        # if i < max_number_of_samples:
+        #     plot_cell_tracks(0, 1, j, True, True, i)
+        #     print('early')
+        #
+        # #### If one wanted to make the trails collapse into the last available location of the cell you would use something
+        # #### like this elif block
+        # # elif projected_upper_sample_index > len(list_of_svgs)-1:
+        # #     plot_cell_tracks(starting_index, 1, max_samples_left, True, True, i)
+        # #     print(max_samples_left)
+        # #     print('late')
+        # else:
+        #     plot_cell_tracks(starting_index, 1, max_number_of_samples, True, True, i)
+        #     print('middle')
     # 11111
     # So close - need to get the file name right now ...
     number_frames = end_file_index - start_file_index
 
-    string_of_interest = 'ffmpeg -start_number ' + str(start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"'
+    string_of_interest = 'ffmpeg -start_number ' + str(
+        start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+        number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"'
     print(string_of_interest)
     os.system(
-        'ffmpeg -start_number ' + str(start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
+        'ffmpeg -start_number ' + str(
+            start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+            number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
 
     # https://superuser.com/questions/666860/clarification-for-ffmpeg-input-option-with-image-files-as-input
     # https://superuser.com/questions/734976/ffmpeg-limit-number-of-images-converted-to-video
 
+
 if __name__ == '__main__':
     # Execute only if run as a script
     #
-    if(len(sys.argv) == 1):
+
+    print(len(sys.argv))
+    if len(sys.argv) == 1:
         # Want this to be the equivalent of "run all SVGs present and make a movie out of all of them"
         # to do this - need a child of or an overload of "create_tracks_movie" that just runs everything
 
         create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
 
-    elif (len(sys.argv) == 4):
+    elif len(sys.argv) == 5:
         # usage_str = "Usage: %s <start tracking index> <stop tracking index> <# of samples to include>" % (sys.argv[0])
         # print(usage_str)
         # print("e.g.,")
@@ -333,15 +375,14 @@ if __name__ == '__main__':
         # print(eg_str)
         starting_file_index = int(sys.argv[1])
         end_file_index = int(sys.argv[2])
-        cell_trail_length = int(sys.argv[3]) # length in time steps
+        cell_trail_length = int(sys.argv[3])  # length in time steps
         movie_name = sys.argv[4]
 
         create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
     else:
         exit(1)
 
-    create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
-
+    # create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
 
 # for fname in glob.glob('snapshot*.svg'):
 #     print(fname)
@@ -356,4 +397,3 @@ if __name__ == '__main__':
 #   count += 1
 #   if count > maxCount:
 #     break
-
