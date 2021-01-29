@@ -1142,6 +1142,11 @@ void setup_tissue( void )
 			while( n <= default_microenvironment_options.X_range[1] )
 			{
 				pCell = create_cell(follower_cell); 
+
+				// To prevent droping cells in areas of high ECM curvature. 
+				while(abs(n) < 70)
+				{n = n + 30.0;}
+
 				pCell->assign_position( n , 0.0 , 0.0 );
 				n = n + 30.0;
 			}

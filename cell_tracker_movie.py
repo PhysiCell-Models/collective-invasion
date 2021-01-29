@@ -4,28 +4,38 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 import math, os, sys, re
+import distutils.util
 
-
-def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_samples: int, output_plot: bool,
+def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, number_of_samples: int, output_plot: bool,
                      show_plot: bool, naming_index: int):
-    ####################################################################################################################
-    ####################################            Usage example and input loading             ########################
-    ####################################################################################################################
+    """
+    Produces savable image of cell positional history, plotted as arrows (quiver plot) with final cell positions plotted as a cirle.
+    Slight modification of the function in cell_track_plotter. The modification allows for tracking the index of a series
+    of inputs such that outputs of this function can be appropriate indexed and compiled into a movie.
 
-    # if (len(sys.argv) < 4):
-    #     usage_str = "Usage: %s <start tracking index> <step interval for tracking> <# of samples to include>" % (sys.argv[0])
-    #     print(usage_str)
-    #     print("e.g.,")
-    #     eg_str = "%s 0 1 10 indicates start at 0, go up by ones, and stop when you 10 samples" % (sys.argv[0])
-    #     print(eg_str)
-    #     exit(1)
-    # else:
-    #     starting_index = int(sys.argv[1])
-    #     sample_step_interval = int(sys.argv[2])
-    #     number_of_samples = int(sys.argv[3])
-    #
-    #
-    # maxCount = starting_index
+    sample_step_interval * number_of_samples - starting_index yields the trail length in time steps. number_of_samples provides
+    the number of intervals plotted per image.
+
+    Parameters
+    ----------
+    starting_index :
+        Integer index of the PhysiCell SVG output to begin trackign at
+    sample_step_interval :
+        Interval (number of time steps (SVGs)) to sample at. A value of 2 would add a tracking point for every other SVG. For this special
+        function, it is currently (01.27.21) assumed that will be 1.
+    number_of_samples :
+        Number of SVGs to process (total)/Length of cell positional history. Number of samples * sample size step interval provides the index of the final SVG to process
+    output_plot :
+        Save plot flag (required to produce a movie from resulting images)
+    show_plot :
+        Show plot flag (for processing many images in a loop, this should likely be set to false. Images have to be closed manually)
+    naming_index :
+        Unique to this function. Index used in naming output file of plot_cell_tracks function - filename = output + naming_index.png and leading zeros as needed.
+    Returns
+    -------
+    Null :
+        Produces a png image from the input PhysiCell SVGs.
+    """
 
     d = {}  # dictionary to hold all (x,y) positions of cells
 
@@ -45,20 +55,6 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
     endpoint = starting_index + sample_step_interval * number_of_samples
     file_indices = np.linspace(starting_index, endpoint, num=number_of_samples, endpoint=False)
     print(file_indices)
-
-    ####### Uncomment for statement below to generate a random list of file names versus the prespecifed list. ########
-    ####### Leaving for historical record. If used, the inputs would need to be a single integer,       ########
-    ####### versus the three integers required to generate the prespecified list. Also, remove the other for statement. ########
-    # count = 0
-    #
-    # for fname in glob.glob('snapshot*.svg'):
-    #     print(fname)
-    # # for fname in['snapshot00000000.svg', 'snapshot00000001.svg']:
-    # # for fname in['snapshot00000000.svg']:
-    # #   print(fname)
-    #   count += 1
-    #   if count > maxCount:
-    #     break
 
     ####################################################################################################################
     ####################################        Main loading and processing loop                ########################
@@ -197,16 +193,7 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
 
     #### Build plot frame, titles, and save data
 
-    ####### How do I get 1000 from the data itself???
 
-    # xmlns: dc = "http://purl.org/dc/elements/1.1/"
-    # xmlns: cc = "http://creativecommons.org/ns#"
-    # xmlns: rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    # xmlns: svg = "http://www.w3.org/2000/svg"
-    # xmlns = "http://www.w3.org/2000/svg"
-    # version = "1.1"
-    # width = "1000"
-    # height = "1070"
     plt.ylim(0, plot_spatial_length)
     plt.xlim(0, plot_spatial_length)
 
@@ -228,41 +215,36 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
         plt.savefig(output_folder + snapshot + '.png')
     if show_plot is True:
         plt.show()
-    # plt.close()
+    plt.close() # cell_tracker_movie.py:151: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
 
-
-# if (len(sys.argv) < 2):
-#     usage_str = "Usage: %s <start tracking index> <step interval for tracking> <# of samples to include>" % (sys.argv[0])
-#     print(usage_str)
-#     print("e.g.,")
-#     eg_str = "%s 0 1 10 indicates start at 0, go up by ones, and stop when you 10 samples" % (sys.argv[0])
-#     print(eg_str)
-#     exit(1)
-# else:
-#     starting_index = int(sys.argv[1])
-#     sample_step_interval = int(sys.argv[2])
-#     number_of_samples = int(sys.argv[3])
-
-# plot_cell_tracks(0, 1, 10, True, True)
 
 def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_file_index: int, end_file_index: int,
-                        trail_length: int):
+                        trail_length: int, INCLUDE_ALL_SVGs: bool, INCLUDE_FULL_HISTORY: bool):
+
     """
-    Generates the list of files in data_path, finds the ones with ECM data, makes plots from them, then outputs an
+    Generates the list of files in data_path, finds the relevant SVGs, makes plots from them, then outputs an
     ffmpeg generated movie to save_path, naming the movie save_name.
 
     This function requires ffmpeg be installed at the command line.
 
-    :param data_path: Path to direcotry containing data
-    :param save_path: Path to save generated image and movie to
+
+    :param data_path: Path to directory containing data
+    :param save_path: Path to save generated image(s) and movie to
     :param save_name: Save name for movie
-    :return:
+    :param start_file_index: For the plotting call - Integer index of the PhysiCell SVG output to begin tracking at
+    :param end_file_index: For the plotting call - Integer index of last PhysiCell SVG output to include in movie
+    :param trail_length: For the plotting call - Length (in output steps) of cell positional history to include in movie
+    :param INCLUDE_ALL_SVGs: If true, all findable PhysiCell SVGs are processed and included in movie
+    :param INCLUDE_FULL_HISTORY: If true, the entire available cell history is included, regardless of the value of trail length.
+    :return: Null. Produces a series of images from PhysiCell SVGs and movie from said images.
     """
 
+    #### Get list of all file names in directory
     files = os.listdir(data_path)
 
     list_of_svgs = []
 
+    #### examine all file names in directory and add ones, via string matching, as needed to list of names of files of interest
     for i in range(len(files)):
         if not re.search('snapshot(.*)\.svg', files[i]):
             continue
@@ -272,12 +254,12 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
 
         list_of_svgs.append(files[i])
 
-        # print(files[i])
-
+    #### Sort file name list
     list_of_svgs.sort()
 
     truncated_list_of_svgs = []
 
+    #### Reduce file list to times of interst only
     for i in range(len(list_of_svgs)):
 
         if i < start_file_index:
@@ -291,30 +273,34 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
     # print(list_of_svgs)
     print(truncated_list_of_svgs)
 
-    ALL_FILES = False
-
-    if ALL_FILES:
-        print('I went into the boolean')
+    if INCLUDE_ALL_SVGs:
+        print('Including all SVGs')
         truncated_list_of_svgs = list_of_svgs
 
     max_number_of_samples = trail_length
 
-    # Would be ideal to have a range - that would help with all the starting index, max samples left etc. Also, as written it isn't very flexible
+    if INCLUDE_FULL_HISTORY:
+        print('Including full positional history of cells')
+        max_number_of_samples = len(truncated_list_of_svgs)
+
+    print('Processing {} SVGs'.format(len(truncated_list_of_svgs)))
+
+    # Also, as written it isn't very flexible
     # would certainly be ideal to not call plot_cell_tracks every time, but instead store what is available. Could add a function that just
     # extracts the data from one SVG then appends it to exsisting data structure. could read all the desired data into Pandas DF
-    # then write out images. Etc. Butas is, this is definitely reading the SVGs much to frequently.
+    # then write out images. Etc. But as is, this is definitely reading the SVGs much to frequently.
 
     for i in range(len(truncated_list_of_svgs)):
         j = i + 1 # this offsets the index so that we don't report that 0 samples have been taken, while stil producing an image.
-        print(j)
         starting_index = j - max_number_of_samples
+
+        #### Goes with "trail closing" block - not currently being used.
         projected_upper_sample_index = max_number_of_samples + starting_index
         max_samples_left = len(truncated_list_of_svgs) - j
-        print(len(truncated_list_of_svgs))
 
         if i >= max_number_of_samples:
-            plot_cell_tracks(starting_index, 1, max_number_of_samples, True, True, i)
-            print('middle')
+            plot_cell_tracks_for_movie(starting_index, 1, max_number_of_samples, True, False, i)
+            # print('middle')
 
         #### If one wanted to make the trails collapse into the last available location of the cell you would use something
         #### like this elif block
@@ -323,33 +309,23 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
         #     print(max_samples_left)
         #     print('late')
         else:
-            plot_cell_tracks(0, 1, j, True, True, i)
-            print('early')
+            plot_cell_tracks_for_movie(0, 1, j, True, False, i)
+            # print('early')
 
-        # if i < max_number_of_samples:
-        #     plot_cell_tracks(0, 1, j, True, True, i)
-        #     print('early')
-        #
-        # #### If one wanted to make the trails collapse into the last available location of the cell you would use something
-        # #### like this elif block
-        # # elif projected_upper_sample_index > len(list_of_svgs)-1:
-        # #     plot_cell_tracks(starting_index, 1, max_samples_left, True, True, i)
-        # #     print(max_samples_left)
-        # #     print('late')
-        # else:
-        #     plot_cell_tracks(starting_index, 1, max_number_of_samples, True, True, i)
-        #     print('middle')
-    # 11111
-    # So close - need to get the file name right now ...
+    #### Total frames to include in moview
     number_frames = end_file_index - start_file_index
+    
+    if INCLUDE_ALL_SVGs:
+        number_frames = len(list_of_svgs)
+        start_file_index = 0
 
-    string_of_interest = 'ffmpeg -start_number ' + str(
-        start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
-        number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"'
-    print(string_of_interest)
+    # string_of_interest = 'ffmpeg -start_number ' + str(
+    #     start_file_index) + ' -y -framerate 12 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+    #     number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"'
+    # print(string_of_interest)
     os.system(
         'ffmpeg -start_number ' + str(
-            start_file_index) + ' -y -framerate 6 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+            start_file_index) + ' -y -framerate 12 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
             number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
 
     # https://superuser.com/questions/666860/clarification-for-ffmpeg-input-option-with-image-files-as-input
@@ -358,42 +334,40 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
 
 if __name__ == '__main__':
     # Execute only if run as a script
-    #
 
-    print(len(sys.argv))
     if len(sys.argv) == 1:
-        # Want this to be the equivalent of "run all SVGs present and make a movie out of all of them"
-        # to do this - need a child of or an overload of "create_tracks_movie" that just runs everything
+        # Running with no arguments will make the script run every SVG with not stop to trail length
 
-        create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
+        create_tracks_movie('.', '', 'cell_tracks', 0, 10, 1, True, True)
 
-    elif len(sys.argv) == 5:
-        # usage_str = "Usage: %s <start tracking index> <stop tracking index> <# of samples to include>" % (sys.argv[0])
-        # print(usage_str)
-        # print("e.g.,")
-        # eg_str = "%s 0 1 10 indicates start at 0, go up by ones, and stop when you 10 samples" % (sys.argv[0])
-        # print(eg_str)
+    elif len(sys.argv) == 2:
+        # Running with 1 argument sets the movie name and nothign else
+
+        movie_name = sys.argv[1]
+        create_tracks_movie('.', '', movie_name, 0, 10, 1, True, True)
+
+    elif len(sys.argv) == 7:
         starting_file_index = int(sys.argv[1])
         end_file_index = int(sys.argv[2])
         cell_trail_length = int(sys.argv[3])  # length in time steps
         movie_name = sys.argv[4]
+        INCLUDE_ALL_SVGs = bool(distutils.util.strtobool(sys.argv[5]))# bool(sys.argv[5])
+        INCLUDE_FULL_HISTORY = bool(distutils.util.strtobool(sys.argv[6])) # bool(sys.argv[6])
 
-        create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
+        create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length, INCLUDE_ALL_SVGs, INCLUDE_FULL_HISTORY)
+
     else:
+        print('\nInput 0 arguments to process every available full and include full history and out put movie with '
+              'default name of cell_tracks.mp4')
+        usage_str = "Usage: %s \n" % (sys.argv[0])
+        print(usage_str)
+        print('Input 1 argument (a string) to set movie name and process all files and full history')
+        usage_str = "Usage: %s this_is_great_data\n" % (sys.argv[0])
+        print(usage_str)
+
+        print('Input 6 arguments to gain the most control')
+        usage_str = "Usage: %s <start tracking index> <end file index> <history trail length> <movie name> " \
+                    "<Bool: Include all SVGs> <Bool: Include full cell history> \n" % (sys.argv[0])
+        print(usage_str)
+
         exit(1)
-
-    # create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length)
-
-# for fname in glob.glob('snapshot*.svg'):
-#     print(fname)
-#
-#     start_index = int(fname[8:16])
-#     print(start_index)
-#
-#     plot_cell_tracks(start_index, 1, 1, True, True)
-# for fname in['snapshot00000000.svg', 'snapshot00000001.svg']:
-# for fname in['snapshot00000000.svg']:
-#   print(fname)
-#   count += 1
-#   if count > maxCount:
-#     break
