@@ -1,3 +1,18 @@
+#
+# cell_tracker.py - plot 2-D cell tracks associated with PhysiCell .svg files
+#
+# Usage:
+#  python cell_track_plotter.py <start tracking index> <step interval for tracking> <# of samples to include> <save image> <show image>"
+#  python cell_track_plotter.py <start tracking index> <step interval for tracking> <# of samples to include>
+#
+# Dependencies include matplotlib and numpy. We recommend installing the Anaconda Python3 distribution.
+#
+# Examples (run from directory containing the .svg files):
+#  See below line 239 in "if __name__ == '__main__':"
+#
+# Author: function plot_cell_tracks_for_movie - Randy Heiland, modified by John Metzcar (see cell_track_plotter.py and cell_tracks.py as well for original functions)
+#         This script cell_tracker_movie.py - John Metzcar (Twitter - @jmetzcar)
+
 import sys
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -7,7 +22,7 @@ import math, os, sys, re
 import distutils.util
 
 def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, number_of_samples: int, output_plot: bool,
-                     show_plot: bool, naming_index: int):
+                     show_plot: bool, naming_index: int, produce_for_panel: bool):
     """
     Produces savable image of cell positional history, plotted as arrows (quiver plot) with final cell positions plotted as a cirle.
     Slight modification of the function in cell_track_plotter. The modification allows for tracking the index of a series
@@ -31,6 +46,8 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
         Show plot flag (for processing many images in a loop, this should likely be set to false. Images have to be closed manually)
     naming_index :
         Unique to this function. Index used in naming output file of plot_cell_tracks function - filename = output + naming_index.png and leading zeros as needed.
+    produce_for_panel :
+        Flag - calls tight_layout, increases axes font sizes, and plots without title. For using in panels of images where there will be captions.
     Returns
     -------
     Null :
@@ -86,10 +103,22 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
             #  if (child.attrib['id'] == 'tissue'):
             ##### Find the tissue tag and make it child
 
+            if child.text and "Current time" in child.text:
+                svals = child.text.split()
+                title_str = "Current time: " + svals[2] + "d, " + svals[4] + "h, " + svals[
+                    7] + "m"
+
             if ('width' in child.attrib.keys()):
-                #### Assumes square domains
-                plot_spatial_length = float(child.attrib['width'])
-                # print(plot_spatial_length)
+                #### Assumes a 70 length unit offsite inthe the Y dimension of the SVG!!!!!!
+                plot_x_extend = float(child.attrib['width'])
+                plot_y_extend = float(child.attrib['height'])
+
+                #### Remove the padding placed into the SVG to determine the true y extend
+                plot_y_extend = plot_y_extend-70
+
+                #### Find the coordinate transform amounts
+                y_coordinate_transform = plot_y_extend/2
+                x_coordinate_transform = plot_x_extend/2
 
             if ('id' in child.attrib.keys()):
                 #      print('-------- found tissue!!')
@@ -130,10 +159,12 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
 
                 # Pull out the cell's location. If ID not already in stack to track, put in new cell in dictionary
                 if (child.attrib['id'] in d.keys()):
-                    d[child.attrib['id']] = np.vstack(
-                        (d[child.attrib['id']], [float(circle.attrib['cx']), float(circle.attrib['cy'])]))
+                    d[child.attrib['id']] = np.vstack((d[child.attrib['id']],
+                                                       [float(circle.attrib['cx']) - x_coordinate_transform,
+                                                        float(circle.attrib['cy']) - y_coordinate_transform]))
                 else:
-                    d[child.attrib['id']] = np.array([float(circle.attrib['cx']), float(circle.attrib['cy'])])
+                    d[child.attrib['id']] = np.array([float(circle.attrib['cx']) - x_coordinate_transform,
+                                                      float(circle.attrib['cy']) - y_coordinate_transform])
                 break
 
             #    if (child.attrib['id'] == 'cells'):
@@ -186,21 +217,14 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
             x = d[key][0]
             y = d[key][1]
 
-            plt.scatter(x, y, s=3.5)
+            plt.scatter(x, y, s=5)
 
         else:
             print(key, " has no x,y points")
 
     #### Build plot frame, titles, and save data
-
-
-    plt.ylim(0, plot_spatial_length)
-    plt.xlim(0, plot_spatial_length)
-
-    title_str = "Starting at frame {}, sample interval of {} for {} total samples".format(starting_index,
-                                                                                          sample_step_interval,
-                                                                                          number_of_samples)
-    plt.title(title_str)
+    plt.ylim(-plot_y_extend/2, plot_y_extend/2)
+    plt.xlim(-plot_x_extend/2, plot_x_extend/2)
 
     output_folder = ''
     snapshot = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
@@ -210,7 +234,17 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
     # output_plot = True
     # show_plot = True
 
-    # Plot output
+    # Produce plot following the available options.
+
+    if produce_for_panel == False:
+        title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
+        # %"Starting at frame {}, sample interval of {} for {} total samples".format(number_of_samples, sample_step_interval, number_of_samples)
+        plt.title(title_str)
+    else:
+        fig.tight_layout()
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+
     if output_plot is True:
         plt.savefig(output_folder + snapshot + '.png')
     if show_plot is True:
@@ -299,7 +333,7 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
         max_samples_left = len(truncated_list_of_svgs) - j
 
         if i >= max_number_of_samples:
-            plot_cell_tracks_for_movie(starting_index, 1, max_number_of_samples, True, False, i)
+            plot_cell_tracks_for_movie(starting_index, 1, max_number_of_samples, True, False, i, True)
             # print('middle')
 
         #### If one wanted to make the trails collapse into the last available location of the cell you would use something
@@ -309,7 +343,7 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
         #     print(max_samples_left)
         #     print('late')
         else:
-            plot_cell_tracks_for_movie(0, 1, j, True, False, i)
+            plot_cell_tracks_for_movie(0, 1, j, True, False, i, True)
             # print('early')
 
     #### Total frames to include in moview
@@ -357,7 +391,7 @@ if __name__ == '__main__':
         create_tracks_movie('.', '', movie_name, starting_file_index, end_file_index, cell_trail_length, INCLUDE_ALL_SVGs, INCLUDE_FULL_HISTORY)
 
     else:
-        print('\nInput 0 arguments to process every available full and include full history and out put movie with '
+        print('\nInput 0 arguments to process every available full and include full history and output movie with '
               'default name of cell_tracks.mp4')
         usage_str = "Usage: %s \n" % (sys.argv[0])
         print(usage_str)
@@ -365,7 +399,7 @@ if __name__ == '__main__':
         usage_str = "Usage: %s this_is_great_data\n" % (sys.argv[0])
         print(usage_str)
 
-        print('Input 6 arguments to gain the most control')
+        print('Input 7 arguments to gain the most control')
         usage_str = "Usage: %s <start tracking index> <end file index> <history trail length> <movie name> " \
                     "<Bool: Include all SVGs> <Bool: Include full cell history> \n" % (sys.argv[0])
         print(usage_str)
