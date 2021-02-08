@@ -2,8 +2,7 @@
 # cell_tracker.py - plot 2-D cell tracks associated with PhysiCell .svg files
 #
 # Usage:
-#  python cell_track_plotter.py <start tracking index> <step interval for tracking> <# of samples to include> <save image> <show image>"
-#  python cell_track_plotter.py <start tracking index> <step interval for tracking> <# of samples to include>
+#  Takes 0, 1, or 7 arguments. See below line 239 in "if __name__ == '__main__':" for usage.
 #
 # Dependencies include matplotlib and numpy. We recommend installing the Anaconda Python3 distribution.
 #
@@ -11,7 +10,7 @@
 #  See below line 239 in "if __name__ == '__main__':"
 #
 # Author: function plot_cell_tracks_for_movie - Randy Heiland, modified by John Metzcar (see cell_track_plotter.py and cell_tracks.py as well for original functions)
-#         This script cell_tracker_movie.py - John Metzcar (Twitter - @jmetzcar)
+#         This script cell_tracker_movie.py - John Metzcar (Twitter - @jmetzcar). See also anim_svg_opac.py in PhysiCell tools for coloring functionality
 
 import sys
 import xml.etree.ElementTree as ET
@@ -54,7 +53,16 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
         Produces a png image from the input PhysiCell SVGs.
     """
 
+    #### Flags
+
+    output_plot = output_plot
+    show_plot = show_plot
+    naming_index = naming_index
+    produce_for_panel = produce_for_panel
+
     d = {}  # dictionary to hold all (x,y) positions of cells
+    d_attributes = {}   #dictionary to hold other attributes, like color (a data frame might be nice here in the long run ... )\
+                        # currently only being read once only as cell dictionary is populated - so only use for static values!
 
     """ 
     --- for example ---
@@ -165,6 +173,9 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
                 else:
                     d[child.attrib['id']] = np.array([float(circle.attrib['cx']) - x_coordinate_transform,
                                                       float(circle.attrib['cy']) - y_coordinate_transform])
+                    d_attributes[child.attrib['id']] = circle.attrib['fill']
+                ##### This 'break' statement is required to skip the nucleus circle. There are two circle attributes. \
+                ##### If both nuclear and cell boundary attributes are needed, this break NEEDS REMOVED!!!!
                 break
 
             #    if (child.attrib['id'] == 'cells'):
@@ -210,14 +221,15 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
             plt.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1,
                        minlength=0.001, headwidth=1.5, headlength=4)
 
-            #### Plot final cell position
-            plt.scatter(x[-1], y[-1], s=3.5)
+            #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
+            plt.scatter(x[-1], y[-1], s = 5.0, c = d_attributes[key])
 
+        #### used if history lenght is set to 0 and if in first frame of sequnece (there is no history)
         elif (len(d[key].shape) == 1):
             x = d[key][0]
             y = d[key][1]
-
-            plt.scatter(x, y, s=5)
+            #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
+            plt.scatter(x, y, s = 5.0, c = d_attributes[key])
 
         else:
             print(key, " has no x,y points")
@@ -230,12 +242,7 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
     snapshot = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
     snapshot = 'output' + f'{naming_index:08}'
 
-    #### Flags for output
-    # output_plot = True
-    # show_plot = True
-
     # Produce plot following the available options.
-
     if produce_for_panel == False:
         title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
         # %"Starting at frame {}, sample interval of {} for {} total samples".format(number_of_samples, sample_step_interval, number_of_samples)
@@ -246,7 +253,7 @@ def plot_cell_tracks_for_movie(starting_index: int, sample_step_interval: int, n
         plt.yticks(fontsize=20)
 
     if output_plot is True:
-        plt.savefig(output_folder + snapshot + '.png')
+        plt.savefig(output_folder + snapshot + '.png', dpi=256)
     if show_plot is True:
         plt.show()
     plt.close() # cell_tracker_movie.py:151: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
@@ -272,6 +279,12 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
     :param INCLUDE_FULL_HISTORY: If true, the entire available cell history is included, regardless of the value of trail length.
     :return: Null. Produces a series of images from PhysiCell SVGs and movie from said images.
     """
+
+    #### Flags (for cell track plotter calls)
+
+    output_plot = True
+    show_plot = False
+    produce_for_panel = False
 
     #### Get list of all file names in directory
     files = os.listdir(data_path)
@@ -333,7 +346,7 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
         max_samples_left = len(truncated_list_of_svgs) - j
 
         if i >= max_number_of_samples:
-            plot_cell_tracks_for_movie(starting_index, 1, max_number_of_samples, True, False, i, True)
+            plot_cell_tracks_for_movie(starting_index, 1, max_number_of_samples, output_plot, show_plot, i, produce_for_panel)
             # print('middle')
 
         #### If one wanted to make the trails collapse into the last available location of the cell you would use something
@@ -343,7 +356,7 @@ def create_tracks_movie(data_path: str, save_path: str, save_name: str, start_fi
         #     print(max_samples_left)
         #     print('late')
         else:
-            plot_cell_tracks_for_movie(0, 1, j, True, False, i, True)
+            plot_cell_tracks_for_movie(0, 1, j, output_plot, show_plot, i, produce_for_panel)
             # print('early')
 
     #### Total frames to include in moview

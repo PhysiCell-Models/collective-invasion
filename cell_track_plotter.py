@@ -3,19 +3,23 @@
 #
 # Usage:
 #  python cell_tracks.py <start tracking index> <step interval for tracking> <# of samples to include>
-# 
+#
+#  Also takes 6 arguments. python cell_tracks.py  <start tracking index> <step interval for tracking> <# of samples to
+#  include> <save image> <show image> <plot with tight layout>
+#
 # Dependencies include matplotlib and numpy. We recommend installing the Anaconda Python3 distribution.
 #
 # Examples (run from directory containing the .svg files):
 #  python cell_tracks.py 0 1 100
 #
-# Author: Randy Heiland, modified by John Metzcar
+# Author: Randy Heiland, modified by John Metzcar. See also anim_svg_opac.py in PhysiCell tools for coloring functionality
 #
 import sys
 import xml.etree.ElementTree as ET
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
+import matplotlib.colors as mplc
 import math
 import distutils.util
 
@@ -42,17 +46,20 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
         Save plot flag (required to produce a movie from resulting images)
     show_plot :
         Show plot flag (for processing many images in a loop, this should likely be set to false. Images have to be closed manually)
-    produce_for_panel :
-        Flag - calls tight_layout, increases axes font sizes, and plots without title. For using in panels of images where there will be captions.
+        produce_for_panel :
+            Flag - calls tight_layout, increases axes font sizes, and plots without title. For using in panels of images where there will be captions.
     Returns
     -------
     Null :
         Produces a png image from the input PhysiCell SVGs.
     """
-    
-    maxCount = starting_index
+
+    output_plot = output_plot
+    show_plot = show_plot
 
     d={}   # dictionary to hold all (x,y) positions of cells
+    d_attributes = {}   #dictionary to hold other attributes, like color (a data frame might be nice here in the long run ... ) \
+                        # currently only being read once only as cell dictionary is populated - so only use for static values!
 
     """ 
     --- for example ---
@@ -70,6 +77,8 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
     endpoint = starting_index + sample_step_interval*number_of_samples
     file_indices = np.linspace(starting_index, endpoint, num=number_of_samples, endpoint=False)
     print(file_indices)
+
+    maxCount = starting_index
 
     ####### Uncomment for statement below to generate a random list of file names versus the prespecifed list. ########
     ####### Leaving for historical record. If used, the inputs would need to be a single integer,       ########
@@ -111,7 +120,7 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
 
         ### Find branches coming from root - tissue parents
         for child in root:
-            print(child.tag, child.attrib)
+            # print(child.tag, child.attrib)
             #    print('attrib=',child.attrib)
             #  if (child.attrib['id'] == 'tissue'):
 
@@ -159,23 +168,40 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
             # Find the locations of the cells within the cell tags
             for circle in child:
             #      print('  --- cx,cy=',circle.attrib['cx'],circle.attrib['cy'])
-                  xval = float(circle.attrib['cx'])
+                xval = float(circle.attrib['cx'])
 
-                  # should we test for bogus x,y locations??
-                  if (math.fabs(xval) > 10000.):
-                      print("xval=",xval)
-                      break
-                  yval = float(circle.attrib['cy']) #- y_coordinate_transform
-                  if (math.fabs(yval) > 10000.):
-                      print("yval=",yval)
-                      break
+                # should we test for bogus x,y locations??
+                if (math.fabs(xval) > 10000.):
+                    print("xval=",xval)
+                    break
+                yval = float(circle.attrib['cy']) #- y_coordinate_transform
+                if (math.fabs(yval) > 10000.):
+                    print("yval=",yval)
+                    break
 
-                  # Pull out the cell's location. If ID not already in stack to track, put in new cell in dictionary while applying coordinate transform.
-                  if (child.attrib['id'] in d.keys()):
-                      d[child.attrib['id']] = np.vstack((d[child.attrib['id']], [ float(circle.attrib['cx'])-x_coordinate_transform, float(circle.attrib['cy'])-y_coordinate_transform ]))
-                  else:
-                      d[child.attrib['id']] = np.array( [ float(circle.attrib['cx'])-x_coordinate_transform, float(circle.attrib['cy'])-y_coordinate_transform ])
-                  break
+                # Pull out the cell's location. If ID not already in stack to track, put in new cell in dictionary while applying coordinate transform.
+                if (child.attrib['id'] in d.keys()):
+                    d[child.attrib['id']] = np.vstack((d[child.attrib['id']], [ float(circle.attrib['cx'])-x_coordinate_transform, float(circle.attrib['cy'])-y_coordinate_transform ]))
+                else:
+                    d[child.attrib['id']] = np.array( [ float(circle.attrib['cx'])-x_coordinate_transform, float(circle.attrib['cy'])-y_coordinate_transform])
+                    d_attributes[child.attrib['id']] = circle.attrib['fill']
+                ##### This 'break' statement is required to skip the nucleus circle. There are two circle attributes. \
+                ##### If both nuclear and cell boundary attributes are needed, this break NEEDS REMOVED!!!!
+                break
+
+                ### Code to translate string based coloring to rgb coloring. Use as needed.
+                  # s = circle.attrib['fill']
+                  # print("s=",s)
+                  # print("type(s)=",type(s))
+                  # if (s[0:3] == "rgb"):  # if an rgb string, e.g. "rgb(175,175,80)"
+                  #     #  circle.attrib={'cx': '1085.59','cy': '1225.24','fill': 'rgb(159,159,96)','r': '6.67717','stroke': 'rgb(159,159,96)','stroke-width': '0.5'}
+                  #     rgb = list(map(int, s[4:-1].split(",")))
+                  #     rgb[:] = [x / 255. for x in rgb]
+                  # else:  # otherwise, must be a color name
+                  #     rgb_tuple = mplc.to_rgb(mplc.cnames[s])  # a tuple
+                  #     print(rgb_tuple)
+                  #     rgb = [x for x in rgb_tuple]
+                  #     print(rgb)
 
         #    if (child.attrib['id'] == 'cells'):
         #      print('-------- found cells!!')
@@ -219,14 +245,16 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
             #### Plot cell track as a directed, weighted (by length) path
             plt.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1, minlength = 0.001, headwidth=1.5, headlength=4)
 
-            #### Plot final cell position
-            plt.scatter(x[-1],y[-1], s = 3.5)
+            #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
+            plt.scatter(x[-1],y[-1], s = 4.5, c = d_attributes[key])
 
+        #### used if history lenght is set to 0 and if in first frame of sequnece (there is no history)
         elif (len(d[key].shape) == 1):
             x = d[key][0]
             y = d[key][1]
-
-            plt.scatter(x, y, s=3.5)
+            #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
+            plt.scatter(x, y, s = 4.5, c = d_attributes[key])
+            # plt.scatter(x, y, s=3.5, c=)
 
         else:
             print(key, " has no x,y points")
@@ -234,8 +262,6 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
     #### Build plot frame, titles, and save data
     plt.ylim(-plot_y_extend/2, plot_y_extend/2)
     plt.xlim(-plot_x_extend/2, plot_x_extend/2)
-    # starting_index
-    # plt.rcParams.update({'xtick.labelsize': 'x-large'})
 
     if produce_for_panel == False:
         title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
@@ -253,7 +279,7 @@ def plot_cell_tracks(starting_index: int, sample_step_interval: int, number_of_s
     # Produce plot following the available options.
 
     if output_plot is True:
-        plt.savefig(output_folder + snapshot + '.png')
+        plt.savefig(output_folder + snapshot + '.png', dpi=256)
     if show_plot is True:
         plt.show()
     # plt.close()
