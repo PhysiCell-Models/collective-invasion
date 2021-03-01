@@ -117,6 +117,7 @@ int main( int argc, char* argv[] )
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();
+	setup_extracellular_matrix(); // NEW LINE!!!!
 
 	/* PhysiCell setup */ 
  	
@@ -155,7 +156,7 @@ int main( int argc, char* argv[] )
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );
 	
 	display_citations(); 
 	
@@ -225,7 +226,7 @@ int main( int argc, char* argv[] )
 				if( PhysiCell_settings.enable_SVG_saves == true )
 				{	
 					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
-					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+					SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern"));
 					
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
@@ -284,7 +285,7 @@ int main( int argc, char* argv[] )
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );
 	
 	// timer 
 	

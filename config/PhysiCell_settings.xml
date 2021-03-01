@@ -13,13 +13,13 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1000</max_time> 
+		<max_time units="min">2500</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -43,7 +43,7 @@
 	<user_parameters>
 		<Model_Initialization description="This is a spacer" type="double" units="dimensionless">0</Model_Initialization>
 		<ECM_initialization_parameters description="ECM_initialization_parameters" type="double" units="dimensionless">0</ECM_initialization_parameters>
-        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">0</initial_anisotropy>
+        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">1.0</initial_anisotropy>
 		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
 
 		<Lesion_intialization description="Lesion_intialization" type="double" units="dimensionless">0</Lesion_intialization>
@@ -63,9 +63,9 @@
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
 		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
-		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0</default_chemotaxis_bias>
+		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0.00</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
-		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">1.0</default_hysteresis_bias>
+		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">0.0</default_hysteresis_bias>
 		<oxygen_migration_bias_for_leaders description="Chemotaxis  bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
 		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.001</anisotropy_increase_rate>
 		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">1.0</fiber_realignment_rate>
@@ -75,6 +75,11 @@
 		<Microenvironment_parameters description="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
 		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>
 
+		<ECM_unit_size description="Size of ECM units" type="double" units="dimensionlesss">0</ECM_unit_size>
+		<ECM_dx description="Length of ECM unit in x-direction" type="double" units="um">20</ECM_dx>
+		<ECM_dy description="Length of ECM unit in y-direction" type="double" units="um">20</ECM_dy>
+		<ECM_dz description="Length of ECM unit in z-direction" type="double" units="um">20</ECM_dz>
+
 		<Model_Selection_Parameters description="Allows selection of various cell motility-ECM models" type="double">0</Model_Selection_Parameters>
 		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower chemotaxis/no follower hysteresis</cell_motility_ECM_interaction_model_selector>
 
@@ -83,10 +88,11 @@
 		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
 		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10</duration_of_uE_conditioning>
 		<freeze_uE_profile hidden="false" type="bool">0</freeze_uE_profile>
-		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">0</unit_test_setup>
+		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">1</unit_test_setup>
 		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
-		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">lesion</cell_setup>
-		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">random</ECM_orientation_setup>
+		<visual_guideline_pattern description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles" hidden="false" type="string">concentric circles</visual_guideline_pattern>
+		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">cells at y = 0</cell_setup>
+		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, or starburst" type="string">circular</ECM_orientation_setup>
 		<chemical_field_setup description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, angle, or none" type="string">none</chemical_field_setup>
 		<angle_of_chemical_field_gradient description="Angle of chemical field gradient orientation, specified in degrees" type="double">45.0</angle_of_chemical_field_gradient>
 		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>

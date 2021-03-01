@@ -102,74 +102,74 @@ class Options
 
 // START ECM STUFF
 
-class ECM_Cartesian_Mesh : public Cartesian_Mesh
-{
-	public:
-	ECM_Cartesian_Mesh();
+// class ECM_Cartesian_Mesh : public Cartesian_Mesh
+// {
+// 	public:
+// 	ECM_Cartesian_Mesh();
 
 
-};
+// };
 
-class ECM_Voxel : public Voxel
-{
-	public:
+// class ECM_Voxel : public Voxel
+// {
+// 	public:
 
-	ECM_Voxel();
+// 	ECM_Voxel();
 
-	double anisotropy;
-	double density;
-	std::vector<double> ecm_fiber_alignment;
+// 	double anisotropy;
+// 	double density;
+// 	std::vector<double> ecm_fiber_alignment;
 
-};
+// };
 
-class ECM
-{
-	// so in theory, anythign that doens't need accessed outside of the class is private, to aid in debugging and not messing thigns up. Interesitng. 
+// class ECM
+// {
+// 	// so in theory, anythign that doens't need accessed outside of the class is private, to aid in debugging and not messing thigns up. Interesitng. 
 	
-	public:
+// 	public:
 	
-	ECM_Voxel ecm_voxel;
-	ECM_Cartesian_Mesh ecm_mesh;
-	std::string spatial_units; 
-	std::string name; 
+// 	ECM_Voxel ecm_voxel;
+// 	ECM_Cartesian_Mesh ecm_mesh;
+// 	std::string spatial_units; 
+// 	std::string name; 
 	
-	std::vector<ECM_Voxel> ecm_voxels;
+// 	std::vector<ECM_Voxel> ecm_voxels;
 
 
 
-	ECM();
-	ECM(std::string name);
+// 	ECM();
+// 	ECM(std::string name);
 
-	void make_ecm_units (void);
-	void resize_ecm_units_from_ecm_mesh(void); // destroys previous ECM vector. New ECM_units are put in place and any previous initial configuration is lost
-	void initialize_ECM(void);
+// 	void make_ecm_units (void);
+// 	void resize_ecm_units_from_ecm_mesh(void); // destroys previous ECM vector. New ECM_units are put in place and any previous initial configuration is lost
+// 	void initialize_ECM(void);
 
-};
+// };
 
-class ECM_options
-{
+// class ECM_options
+// {
 
-	private:
+// 	private:
  
-	public: 
-	ECM* pECM;
-	std::string name; 
+// 	public: 
+// 	ECM* pECM;
+// 	std::string name; 
 
 	
 
-	std::string spatial_units; 
-	double dx;
-	double dy; 
-	double dz; 
+// 	std::string spatial_units; 
+// 	double dx;
+// 	double dy; 
+// 	double dz; 
 
-	// Currently only used to specify FIBER orientation, but could be expanded in the future
-	std::string ecm_initial_configuration;
+// 	// Currently only used to specify FIBER orientation, but could be expanded in the future
+// 	std::string ecm_initial_configuration;
 
-	ECM_options(); // needs defined!!!
-};
+// 	ECM_options(); // needs defined!!!
+// };
 
-// extern ECM_options default_ecm_options; 
-// extern ECM ecm;
+// // extern ECM_options default_ecm_options; 
+// // extern ECM ecm;
 
 // END ECM STUFF
 
@@ -180,6 +180,7 @@ class ECM_options
 // to set up the tumor cells 
 void create_cell_types( void ); // done 
 void ECM_setup(double numvox);
+void setup_extracellular_matrix( void ); 
 void setup_tissue(void); // done 
 
 // set up the microenvironment to include the immunostimulatory factor 
@@ -199,5 +200,6 @@ void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , doubl
 void run_biotransport( double t_max );
 void alter_cell_uptake_secretion_saturation ( void );
 void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
+void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern );
 void write_ECM_Data_matlab( std::string filename );
 double sign_function (double number);
