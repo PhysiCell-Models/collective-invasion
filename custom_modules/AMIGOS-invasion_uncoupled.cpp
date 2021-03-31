@@ -284,7 +284,7 @@ void create_cell_types( void )
 	if( parameters.ints("unit_test_setup") == 1)
 	{
 		leader_cell.phenotype.motility.persistence_time = 10.0;
-		leader_cell.phenotype.motility.migration_speed = 1.0;
+		leader_cell.phenotype.motility.migration_speed = 0.50;
 		leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
 		leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		leader_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
@@ -1949,8 +1949,8 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
     
 	if( pCell->type == 2 )
     {
-		output[0] = "yellow";
         output[2] = "yellow";	
+		output[0] = "yellow";
 		
 		// Return yellow for followers and exit statement
 
@@ -1966,7 +1966,10 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
         	return output;
 		}
 
-		// If doing unit testing AND cell not selected as marker cell, return yellow (assigned prior to first if statement)
+		// If doing unit testing AND cell not selected as marker cell, return blue. 
+		output[2] = "blue";	
+		output[0] = "blue";
+
 
         return output;
     }

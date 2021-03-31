@@ -179,7 +179,7 @@ int main( int argc, char* argv[] )
 	std::ofstream report_file;
 
 	//variables for March Project
-	double reset_Cells_interval = 980.0; // for a 1000 by 1000 um computational domain
+	double reset_Cells_interval = 1960.0; // for a 1000 by 1000 um computational domain (use 980.0 for speed = 1.0. Doulbe it for speed equals 0.5. )
 	bool enable_cell_resets = true;
 
 	// main loop 
@@ -239,7 +239,7 @@ int main( int argc, char* argv[] )
 				if (enable_cell_resets == true )
 				{
 					reset_cell_position();
-					reset_Cells_interval += 980.0; // for a 1000 by 1000 um computational domain
+					reset_Cells_interval += 1960.0; // for a 1000 by 1000 um computational domain (use 980.0 for speed = 1.0. Doulbe it for speed equals 0.5. )
 				}
 				
 			}
