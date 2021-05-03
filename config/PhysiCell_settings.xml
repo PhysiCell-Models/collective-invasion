@@ -1,9 +1,9 @@
 <PhysiCell_settings version="1.4.1">
 	<domain>
-		<x_min>-750</x_min>
-		<x_max>750</x_max>
-		<y_min>-750</y_min>
-		<y_max>750</y_max>
+		<x_min>-800</x_min>
+		<x_max>800</x_max>
+		<y_min>-800</y_min>
+		<y_max>800</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -23,7 +23,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output</folder>  
+		<folder>circle_unit_test_with_chemical_cues</folder>  
 
 		<full_data>
 			<interval units="min">6</interval>
@@ -53,11 +53,11 @@
 		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
 		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10</oxygen_uptake>
 
-		<leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">1.25</leader_adhesion>
+		<leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">10.0</leader_adhesion>
 		<leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25</leader_repulsion>
-   		<follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">1.25</follower_adhesion>
+   		<follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">10.0</follower_adhesion>
     	<follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25</follower_repulsion>
-    	<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.05</default_cell_speed>
+    	<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.5</default_cell_speed>
 		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
 		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
 		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
@@ -65,7 +65,7 @@
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
 		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">1.00</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
-		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">0.0</default_hysteresis_bias>
+		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">1.0</default_hysteresis_bias>
 		<oxygen_migration_bias_for_leaders description="Chemotaxis  bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
 		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.001</anisotropy_increase_rate>
 		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">1.0</fiber_realignment_rate>
@@ -81,7 +81,7 @@
 		<ECM_dz description="Length of ECM unit in z-direction" type="double" units="um">20</ECM_dz>
 
 		<Model_Selection_Parameters description="Allows selection of various cell motility-ECM models" type="double">0</Model_Selection_Parameters>
-		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower chemotaxis/no follower hysteresis</cell_motility_ECM_interaction_model_selector>
+		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower hysteresis/no follower chemotaxis</cell_motility_ECM_interaction_model_selector>
 
 		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
 		<ecm_update_model decription="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector" type="string">ecm_update_from_cell_motility_vector</ecm_update_model>
