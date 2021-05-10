@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mplc
 import math
 import distutils.util
-import pyMCDS_ECM
+from pyMCDS_ECM import *
 
 # pseudo code:
 
@@ -27,6 +27,9 @@ import pyMCDS_ECM
 #     - title
 #     - axes
 
+
+
+
 class PhysiCellPlotter():
     
     def __init__(self, parent = None):
@@ -38,6 +41,7 @@ class PhysiCellPlotter():
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
                         file_name: str = None, options=None):
         #### Needs output and input folders!!!!!!!!
+        #### Write down your options next I guess -
 
         if options is None:
             options = {"output_plot": True,
@@ -50,83 +54,58 @@ class PhysiCellPlotter():
 
         cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
-        # print(type(cell_attributes))
-        # print(type(cell_positions))
-        # print(title_str, plot_x_extend)
-        # fig = plt.figure(figsize=(7, 7))
-        # print(fig)
-        # self.fig.show()
-        self.create_figure_from_SVG(cell_positions, cell_attributes)
-        # fig = plt.gcf()
-        # plt.show(figsize=(7, 7))
+
+        #### Cell attributes will have the colors nad I think the IDs!!!!!!!!
 
         endpoint = starting_index + sample_step_interval * number_of_samples
+        final_snapshot_name = 'output' + f'{endpoint:08}'
         title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
         if file_name is None:
             file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
 
+        self.load_full_physicell_data(final_snapshot_name)
+        xx, yy, plane_oxy, xx_ecm, yy_ecm, plane_anisotropy = self.load_microenvironment()
+
+        self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=plane_anisotropy)
+
+        self.create_figure_from_SVG(cell_positions, cell_attributes)
+
+
+
+
+
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, options)
 
-        # self.ax.set_aspect("equal")
-        # # endpoint = starting_index + sample_step_interval*number_of_samples
-        # #### Build plot frame, titles, and save data
-        # self.ax.set_ylim(-plot_y_extend / 2, plot_y_extend / 2)
-        # self.ax.set_xlim(-plot_x_extend / 2, plot_x_extend / 2)
+    def load_full_physicell_data (self, snapshot: str='output000000000', folder: str='../output'):
+        # load cell and microenvironment data
+        self.mcds = pyMCDS(snapshot + '.xml', folder)
 
-        # if produce_for_panel == False:
-        #     # title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
-        #     # %"Starting at frame {}, sample interval of {} for {} total samples".format(number_of_samples, sample_step_interval, number_of_samples)
-        #     self.ax.set_title(title_str)
-        # else:
-        #     self.ax.xticks(fontsize=20)
-        #     self.ax.yticks(fontsize=20)
-        #     self.ax.set_xlabel('microns', fontsize=20)
-        #     self.ax.set_ylabel('microns', fontsize=20)
-        #     self.fig.tight_layout()
-        # # could change to the custom in the movie output or some other more better output if desired.
-        # output_folder = ''
-        # # if file_name is None:
-        # #     file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
-        #
-        # # Produce plot following the available options.
-        #
-        # if output_plot is True:
-        #     plt.savefig(output_folder + file_name + '.png', dpi=256)
-        # if show_plot is True:
-        #     plt.show()
+        # loads and reads ECM data
+        self.mcds.load_ecm(snapshot + '_ECM.mat', folder)
 
-        # fig.figure(figsize=(7, 7))
-        # ax = fig.gca()
-        # ax.set_aspect("equal")
-        # endpoint = starting_index + sample_step_interval*number_of_samples
-        # #### Build plot frame, titles, and save data
-        # plt.ylim(-plot_y_extend/2, plot_y_extend/2)
-        # plt.xlim(-plot_x_extend/2, plot_x_extend/2)
-        #
-        # if produce_for_panel == False:
-        #     title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
-        #     # %"Starting at frame {}, sample interval of {} for {} total samples".format(number_of_samples, sample_step_interval, number_of_samples)
-        #     plt.title(title_str)
-        # else:
-        #     plt.xticks(fontsize=20)
-        #     plt.yticks(fontsize=20)
-        #     ax.set_xlabel('microns', fontsize=20)
-        #     ax.set_ylabel('microns', fontsize=20)
-        #     fig.tight_layout()
-        # # could change to the custom in the movie output or some other more better output if desired.
-        # output_folder = ''
-        # if file_name is None:
-        #     file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
-        #
-        # # Produce plot following the available options.
-        #
-        # if output_plot is True:
-        #     plt.savefig(output_folder + file_name + '.png', dpi=256)
-        # if show_plot is True:
-        #     plt.show()
+    def create_contour_plot(self, x_mesh: dict, y_mesh: dict, data_to_contour: dict, contour_options=None):
+        ### best options are probably to just allow defaults, search for max and min for limits, or maybe insist on limits ...
+        ### another obvious option - and this coudl be a global to reset ... you could even change it with function calls
+        ### countour color maps ...
+        if contour_options is None:
+            print('hellow!')
+            cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap="Reds")
+            self.fig.colorbar(cs, ax=self.ax)
+            # self.fig.show()
 
-        # return d, d_attributes, title_str, plot_x_extend, plot_y_extend
-    
+    def load_microenvironment(self):
+
+        #### Diffusion microenvironment
+        xx, yy = self.mcds.get_2D_mesh()  # Mesh
+        plane_oxy = self.mcds.get_concentrations('oxygen', 0.0)  # Oxyen (used for contour plot)
+
+        #### ECM microenvironment
+        xx_ecm, yy_ecm = self.mcds.get_2D_ECM_mesh()  # Mesh
+        plane_anisotropy = self.mcds.get_ECM_field('anisotropy', 0.0)  # Anistropy (used for scaling and contour plot)
+        # plane_anisotropy = micro # Used for contour plot
+
+        return xx, yy, plane_oxy, xx_ecm, yy_ecm, plane_anisotropy
+
     def plot_figure(self, title_str, plot_x_extend, plot_y_extend, file_name, options: dict=None): ###### This should probably have to have options??????? Why though???
         if options is None:
             options= {"output_plot": True,
