@@ -6,12 +6,14 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mplc
 import math
 import distutils.util
+import os
 from matplotlib.patches import Circle
-try:
-    from pyMCDS_ECM import *
-except ImportError:
-    try:
-        from pyMCDS import *
+from pyMCDS_ECM import *
+# try:
+#     from pyMCDS_ECM import *
+# except ImportError:
+#     try:
+#         from pyMCDS import *
 
 # pseudo code:
 
@@ -46,7 +48,6 @@ except ImportError:
 # Add in module catch that says - ECM functionality will fail - load pyMCDS_ECM to use with ECM, otherwise your are fine
 # you will probably want just ONE function for plots and ONE for movies - and just lots of options in each ...
 
-
 class PhysiCellPlotter():
     
     def __init__(self, parent = None):
@@ -54,6 +55,20 @@ class PhysiCellPlotter():
         self.figsize_height_svg = 7.0
         self.title = "title"
         self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
+        self.default_options = {"output_plot": True,
+                       "show_plot": True,
+                       "produce_for_panel": False,
+                       "load_SVG_data" : True, # cell color and positions
+                       "load_full_physicell_data" : False, # The runs py_MCDS_ECM (ECM could be split out later if pyMCDS changes??)
+                       "retrieve_first_chemical_field_data" : False, # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
+                       "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
+                       "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
+                       "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
+                       "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
+                       "plot_cells_from_physicell_data": False # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
+                       ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
+
+                       }
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
                         file_name: str = None, options=None):
@@ -75,13 +90,22 @@ class PhysiCellPlotter():
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
 
                        }
-        output_plot = options['output_plot']
-        show_plot = options['show_plot']
-        produce_for_panel = options['produce_for_panel']
+        else:
+            for key in self.default_options.keys():
+                if key in options.keys():
+                    pass
+                else: 
+                    options[key] = self.default_options[key]
+                    print(options[key]) ##### Add in something saying that defaults were used for this key value???. Then is there someway to get it to only do that once per call???
+                    print(key)
+
+        # output_plot = options['output_plot']
+        # show_plot = options['show_plot']
+        # produce_for_panel = options['produce_for_panel']
 
 
 
-        if load_from_SVG is True:
+        if options["load_SVG_data"] is True:
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
 
@@ -255,6 +279,7 @@ class PhysiCellPlotter():
             ####################################################################################################################
     
             for file_index in file_indices:
+                print(os.getcwd())
                 fname = "%0.8d" % file_index
                 fname = 'snapshot' + fname + '.svg'  # https://realpython.com/python-f-strings/
                 print(fname)
