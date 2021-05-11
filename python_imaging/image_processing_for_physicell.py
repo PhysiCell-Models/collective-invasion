@@ -6,7 +6,12 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mplc
 import math
 import distutils.util
-from pyMCDS_ECM import *
+from matplotlib.patches import Circle
+try:
+    from pyMCDS_ECM import *
+except ImportError:
+    try:
+        from pyMCDS import *
 
 # pseudo code:
 
@@ -27,7 +32,19 @@ from pyMCDS_ECM import *
 #     - title
 #     - axes
 
-
+# Features for PhysiImage module
+# Plots cells, tracks (as vectors???), and at least one microenvironment feature (ECM or otherwise)
+# Allows for fine grain control of rate of plotting of tracks - start, end and interval
+# Allows for fine grain control of outputs - quality, for insets, for videos
+# has scale bar (ideally)
+# preserves correctly scaled cell diamteers - DONE! working with SVG loader if cells are constant size. Must use other one otherwise.
+# preserves cell colors (only in SVGs!!!!!!!!) and also allows for that to be overridden if needed
+# Gets mat size and time/slide number from images
+# Allows you to specify a title and add time/slide number to it
+# plots color bar that isn't stupidly large (can I get something that returns a figure and then lets me change it in a script????) Ormaybe I can just write a bunch of different ones or use flags. Something to make it easier than it currently is - which it is currently assine.
+# Be able to specify an output directory (might want to check that it is exsists (or not - does Python give an error?))
+# Add in module catch that says - ECM functionality will fail - load pyMCDS_ECM to use with ECM, otherwise your are fine
+# you will probably want just ONE function for plots and ONE for movies - and just lots of options in each ...
 
 
 class PhysiCellPlotter():
@@ -46,13 +63,26 @@ class PhysiCellPlotter():
         if options is None:
             options = {"output_plot": True,
                        "show_plot": True,
-                       "produce_for_panel": False
+                       "produce_for_panel": False,
+                       "load_SVG_data" : True, # cell color and positions
+                       "load_full_physicell_data" : False, # The runs py_MCDS_ECM (ECM could be split out later if pyMCDS changes??)
+                       "retrieve_first_chemical_field_data" : False, # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
+                       "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
+                       "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
+                       "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
+                       "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
+                       "plot_cells_from_physicell_data": False # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
+                       ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
+
                        }
         output_plot = options['output_plot']
         show_plot = options['show_plot']
         produce_for_panel = options['produce_for_panel']
 
-        cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
+
+
+        if load_from_SVG is True:
+            cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
 
         #### Cell attributes will have the colors nad I think the IDs!!!!!!!!
@@ -68,11 +98,7 @@ class PhysiCellPlotter():
 
         self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=plane_anisotropy)
 
-        self.create_figure_from_SVG(cell_positions, cell_attributes)
-
-
-
-
+        self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
 
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, options)
 
@@ -131,8 +157,8 @@ class PhysiCellPlotter():
             # %"Starting at frame {}, sample interval of {} for {} total samples".format(number_of_samples, sample_step_interval, number_of_samples)
             self.ax.set_title(title_str)
         else:
-            self.ax.xticks(fontsize=20)
-            self.ax.yticks(fontsize=20)
+            self.ax.xaxis.set_tick_params(labelsize=20)
+            self.ax.yaxis.set_tick_params(labelsize=20)
             self.ax.set_xlabel('microns', fontsize=20)
             self.ax.set_ylabel('microns', fontsize=20)
             self.fig.tight_layout()
@@ -352,6 +378,70 @@ class PhysiCellPlotter():
                     num_cells += 1
                 print(fname, ':  num_cells= ', num_cells)
             return d, d_attributes, title_str, plot_x_extend, plot_y_extend
+
+    def create_cell_layer_from_SVG(self, cell_positions: dict, cell_attributes: dict):
+        d = cell_positions
+        d_attributes = cell_attributes
+
+        ####################################################################################################################
+        ####################################        Plot cell tracks and other options              ########################
+        ####################################################################################################################
+
+        # ax.set_xticks([])
+        # ax.set_yticks([]);
+        # ax.set_xlim(0, 8); ax.set_ylim(0, 8)
+
+        # print 'dir(fig)=',dir(fig)
+        # fig.set_figwidth(8)
+        # fig.set_figheight(8)
+
+        count = 0
+
+        # weighting = np.linspace(0.0001, 3.5, num=number_of_samples)
+        #
+        # weighting = np.log10(weighting)
+
+        ##### Extract and plot position data for each cell found
+        for key in d.keys():
+            if (len(d[key].shape) == 2):
+                x = d[key][:, 0]
+                y = d[key][:, 1]
+
+                # plt.plot(x, y,'-')  # plot doesn't seem to allow weighting or size variation at all in teh connections ...  # https://matplotlib.org/api/_as_gen/matplotlib.pyplot.arrow.html or https://stackoverflow.com/questions/7519467/line-plot-with-arrows-in-matplotlib
+                # plt.scatter(x, y, s = weighting) - scatter allows weighting but doens't connect ...
+                # plt.scatter(x, y, s=weighting) # could try a non-linear weighting ...
+
+                #### Plot cell track as a directed, weighted (by length) path
+                self.ax.quiver(x[:-1], y[:-1], x[1:] - x[:-1], y[1:] - y[:-1], scale_units='xy', angles='xy', scale=1,
+                               minlength=0.001, headwidth=1.5, headlength=4)
+
+                #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
+                # self.ax.scatter(x[-1], y[-1], s=85.0, c=d_attributes[key], alpha=0.7)
+
+                # Add cells layer
+                # for i, ct in enumerate(types):
+                #     plot_df = cell_df[cell_df['cell_type'] == ct]
+                #     for j in plot_df.index:
+                circ = Circle((x[-1], y[-1]),
+                                      radius=8.41271, color=d_attributes[key], alpha=0.7)
+                        # for a blue circle with a black edge
+                        # circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
+                        #                radius=plot_df.loc[j, 'radius'], alpha=0.7, edgecolor='black')
+                self.ax.add_artist(circ)
+
+            #### used if history lenght is set to 0 and if in first frame of sequnece (there is no history)
+            elif (len(d[key].shape) == 1):
+                x = d[key][0]
+                y = d[key][1]
+                #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
+                circ = Circle((x, y),
+                              radius=8.41271, color=d_attributes[key], alpha=0.7)
+                self.ax.add_artist(circ)
+                # self.ax.scatter(x, y, s=85.0, c=d_attributes[key], alpha=0.7)
+                # plt.scatter(x, y, s=3.5, c=)
+
+            else:
+                print(key, " has no x,y points")
 
     def create_figure_from_SVG (self, cell_positions: dict, cell_attributes: dict):
         d = cell_positions
