@@ -8,12 +8,12 @@ import math
 import distutils.util
 import os
 from matplotlib.patches import Circle
-from pyMCDS_ECM import *
-# try:
-#     from pyMCDS_ECM import *
-# except ImportError:
-#     try:
-#         from pyMCDS import *
+# from pyMCDS_ECM import *
+try:
+    from pyMCDS_ECM import *
+except ImportError:
+    from pyMCDS import *
+        
 
 # pseudo code:
 
@@ -67,6 +67,7 @@ class PhysiCellPlotter():
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
+                        "contour_options": None
 
                        }
 
@@ -88,8 +89,7 @@ class PhysiCellPlotter():
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
-
-                       }
+                       "contour_options": None}
         else:
             for key in self.default_options.keys():
                 if key in options.keys():
@@ -99,17 +99,9 @@ class PhysiCellPlotter():
                     print(options[key]) ##### Add in something saying that defaults were used for this key value???. Then is there someway to get it to only do that once per call???
                     print(key)
 
-        # output_plot = options['output_plot']
-        # show_plot = options['show_plot']
-        # produce_for_panel = options['produce_for_panel']
-
-
-
         if options["load_SVG_data"] is True:
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
-
-        #### Cell attributes will have the colors nad I think the IDs!!!!!!!!
 
         endpoint = starting_index + sample_step_interval * number_of_samples
         final_snapshot_name = 'output' + f'{endpoint:08}'
@@ -117,12 +109,35 @@ class PhysiCellPlotter():
         if file_name is None:
             file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
 
-        self.load_full_physicell_data(final_snapshot_name)
-        xx, yy, plane_oxy, xx_ecm, yy_ecm, plane_anisotropy = self.load_microenvironment()
+        if options['load_full_physicell_data'] is True:
+            self.load_full_physicell_data(final_snapshot_name)
 
-        self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=plane_anisotropy)
+        if options['retrieve_first_chemical_field_data'] is True:
+            xx, yy, plane_oxy = self.load_microenvironment()
 
-        self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
+        if options['retrieve_ECM_data'] is True:
+            xx_ecm, yy_ecm, ECM_anisotropy, ECM_density, ECM_x_orientation, ECM_y_orientation = self.retreive_ECM_data()
+        # 1e-14, 1.0
+
+        # contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'],
+        #                               contour_options['number_of_levels'])
+        #
+        # cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'],
+        #                       levels=contour_spacing)
+
+        # if contour_options['color_bar'] is True:
+
+        if options['plot_ECM_anisotropy'] is True:
+            self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"])
+
+        if options['plot_ECM_orientation'] is True:
+            pass
+
+        if options['plot_cells_from_physicell_data'] is True:
+            pass
+
+        if options['plot_cells_from_SVG'] is True:
+            self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
 
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, options)
 
@@ -138,23 +153,41 @@ class PhysiCellPlotter():
         ### another obvious option - and this coudl be a global to reset ... you could even change it with function calls
         ### countour color maps ...
         if contour_options is None:
-            print('hellow!')
             cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap="Reds")
             self.fig.colorbar(cs, ax=self.ax)
             # self.fig.show()
+        else:
 
-    def load_microenvironment(self):
+            # Number of contours (could include as a parameter)
+            num_levels = 25  # 25 works well for ECM, 38 works well for oxygen
+
+            # Make levels for contours
+            contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], contour_options['number_of_levels'])
+
+            cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing)
+
+            if contour_options['color_bar'] is True:
+                self.fig.colorbar(cs, ax=self.ax)
+
+
+    def load_microenvironment(self, field_name: str=None, field_number: int=None):
 
         #### Diffusion microenvironment
         xx, yy = self.mcds.get_2D_mesh()  # Mesh
-        plane_oxy = self.mcds.get_concentrations('oxygen', 0.0)  # Oxyen (used for contour plot)
+        scalar_field_at_z_equals_zero = self.mcds.get_concentrations('oxygen', 0.0)  # Oxyen (used for contour plot)
+
+        return xx, yy, scalar_field_at_z_equals_zero
+
+    def retreive_ECM_data(self):
 
         #### ECM microenvironment
         xx_ecm, yy_ecm = self.mcds.get_2D_ECM_mesh()  # Mesh
-        plane_anisotropy = self.mcds.get_ECM_field('anisotropy', 0.0)  # Anistropy (used for scaling and contour plot)
-        # plane_anisotropy = micro # Used for contour plot
+        anisotropy_at_z_equals_zero = self.mcds.get_ECM_field('anisotropy', 0.0)  # Anistropy (used for scaling and contour plot)
+        density_at_z_equals_zero = self.mcds.get_ECM_field('density', 0.0)
+        x_orientation_at_z_equals_zero = self.mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0]
+        y_orientation_at_z_equals_zero = self.mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
 
-        return xx, yy, plane_oxy, xx_ecm, yy_ecm, plane_anisotropy
+        return xx_ecm, yy_ecm, anisotropy_at_z_equals_zero, density_at_z_equals_zero, x_orientation_at_z_equals_zero, y_orientation_at_z_equals_zero
 
     def plot_figure(self, title_str, plot_x_extend, plot_y_extend, file_name, options: dict=None): ###### This should probably have to have options??????? Why though???
         if options is None:
