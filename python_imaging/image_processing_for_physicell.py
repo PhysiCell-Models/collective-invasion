@@ -4,10 +4,14 @@ import numpy as np
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.colors as mplc
+import matplotlib.colorbar as colorbar
+import matplotlib as mpl
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.patches import Circle
 import math
 import distutils.util
 import os
-from matplotlib.patches import Circle
+
 # from pyMCDS_ECM import *
 try:
     from pyMCDS_ECM import *
@@ -51,8 +55,8 @@ except ImportError:
 class PhysiCellPlotter():
     
     def __init__(self, parent = None):
-        self.figsize_width_svg = 7.0
-        self.figsize_height_svg = 7.0
+        self.figsize_width_svg = 8.0
+        self.figsize_height_svg = 8.0
         self.title = "title"
         self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
         self.default_options = {"output_plot": True,
@@ -67,7 +71,8 @@ class PhysiCellPlotter():
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
-                        "contour_options": None}
+                        "contour_options": None,
+                        "quiver_options": None}
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
                         file_name: str = None, options=None):
@@ -87,7 +92,8 @@ class PhysiCellPlotter():
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
-                       "contour_options": None}
+                       "contour_options": None,
+                       "quiver_options": None}
         else:
             for key in self.default_options.keys():
                 if key in options.keys():
@@ -130,10 +136,12 @@ class PhysiCellPlotter():
             self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"])
 
         if options['plot_ECM_orientation'] is True:
-            self.create_quiver_plot(scaling_values=ECM_anisotropy, x_mesh=xx_ecm, y_mesh=yy_ecm, x_orientation=ECM_x_orientation, y_orientation=ECM_y_orientation)
-            Function still needs work but closer ... Also, what happens if you odn't do the orientaion/what takes al ong time here?
+            self.create_quiver_plot(scaling_values=ECM_anisotropy, x_mesh=xx_ecm, y_mesh=yy_ecm, x_orientation=ECM_x_orientation, y_orientation=ECM_y_orientation, quiver_options=options['quiver_options'])
+            # Would be greato to pass kwargs here to teh plotting function, but can do that later ... I think maybe I can do some default behavior here??
+            # And have a scaling inconsistency - but can deal with that later ...
+            # https://stackoverflow.com/questions/49887526/rescaling-quiver-arrows-in-physical-units-consistent-to-the-aspect-ratio-of-the/49891134
         if options['plot_cells_from_physicell_data'] is True:
-            pass
+            pass #### May not need implemented for
 
         if options['plot_cells_from_SVG'] is True:
             self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
@@ -166,22 +174,59 @@ class PhysiCellPlotter():
             cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing)
 
             if contour_options['color_bar'] is True:
-                self.fig.colorbar(cs, ax=self.ax)
+                divider = make_axes_locatable(self.ax)
+                cax = divider.append_axes("right", size="5%", pad=0.10)
+                # other fancy things you can do with colorbars - https://stackoverflow.com/questions/16595138/standalone-colorbar-matplotlib
+                self.fig.colorbar(cs, cax=cax)
+
+    def create_separate_colorbar(self, contour_options: dict=None):
+        print('not working - WIP')
+
+        if contour_options is not None:
+            contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'],
+                                          contour_options['number_of_levels'])
+            fig, ax = plt.subplots()
+            # ax = fig.add_axes([0.05, 0.80, 0.9, 0.1])
+            cmap_str = 'mpl.cm' + contour_options['color_map_name']
+
+            cmap = cmap_str
+            norm = mpl.colors.Normalize(vmin=contour_options['lowest_contour'], vmax=contour_options['upper_contour'])
+            cb = colorbar.ColorbarBase(ax, orientation='horizontal',
+                                           cmap=cmap)
+
+            plt.savefig('just_colorbar', bbox_inches='tight')
+            # plt.colorbar(cmap=contour_options['color_map_name'], levels=contour_spacing)
+            plt.show()
+        else:
+            print("you need to put in something for the color bar options. Supply \"contour_options\" to me!!!!")
 
     def create_quiver_plot(self, scaling_values: dict, x_mesh: dict, y_mesh: dict, x_orientation: dict, y_orientation: dict, quiver_options: dict=None):
         
-        scaled_ECM_x = np.multiply(x_orientation, scaling_values)
-        scaled_ECM_y = np.multiply(y_orientation, scaling_values)
+        if quiver_options is None:
+            mask = scaling_values > 0.0001
+            ECM_x = np.multiply(x_orientation, scaling_values)
+            ECM_y = np.multiply(y_orientation, scaling_values)
+            self.ax.quiver(x_mesh[mask], y_mesh[mask], ECM_x[mask], ECM_y[mask],
+                           pivot='middle', angles='xy', scale_units='in', scale=3.0, headwidth=0)
+        else:
+            if quiver_options["scale_quiver"] is True:
+                ECM_x = np.multiply(x_orientation, scaling_values)
+                ECM_y = np.multiply(y_orientation, scaling_values)
+            else:
+                ECM_x = x_orientation
+                ECM_y = y_orientation
 
-        # if we want the arrows the same length instead
-        ECM_x = self.mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0]
-        ECM_y = self.mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
+            # q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
+            #               width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
 
-        # mask out zero vectors
-        mask = scaling_values > 0.0001
-
-        self.ax.quiver(x_mesh, y_mesh, ECM_x, ECM_y,
-            pivot='middle', angles='xy', scale_units='inches', scale=3.0, headwidth=0)
+            # mask out zero vectors
+            mask = scaling_values > 0.0001
+            if quiver_options["mask_quiver"] is True:
+                self.ax.quiver(x_mesh[mask], y_mesh[mask], ECM_x[mask], ECM_y[mask],
+                               pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
+            else:
+                self.ax.quiver(x_mesh, y_mesh, ECM_x, ECM_y,
+                pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
 
 
     def load_microenvironment(self, field_name: str=None, field_number: int=None):
