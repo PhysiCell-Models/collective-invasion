@@ -65,11 +65,9 @@ class PhysiCellPlotter():
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
-                       "plot_cells_from_physicell_data": False # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
+                       "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
-                        "contour_options": None
-
-                       }
+                        "contour_options": None}
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
                         file_name: str = None, options=None):
@@ -87,7 +85,7 @@ class PhysiCellPlotter():
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
-                       "plot_cells_from_physicell_data": False # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
+                       "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
                        "contour_options": None}
         else:
@@ -103,8 +101,9 @@ class PhysiCellPlotter():
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
 
-        endpoint = starting_index + sample_step_interval * number_of_samples
+        endpoint = starting_index + sample_step_interval * number_of_samples - 1
         final_snapshot_name = 'output' + f'{endpoint:08}'
+        print(final_snapshot_name)
         title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
         if file_name is None:
             file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
@@ -131,8 +130,8 @@ class PhysiCellPlotter():
             self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"])
 
         if options['plot_ECM_orientation'] is True:
-            pass
-
+            self.create_quiver_plot(scaling_values=ECM_anisotropy, x_mesh=xx_ecm, y_mesh=yy_ecm, x_orientation=ECM_x_orientation, y_orientation=ECM_y_orientation)
+            Function still needs work but closer ... Also, what happens if you odn't do the orientaion/what takes al ong time here?
         if options['plot_cells_from_physicell_data'] is True:
             pass
 
@@ -168,6 +167,21 @@ class PhysiCellPlotter():
 
             if contour_options['color_bar'] is True:
                 self.fig.colorbar(cs, ax=self.ax)
+
+    def create_quiver_plot(self, scaling_values: dict, x_mesh: dict, y_mesh: dict, x_orientation: dict, y_orientation: dict, quiver_options: dict=None):
+        
+        scaled_ECM_x = np.multiply(x_orientation, scaling_values)
+        scaled_ECM_y = np.multiply(y_orientation, scaling_values)
+
+        # if we want the arrows the same length instead
+        ECM_x = self.mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0]
+        ECM_y = self.mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
+
+        # mask out zero vectors
+        mask = scaling_values > 0.0001
+
+        self.ax.quiver(x_mesh, y_mesh, ECM_x, ECM_y,
+            pivot='middle', angles='xy', scale_units='inches', scale=3.0, headwidth=0)
 
 
     def load_microenvironment(self, field_name: str=None, field_number: int=None):
