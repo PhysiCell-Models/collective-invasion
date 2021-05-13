@@ -179,24 +179,22 @@ class PhysiCellPlotter():
                 # other fancy things you can do with colorbars - https://stackoverflow.com/questions/16595138/standalone-colorbar-matplotlib
                 self.fig.colorbar(cs, cax=cax)
 
-    def create_separate_colorbar(self, contour_options: dict=None):
-        print('not working - WIP')
+    def create_separate_colorbar(self, file_name='just_colorbar', contour_options: dict=None):
+        print('Working - gives continous colorbar instead of discrete - could fix')
 
         if contour_options is not None:
             contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'],
                                           contour_options['number_of_levels'])
-            fig, ax = plt.subplots()
-            # ax = fig.add_axes([0.05, 0.80, 0.9, 0.1])
-            cmap_str = 'mpl.cm' + contour_options['color_map_name']
+            fig, ax = plt.subplots(figsize=(1, 8))
+            cmap_str = 'mpl.cm.' + contour_options['color_map_name']
 
-            cmap = cmap_str
+            cmap = eval(cmap_str)
             norm = mpl.colors.Normalize(vmin=contour_options['lowest_contour'], vmax=contour_options['upper_contour'])
-            cb = colorbar.ColorbarBase(ax, orientation='horizontal',
-                                           cmap=cmap)
+            cb = colorbar.ColorbarBase(ax, orientation='vertical',
+                                           cmap=cmap, norm=norm)
 
-            plt.savefig('just_colorbar', bbox_inches='tight')
-            # plt.colorbar(cmap=contour_options['color_map_name'], levels=contour_spacing)
-            plt.show()
+            plt.savefig('file_name', bbox_inches='tight')
+            
         else:
             print("you need to put in something for the color bar options. Supply \"contour_options\" to me!!!!")
 
