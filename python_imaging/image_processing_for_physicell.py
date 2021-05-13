@@ -107,10 +107,20 @@ class PhysiCellPlotter():
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
 
-        endpoint = starting_index + sample_step_interval * number_of_samples - 1
-        final_snapshot_name = 'output' + f'{endpoint:08}'
-        print(final_snapshot_name)
-        title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
+        if options["load_SVG_data"] is False:
+            endpoint = starting_index + sample_step_interval * number_of_samples - 1
+            final_snapshot_name = 'output' + f'{endpoint:08}'
+            print(final_snapshot_name)
+            title_str = 'some one should add extracting the file name from teh .mat files or similar to the code!!!'
+            plot_x_extend = 1000
+            plot_y_extend = 1000
+            print("WARNING!!!!!!!!!!! Plot extend is not dynamic!!!!!!!!!!!!!! Load from SVG OR update Load Physicell Data!!!!")
+        else:
+            endpoint = starting_index + sample_step_interval * number_of_samples - 1
+            final_snapshot_name = 'output' + f'{endpoint:08}'
+            print(final_snapshot_name)
+            title_str = "History from image " + str(starting_index) + " to image " + str(endpoint) + "; " + title_str
+
         if file_name is None:
             file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
 
@@ -141,14 +151,31 @@ class PhysiCellPlotter():
             # And have a scaling inconsistency - but can deal with that later ...
             # https://stackoverflow.com/questions/49887526/rescaling-quiver-arrows-in-physical-units-consistent-to-the-aspect-ratio-of-the/49891134
         if options['plot_cells_from_physicell_data'] is True:
-            pass #### May not need implemented for
+            self.plot_cells_from_physicell_data()
 
         if options['plot_cells_from_SVG'] is True:
             self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
 
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, options)
 
-    def load_full_physicell_data (self, snapshot: str='output000000000', folder: str='../output'):
+    def plot_cells_from_physicell_data(self):
+        cell_df = self.mcds.get_cell_df()
+        cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi)) ** (1 / 3)
+        types = cell_df['cell_type'].unique()
+        colors = ['yellow', 'blue']
+
+        # Add cells layer
+        for i, ct in enumerate(types):
+            plot_df = cell_df[cell_df['cell_type'] == ct]
+            for j in plot_df.index:
+                circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
+                              radius=plot_df.loc[j, 'radius'], color='blue', alpha=0.7, edgecolor='black')
+                # for a blue circle with a black edge
+                # circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
+                #                radius=plot_df.loc[j, 'radius'], alpha=0.7, edgecolor='black')
+                self.ax.add_artist(circ)
+
+    def load_full_physicell_data (self, snapshot: str='output000000000', folder: str='.'):
         # load cell and microenvironment data
         self.mcds = pyMCDS(snapshot + '.xml', folder)
 
@@ -165,9 +192,6 @@ class PhysiCellPlotter():
             # self.fig.show()
         else:
 
-            # Number of contours (could include as a parameter)
-            num_levels = 25  # 25 works well for ECM, 38 works well for oxygen
-
             # Make levels for contours
             contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], contour_options['number_of_levels'])
 
@@ -180,7 +204,7 @@ class PhysiCellPlotter():
                 self.fig.colorbar(cs, cax=cax)
 
     def create_separate_colorbar(self, file_name='just_colorbar', contour_options: dict=None):
-        print('Working - gives continous colorbar instead of discrete - could fix')
+        print('Working - gives continous colorbar instead of discrete - could fix possibly but not sure how to match N')
 
         if contour_options is not None:
             contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'],
@@ -194,7 +218,7 @@ class PhysiCellPlotter():
                                            cmap=cmap, norm=norm)
 
             plt.savefig('file_name', bbox_inches='tight')
-            
+            plt.show()
         else:
             print("you need to put in something for the color bar options. Supply \"contour_options\" to me!!!!")
 
@@ -225,7 +249,6 @@ class PhysiCellPlotter():
             else:
                 self.ax.quiver(x_mesh, y_mesh, ECM_x, ECM_y,
                 pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
-
 
     def load_microenvironment(self, field_name: str=None, field_number: int=None):
 
