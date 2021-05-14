@@ -79,6 +79,8 @@ class PhysiCellPlotter():
         #### Needs output and input folders!!!!!!!!
         #### Write down your options next I guess -
 
+        self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
+
         if options is None:
             options = {"output_plot": True,
                        "show_plot": True,
@@ -163,7 +165,7 @@ class PhysiCellPlotter():
         cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi)) ** (1 / 3)
         types = cell_df['cell_type'].unique()
         colors = ['yellow', 'blue']
-
+        print('The colors need fixed!!!!!!!!  - AND WONT WORK ON NON-ECM SIMS!!!!!')
         # Add cells layer
         for i, ct in enumerate(types):
             plot_df = cell_df[cell_df['cell_type'] == ct]
@@ -310,6 +312,7 @@ class PhysiCellPlotter():
             plt.savefig(output_folder + file_name + '.png', dpi=256)
         if show_plot is True:
             plt.show()
+        # self.fig.clf()
     
     def load_cell_positions_from_SVG(self, starting_index: int, sample_step_interval: int, number_of_samples: int):
             """
