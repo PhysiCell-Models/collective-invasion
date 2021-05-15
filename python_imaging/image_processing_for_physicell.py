@@ -203,7 +203,7 @@ class PhysiCellPlotter():
                 divider = make_axes_locatable(self.ax)
                 cax = divider.append_axes("right", size="5%", pad=0.10)
                 # other fancy things you can do with colorbars - https://stackoverflow.com/questions/16595138/standalone-colorbar-matplotlib
-                self.fig.colorbar(cs, cax=cax)
+                self.fig.colorbar(cs, cax=cax, format='%.3f')
 
     def create_separate_colorbar(self, file_name='just_colorbar', contour_options: dict=None):
         print('Working - gives continous colorbar instead of discrete - could fix possibly but not sure how to match N')

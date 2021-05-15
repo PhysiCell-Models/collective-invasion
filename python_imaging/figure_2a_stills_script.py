@@ -18,8 +18,8 @@ options_for_figure2a = {"output_plot" : True,
                         'plot_cells_from_physicell_data': True,
                         "contour_options" : {'lowest_contour': 0.90, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 0.93,
-                                           'number_of_levels': 10,
-                                           'color_map_name': 'summer',
+                                           'number_of_levels': 25,
+                                           'color_map_name': 'YlGnBu',
                                            'color_bar': True
                                            },
                         "quiver_options" : {"scale_quiver": False,
@@ -40,8 +40,10 @@ image_list_for_figure2a = []
 
 image_list_for_figure2a = [90, 500, 1200]
 
+file_name = 'march_' + str(90)
+
 for number in image_list_for_figure2a:
-    mf.generic_plotter(starting_index=number, number_of_samples=1, options=options_for_figure2a)
+    mf.generic_plotter(starting_index=number, number_of_samples=1, options=options_for_figure2a, file_name='march_' + str(number))
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)
