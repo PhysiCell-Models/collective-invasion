@@ -75,7 +75,7 @@ class PhysiCellPlotter():
                         "quiver_options": None}
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
-                        file_name: str = None, options=None):
+                        file_name: str = None, input_path: str= '.', output_path: str= '', options=None):
         #### Needs output and input folders!!!!!!!!
         #### Write down your options next I guess -
 
@@ -108,6 +108,7 @@ class PhysiCellPlotter():
         if options["load_SVG_data"] is True:
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
+            input_path all messed up
 
         if options["load_SVG_data"] is False:
             endpoint = starting_index + sample_step_interval * number_of_samples - 1
@@ -116,7 +117,7 @@ class PhysiCellPlotter():
             title_str = 'some one should add extracting the file name from teh .mat files or similar to the code!!!'
             plot_x_extend = 1000
             plot_y_extend = 1000
-            print("WARNING!!!!!!!!!!! Plot extend is not dynamic!!!!!!!!!!!!!! Load from SVG OR update Load Physicell Data!!!!")
+            print("WARNING!!!!!!!!!!! Plot extent is not dynamic!!!!!!!!!!!!!! Load from SVG OR change pyMCDS to get bounding box then change Load Physicell Data method!!!!!")
         else:
             endpoint = starting_index + sample_step_interval * number_of_samples - 1
             final_snapshot_name = 'output' + f'{endpoint:08}'
@@ -128,6 +129,7 @@ class PhysiCellPlotter():
 
         if options['load_full_physicell_data'] is True:
             self.load_full_physicell_data(final_snapshot_name)
+            input_path all messed up
 
         if options['retrieve_first_chemical_field_data'] is True:
             xx, yy, plane_oxy = self.load_microenvironment()
@@ -158,7 +160,7 @@ class PhysiCellPlotter():
         if options['plot_cells_from_SVG'] is True:
             self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
 
-        self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, options)
+        self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, output_path, options)
 
     def plot_cells_from_physicell_data(self):
         cell_df = self.mcds.get_cell_df()
@@ -219,7 +221,7 @@ class PhysiCellPlotter():
             cb = colorbar.ColorbarBase(ax, orientation='vertical',
                                            cmap=cmap, norm=norm)
 
-            plt.savefig('file_name', bbox_inches='tight')
+            plt.savefig(output_folder + file_name, bbox_inches='tight', dpi=256)
             plt.show()
         else:
             print("you need to put in something for the color bar options. Supply \"contour_options\" to me!!!!")
@@ -271,7 +273,7 @@ class PhysiCellPlotter():
 
         return xx_ecm, yy_ecm, anisotropy_at_z_equals_zero, density_at_z_equals_zero, x_orientation_at_z_equals_zero, y_orientation_at_z_equals_zero
 
-    def plot_figure(self, title_str, plot_x_extend, plot_y_extend, file_name, options: dict=None): ###### This should probably have to have options??????? Why though???
+    def plot_figure(self, title_str: str, plot_x_extend: float, plot_y_extend: float, file_name: str, output_directory: str='', options: dict=None): ###### This should probably have to have options??????? Why though???
         if options is None:
             options= {"output_plot": True,
                       "show_plot": True,
@@ -302,7 +304,7 @@ class PhysiCellPlotter():
             self.ax.set_ylabel('microns', fontsize=20)
             self.fig.tight_layout()
         # could change to the custom in the movie output or some other more better output if desired.
-        output_folder = ''
+        output_folder = output_directory
         # if file_name is None:
         #     file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
     
