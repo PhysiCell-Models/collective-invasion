@@ -108,7 +108,7 @@ class PhysiCellPlotter():
         if options["load_SVG_data"] is True:
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
-            input_path all messed up
+            print('Stil need to get input_path for SVGs working!!!')
 
         if options["load_SVG_data"] is False:
             endpoint = starting_index + sample_step_interval * number_of_samples - 1
@@ -117,7 +117,8 @@ class PhysiCellPlotter():
             title_str = 'some one should add extracting the file name from teh .mat files or similar to the code!!!'
             plot_x_extend = 1000
             plot_y_extend = 1000
-            print("WARNING!!!!!!!!!!! Plot extent is not dynamic!!!!!!!!!!!!!! Load from SVG OR change pyMCDS to get bounding box then change Load Physicell Data method!!!!!")
+            print("WARNING!!!!!!!!!!! Plot extent is not dynamic!!!!!!!!!!!!!! Load from SVG to get dynamic changes OR change pyMCDS to get bounding box then change Load Physicell Data method!!!!!")
+
         else:
             endpoint = starting_index + sample_step_interval * number_of_samples - 1
             final_snapshot_name = 'output' + f'{endpoint:08}'
@@ -128,12 +129,12 @@ class PhysiCellPlotter():
             file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
 
         if options['load_full_physicell_data'] is True:
-            self.load_full_physicell_data(final_snapshot_name)
-            input_path all messed up
+            self.load_full_physicell_data(final_snapshot_name, folder=input_path)
+            print('test input path option!!!! (for loading physicell data...)')
 
         if options['retrieve_first_chemical_field_data'] is True:
-            xx, yy, plane_oxy = self.load_microenvironment()
-
+            xx, yy, plane_oxy = self.load_chemical_field('oxygen')
+            print('this call needs updated to use an option for putting in the chemical field name then defaulting ot oxygen perhaps for generic???')
         if options['retrieve_ECM_data'] is True:
             xx_ecm, yy_ecm, ECM_anisotropy, ECM_density, ECM_x_orientation, ECM_y_orientation = self.retreive_ECM_data()
         # 1e-14, 1.0
@@ -254,11 +255,16 @@ class PhysiCellPlotter():
                 self.ax.quiver(x_mesh, y_mesh, ECM_x, ECM_y,
                 pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
 
-    def load_microenvironment(self, field_name: str=None, field_number: int=None):
+    def load_chemical_field(self, field_name: str=None):
 
         #### Diffusion microenvironment
         xx, yy = self.mcds.get_2D_mesh()  # Mesh
-        scalar_field_at_z_equals_zero = self.mcds.get_concentrations('oxygen', 0.0)  # Oxyen (used for contour plot)
+
+        if field_name is not None:
+            scalar_field_at_z_equals_zero = self.mcds.get_concentrations(field_name, 0.0)  # Oxyen (used for contour plot)
+        else:
+            print('Must supply field name as a string to use \'load_chemical_field\' function.')
+
 
         return xx, yy, scalar_field_at_z_equals_zero
 
