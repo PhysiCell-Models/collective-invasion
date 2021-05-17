@@ -30,7 +30,7 @@ mf = PhysiCellPlotter()
 # m2 = PhysiCellPlotter()
 # m3 = PhysiCellPlotter()
 
-mf.generic_plotter(starting_index=0, number_of_samples=1, options=options_for_figure2b, file_name='horizontal_ECM_w_chemical_cue_0')
+mf.generic_plotter(starting_index=0, number_of_samples=1, options=options_for_figure2b, file_name='split_ECM_w_chemical_cue_0')
 
 image_list_for_figure2b = []
 
@@ -43,7 +43,7 @@ options_for_figure2b['retrieve_ECM_data'] = False
 options_for_figure2b['load_full_physicell_data'] = False
 
 for number in image_list_for_figure2b:
-    mf.generic_plotter(starting_index=0, number_of_samples=number, options=options_for_figure2b, file_name='horizontal_ECM_w_chemical_cue_' + str(number))
+    mf.generic_plotter(starting_index=0, number_of_samples=number, options=options_for_figure2b, file_name='split_ECM_w_chemical_cue_' + str(number))
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)

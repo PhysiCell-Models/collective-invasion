@@ -864,6 +864,25 @@ void setup_extracellular_matrix( void )
 			normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
 		}
 
+		else if(parameters.strings( "ECM_orientation_setup") == "split")
+		{
+			std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
+			normalize( &position ); 
+
+			if(position[1]<=0)
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1,-1,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
+			}
+
+			else
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1,1,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);				
+			}
+
+		}
+
 		else
 		{
 			std::cout<<"WARNING: NO ECM ORIENTATION SPECIFIED. FIX THIS!!!"<<std::endl;
