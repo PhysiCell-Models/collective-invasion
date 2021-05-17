@@ -39,6 +39,8 @@ image_list_for_figure2b = [50, 150]
 # file_name = 'horizontal_ECM_w_chemical_cue_' + str(90)
 
 options_for_figure2b['plot_ECM_orientation'] = False
+options_for_figure2b['retrieve_ECM_data'] = False
+options_for_figure2b['load_full_physicell_data'] = False
 
 for number in image_list_for_figure2b:
     mf.generic_plotter(starting_index=0, number_of_samples=number, options=options_for_figure2b, file_name='horizontal_ECM_w_chemical_cue_' + str(number))
