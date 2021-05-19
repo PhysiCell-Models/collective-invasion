@@ -234,7 +234,7 @@ class PhysiCellPlotter():
             ECM_x = np.multiply(x_orientation, scaling_values)
             ECM_y = np.multiply(y_orientation, scaling_values)
             self.ax.quiver(x_mesh[mask], y_mesh[mask], ECM_x[mask], ECM_y[mask],
-                           pivot='middle', angles='xy', scale_units='in', scale=3.0, headwidth=0)
+                           pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
         else:
             if quiver_options["scale_quiver"] is True:
                 ECM_x = np.multiply(x_orientation, scaling_values)
