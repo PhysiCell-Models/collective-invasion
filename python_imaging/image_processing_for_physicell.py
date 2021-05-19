@@ -55,8 +55,8 @@ except ImportError:
 class PhysiCellPlotter():
     
     def __init__(self, parent = None):
-        self.figsize_width_svg = 8.0
-        self.figsize_height_svg = 8.0
+        self.figsize_width_svg = 7.0
+        self.figsize_height_svg = 7.0
         self.title = "title"
         self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
         self.default_options = {"output_plot": True,
@@ -168,13 +168,13 @@ class PhysiCellPlotter():
         cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi)) ** (1 / 3)
         types = cell_df['cell_type'].unique()
         colors = ['yellow', 'blue']
-        print('The colors need fixed!!!!!!!!  - AND WONT WORK ON NON-ECM SIMS!!!!!')
+        print('WARNING!!!!!! WARNING!!!!!!!!!! These colors are hard coded AND WONT WORK ON NON-ECM SIMS!!!!!')
         # Add cells layer
         for i, ct in enumerate(types):
             plot_df = cell_df[cell_df['cell_type'] == ct]
             for j in plot_df.index:
                 circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
-                              radius=plot_df.loc[j, 'radius'], color='blue', alpha=0.7, edgecolor='black')
+                              radius=plot_df.loc[j, 'radius'], color=colors[i], alpha=0.7)
                 # for a blue circle with a black edge
                 # circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
                 #                radius=plot_df.loc[j, 'radius'], alpha=0.7, edgecolor='black')
@@ -434,12 +434,13 @@ class PhysiCellPlotter():
                             7] + "m"
     
                     if 'width' in child.attrib.keys():
-                        #### Assumes a 70 length unit offsite inthe the Y dimension of the SVG!!!!!!
+                        #### Assumes 100% of difference in SVG width and height is due to top margin of the SVG!!!!!!
+                        # print('Reading SVG - Assumes 100% of difference in SVG width and height is due to top margin of the SVG!!!!!!')
                         plot_x_extend = float(child.attrib['width'])
-                        plot_y_extend = float(child.attrib['height'])
-    
+                        top_margin_size = abs(float(child.attrib['height']) - float(child.attrib['width']))
+
                         #### Remove the padding placed into the SVG to determine the true y extend
-                        plot_y_extend = plot_y_extend - 70
+                        plot_y_extend = float(child.attrib['height']) - top_margin_size
     
                         #### Find the coordinate transform amounts
                         y_coordinate_transform = plot_y_extend / 2

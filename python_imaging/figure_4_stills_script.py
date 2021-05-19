@@ -15,8 +15,8 @@ options_for_figure4 = {"output_plot" : True,
                         "load_full_physicell_data" : True,
                         "plot_cells_from_SVG" : True,
                         "load_SVG_data": True,
-                        'plot_cells_from_physicell_data': True,
-                        "contour_options" : {'lowest_contour': 0.0, ### I woud like this to be cleaner - but it does work!!!
+                        'plot_cells_from_physicell_data': False,
+                        "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 1.0,
                                            'number_of_levels': 25,
                                            'color_map_name': 'Reds',
@@ -45,7 +45,7 @@ mf = PhysiCellPlotter()
 
 #  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
 
-mf.generic_plotter( options=options_for_figure4)
+mf.generic_plotter(number_of_samples = 240, options=options_for_figure4)
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)
