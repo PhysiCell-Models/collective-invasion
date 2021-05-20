@@ -148,7 +148,7 @@ class PhysiCellPlotter():
         # if contour_options['color_bar'] is True:
 
         if options['plot_ECM_anisotropy'] is True:
-            self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"])
+            self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"], options=options)
 
         if options['plot_ECM_orientation'] is True:
             self.create_quiver_plot(scaling_values=ECM_anisotropy, x_mesh=xx_ecm, y_mesh=yy_ecm, x_orientation=ECM_x_orientation, y_orientation=ECM_y_orientation, quiver_options=options['quiver_options'])
@@ -187,10 +187,11 @@ class PhysiCellPlotter():
         # loads and reads ECM data
         self.mcds.load_ecm(snapshot + '_ECM.mat', folder)
 
-    def create_contour_plot(self, x_mesh: dict, y_mesh: dict, data_to_contour: dict, contour_options=None):
+    def create_contour_plot(self, x_mesh: dict, y_mesh: dict, data_to_contour: dict, contour_options=None, options: dict=None):
         ### best options are probably to just allow defaults, search for max and min for limits, or maybe insist on limits ...
         ### another obvious option - and this coudl be a global to reset ... you could even change it with function calls
         ### countour color maps ...
+
         if contour_options is None:
             cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap="Reds")
             self.fig.colorbar(cs, ax=self.ax)
@@ -206,7 +207,14 @@ class PhysiCellPlotter():
                 divider = make_axes_locatable(self.ax)
                 cax = divider.append_axes("right", size="5%", pad=0.10)
                 # other fancy things you can do with colorbars - https://stackoverflow.com/questions/16595138/standalone-colorbar-matplotlib
-                self.fig.colorbar(cs, cax=cax, format='%.3f')
+                if options is None:
+                    cb = self.fig.colorbar(cs, cax=cax, format='%.3f')
+                elif options['produce_for_panel'] is False:
+                    cb = self.fig.colorbar(cs, cax=cax, format='%.3f')
+                else:
+                    tick_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], 5)
+                    cb = self.fig.colorbar(cs, cax=cax, format='%.2f', ticks=tick_spacing)
+                    cb.ax.tick_params(labelsize=20)
 
     def create_separate_colorbar(self, file_name='just_colorbar', contour_options: dict=None):
         print('Working - gives continous colorbar instead of discrete - could fix possibly but not sure how to match N')
@@ -308,6 +316,8 @@ class PhysiCellPlotter():
             self.ax.yaxis.set_tick_params(labelsize=20)
             self.ax.set_xlabel('microns', fontsize=20)
             self.ax.set_ylabel('microns', fontsize=20)
+            self.ax.set_xticks([ -plot_x_extend/2, -plot_x_extend/4, 0, plot_x_extend/4 ,plot_x_extend/2])
+            self.ax.set_yticks([ -plot_y_extend/2, -plot_y_extend/4, 0, plot_y_extend/4 ,plot_y_extend/2])
             self.fig.tight_layout()
         # could change to the custom in the movie output or some other more better output if desired.
         output_folder = output_directory
