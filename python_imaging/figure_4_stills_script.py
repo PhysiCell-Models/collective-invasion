@@ -8,7 +8,7 @@ options_for_figure4 = {}
 
 options_for_figure4 = {"output_plot" : True,
                        "show_plot" : False,
-                       "produce_for_panel" : False,
+                       "produce_for_panel" : True,
                         "plot_ECM_anisotropy" : True,
                         "plot_ECM_orientation" : False,
                         "retrieve_ECM_data": True,
@@ -45,7 +45,7 @@ mf = PhysiCellPlotter()
 
 #  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
 
-mf.generic_plotter(number_of_samples = 240, options=options_for_figure4)
+mf.generic_plotter(number_of_samples = 481, options=options_for_figure4)
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)

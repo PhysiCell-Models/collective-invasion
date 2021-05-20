@@ -1,9 +1,9 @@
 <PhysiCell_settings version="1.4.1">
 	<domain>
-		<x_min>-800</x_min>
-		<x_max>800</x_max>
-		<y_min>-800</y_min>
-		<y_max>800</y_max>
+		<x_min>-750</x_min>
+		<x_max>750</x_max>
+		<y_min>-750</y_min>
+		<y_max>750</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -23,7 +23,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output</folder>  
+		<folder>data_for_paper/parameter_set_21_20_20_ECM_no_chemotaxsis</folder>  
 
 		<full_data>
 			<interval units="min">6</interval>
