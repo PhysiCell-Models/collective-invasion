@@ -654,6 +654,8 @@ class PhysiCellPlotter():
             else:
                 print(key, " has no x,y points")
 
+    def plot_all_SVGs(self, options: dict=None, ):
+
     def general_image_plotter (filename: str=None, folder: str='.', output_folder='', cell_df: dict=None, cell_positions_from_SVG: dict=None, cell_attributes_from_SVG: dict=None, chemical_mesh: dict=None, ECM_mesh: dict=None, options=None):
         if options is None:
             options = {"output_plot": True,

@@ -45,7 +45,7 @@ mf = PhysiCellPlotter()
 
 #  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
 
-mf.generic_plotter(number_of_samples = 481, options=options_for_figure4)
+mf.generic_plotter( number_of_samples = 481, file_name='parameter_set_21_80_80_ECM_with_chemotaxsis', options=options_for_figure4)
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)
