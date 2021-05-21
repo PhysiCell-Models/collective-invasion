@@ -1,4 +1,4 @@
-import sys
+import math, os, sys, re
 import xml.etree.ElementTree as ET
 import numpy as np
 import glob
@@ -8,9 +8,7 @@ import matplotlib.colorbar as colorbar
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.patches import Circle
-import math
 import distutils.util
-import os
 
 # from pyMCDS_ECM import *
 try:
@@ -71,11 +69,12 @@ class PhysiCellPlotter():
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
+                        "produce_for_movie" : False,
                         "contour_options": None,
                         "quiver_options": None}
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
-                        file_name: str = None, input_path: str= '.', output_path: str= '', options=None):
+                        file_name: str = None, input_path: str= '.', output_path: str= '', naming_index: int=0, options=None):
         #### Needs output and input folders!!!!!!!!
         #### Write down your options next I guess -
 
@@ -94,6 +93,7 @@ class PhysiCellPlotter():
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
+                       "produce_for_movie" : False,
                        "contour_options": None,
                        "quiver_options": None}
         else:
@@ -127,6 +127,10 @@ class PhysiCellPlotter():
 
         if file_name is None:
             file_name = str(starting_index) + '_' + str(sample_step_interval) + '_' + str(number_of_samples)
+
+        if options["produce_for_movie"] is True: 
+            file_name = snapshot = 'output' + f'{naming_index:08}'
+            print('Output file name forced to indexable name to produce movie')
 
         if options['load_full_physicell_data'] is True:
             self.load_full_physicell_data(final_snapshot_name, folder=input_path)
@@ -537,6 +541,7 @@ class PhysiCellPlotter():
                     #### num_cells becomes total number of cells per frame/sample
                     num_cells += 1
                 print(fname, ':  num_cells= ', num_cells)
+
             return d, d_attributes, title_str, plot_x_extend, plot_y_extend
 
     def create_cell_layer_from_SVG(self, cell_positions: dict, cell_attributes: dict):
@@ -654,7 +659,121 @@ class PhysiCellPlotter():
             else:
                 print(key, " has no x,y points")
 
-    def plot_all_SVGs(self, options: dict=None, ):
+    def produce_movie(self, data_path: str=  '.',  save_path: str= '', start_file_index: int = 0, sample_step_interval: int = 1, 
+                             end_file_index: int=120, trail_length: int=10, movie_options: dict=None, image_options: dict=None):
+        if movie_options is None:
+            movie_options =  {'INCLUDE_ALL_SVGs': True,
+                            'INCLUDE_FULL_HISTORY': True
+                            }
+
+        if image_options is None:
+            image_options = {"produce_for_movie" : True,
+                        "show_plot": False}
+            # movie_options['INCLUDE_ALL_SVGs'] = True
+            # movie_options['INCLUDE_FULL_HISTORY'] = True
+
+            #### Get list of all file names in directory
+
+        # data_path: str, save_path: str, save_name: str, start_file_index: int, end_file_index: int,
+                # trail_length: int, INCLUDE_ALL_SVGs: bool, INCLUDE_FULL_HISTORY: bool)
+
+        # def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
+        #             file_name: str = None, input_path: str= '.', output_path: str= '', naming_index: int=0, options=None):
+        
+        files = os.listdir(data_path)
+
+        list_of_svgs = []
+
+        #### examine all file names in directory and add ones, via string matching, as needed to list of names of files of interest
+        for i in range(len(files)):
+            if not re.search('snapshot(.*)\.svg', files[i]):
+                continue
+
+            # I feel like a dictionary could be used here, but I really need some ordering. A dict might be faster, but I don't
+            # expect huge file lists. So I will just sort as I know how to do that ...
+
+            list_of_svgs.append(files[i])
+
+        #### Sort file name list
+        list_of_svgs.sort()
+
+        truncated_list_of_svgs = []
+
+        #### Reduce file list to times of interst only
+        for i in range(len(list_of_svgs)):
+
+            if i < start_file_index:
+                continue
+
+            if i >= end_file_index:
+                continue
+
+            truncated_list_of_svgs.append(list_of_svgs[i])
+
+        # print(list_of_svgs)
+        print(truncated_list_of_svgs)
+
+        if movie_options['INCLUDE_ALL_SVGs'] :
+            print('Including all SVGs')
+            truncated_list_of_svgs = list_of_svgs
+
+        max_number_of_samples = trail_length
+
+        if movie_options['INCLUDE_FULL_HISTORY']:
+            print('Including full positional history of cells')
+            max_number_of_samples = len(truncated_list_of_svgs)
+
+        print('Processing {} SVGs'.format(len(truncated_list_of_svgs)))
+
+        # Also, as written it isn't very flexible
+        # would certainly be ideal to not call plot_cell_tracks every time, but instead store what is available. Could add a function that just
+        # extracts the data from one SVG then appends it to exsisting data structure. could read all the desired data into Pandas DF
+        # then write out images. Etc. But as is, this is definitely reading the SVGs much to frequently.
+
+        for i in range(len(truncated_list_of_svgs)):
+            j = i + 1 # this offsets the index so that we don't report that 0 samples have been taken, while stil producing an image.
+            starting_index = j - max_number_of_samples
+
+            #### Goes with "trail closing" block - not currently being used.
+            projected_upper_sample_index = max_number_of_samples + starting_index
+            max_samples_left = len(truncated_list_of_svgs) - j
+
+            # def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
+    #             file_name: str = None, input_path: str= '.', output_path: str= '', naming_index: int=0, options=None):
+
+            if i >= max_number_of_samples:
+                self.generic_plotter(starting_index, 1, max_number_of_samples, naming_index=i, options=image_options)
+                # print('middle')
+
+            #### If one wanted to make the trails collapse into the last available location of the cell you would use something
+            #### like this elif block
+            # elif projected_upper_sample_index > len(list_of_svgs)-1:
+            #     plot_cell_tracks(starting_index, 1, max_samples_left, True, True, i)
+            #     print(max_samples_left)
+            #     print('late')
+            else:
+                self.generic_plotter(0, 1, j, naming_index=i, options=image_options)
+                # print('early')
+
+        #### Total frames to include in moview
+        number_frames = end_file_index - start_file_index
+        
+        if movie_options['INCLUDE_ALL_SVGs']:
+            number_frames = len(list_of_svgs)
+            start_file_index = 0
+
+        # string_of_interest = 'ffmpeg -start_number ' + str(
+        #     start_file_index) + ' -y -framerate 12 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+        #     number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"'
+        # print(string_of_interest)
+        os.system(
+            'ffmpeg -start_number ' + str(
+                start_file_index) + ' -y -framerate 12 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+                number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
+
+        # https://superuser.com/questions/666860/clarification-for-ffmpeg-input-option-with-image-files-as-input
+        # https://superuser.com/questions/734976/ffmpeg-limit-number-of-images-converted-to-video
+
 
     def general_image_plotter (filename: str=None, folder: str='.', output_folder='', cell_df: dict=None, cell_positions_from_SVG: dict=None, cell_attributes_from_SVG: dict=None, chemical_mesh: dict=None, ECM_mesh: dict=None, options=None):
         if options is None:
