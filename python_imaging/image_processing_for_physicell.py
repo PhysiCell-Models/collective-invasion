@@ -1,13 +1,18 @@
 import math, os, sys, re
 import xml.etree.ElementTree as ET
 import numpy as np
-import glob
+
 import matplotlib.pyplot as plt
+
+######## If using on remote system, uncomment this line below to load correct matplotlib backend ################
+# matplotlib.use('Agg')
+
 import matplotlib.colors as mplc
 import matplotlib.colorbar as colorbar
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.patches import Circle
+
 import distutils.util
 
 # from pyMCDS_ECM import *
@@ -15,26 +20,6 @@ try:
     from pyMCDS_ECM import *
 except ImportError:
     from pyMCDS import *
-        
-
-# pseudo code:
-
-# generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
-#
-#     All based on options/logic- function
-#     load_cell_positiondata
-#     load_uE_data_chemical
-#     load_uE_data_ECM
-#
-#     process data into plots - functions
-#     - cell tracks (might be loaded by just be plotted???)
-#     - cell positions
-#     - ECM layer
-#     - chemical layer
-#
-#     complete plot presentaiont and save (maybe functions)
-#     - title
-#     - axes
 
 # Features for PhysiImage module
 # Plots cells, tracks (as vectors???), and at least one microenvironment feature (ECM or otherwise)
@@ -48,11 +33,23 @@ except ImportError:
 # plots color bar that isn't stupidly large (can I get something that returns a figure and then lets me change it in a script????) Ormaybe I can just write a bunch of different ones or use flags. Something to make it easier than it currently is - which it is currently assine.
 # Be able to specify an output directory (might want to check that it is exsists (or not - does Python give an error?))
 # Add in module catch that says - ECM functionality will fail - load pyMCDS_ECM to use with ECM, otherwise your are fine
-# you will probably want just ONE function for plots and ONE for movies - and just lots of options in each ...
 
 class PhysiCellPlotter():
     
     def __init__(self, parent = None):
+
+        """
+        Produces multlilayer image: allows for one cell layer, a contour layer (with colorbar), vector field, 
+        and cell positional history, plotted as arrows (quiver plot) with final cell positions plotted as a cirle.
+        Options passed through a dictionary (see class consctructor for example). 
+
+        sample_step_interval * number_of_samples - starting_index yields the trail length in time steps. number_of_samples provides
+        the number of intervals plotted per image. 
+
+        Example: starting_index of 0, sample intervale of 1, and number of samples of 120 will produce a cell track 120 steps long, sampled at whatever rate the SVGs were produced, starting at 
+        snapshot 0 going until snapshot 119. 
+
+        """
         self.figsize_width_svg = 7.0
         self.figsize_height_svg = 7.0
         self.title = "title"
@@ -75,8 +72,46 @@ class PhysiCellPlotter():
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
                         file_name: str = None, input_path: str= '.', output_path: str= '', naming_index: int=0, options=None):
-        #### Needs output and input folders!!!!!!!!
-        #### Write down your options next I guess -
+
+        """
+        Produces multlilayer image: allows for one cell layer, a contour layer (with colorbar), vector field, 
+        and cell positional history, plotted as arrows (quiver plot) with final cell positions plotted as a cirle.
+        Options passed through a dictionary (see class consctructor for example). 
+
+        sample_step_interval * number_of_samples - starting_index yields the trail length in time steps. number_of_samples provides
+        the number of intervals plotted per image. 
+
+        Example: starting_index of 0, sample intervale of 1, and number of samples of 120 will produce a cell track 120 steps long, sampled at whatever rate the SVGs were produced, starting at 
+        snapshot 0 going until snapshot 119. 
+
+        Parameters
+        ----------
+        starting_index :
+            Integer index of the PhysiCell SVG output to begin trackign at. Default is 0.
+        sample_step_interval :
+            Interval (number of time steps (SVGs)) to sample at. A value of 2 would add a tracking point for every other SVG. Default is 1.
+        number_of_samples :
+            Total Number of SVGs to process. Length of cell positional history. Number_of_samples * sample_step_interval provides the index of the final SVG to process. Default is 120.
+        file_name : 
+            Use to specify a non-default image output name. "produce_for_movie" option=True overrides both the default and given (if given) file name to allow for 
+            required image names to make movie. Default is None, producing the default naming scheme. Example: for the default arguements: 0_1_120 (starting index, sample interval, number of samples). 
+        input_path : 
+            Sets input directory for .mat, xml, and SVG files. All data assumed to be in the same directory. Default values is the current/working directory.
+            NOT CURRENTLY IMMPLEMENTED FOR SVGs!!!!!!!!!! In future versions, plan to use os.chdir, but want to set up logic to help with this.
+        output_path :
+            Sets image output location. Default is current/working directory. 
+        naming_index : 
+            Special use variable to specify expected and ordered file names required to make movie from multiple output images. Default is 0.
+        options : 
+            Diectinoary containing all options required to specify image to be produced. Default is None. Since the dictionary is requied, the default trigeers copying of the default_options, 
+            specified in the PhysiCellPlotter default constructor. Basically, the defaults make an image with cells and cell histories only plotted. 
+        
+        Returns
+        -------
+        Null :
+            Produces a png image using specified PhysiCell inputs etc as specified in the options dictionary. 
+
+        """
 
         self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
 
@@ -104,6 +139,9 @@ class PhysiCellPlotter():
                     options[key] = self.default_options[key]
                     print(options[key]) ##### Add in something saying that defaults were used for this key value???. Then is there someway to get it to only do that once per call???
                     print(key)
+
+        # print("Current Working Directory " , os.getcwd())
+        # os.chdir("/home/varun/temp")
 
         if options["load_SVG_data"] is True:
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
