@@ -17,9 +17,9 @@ options_for_figure2a = {"output_plot" : True,
                         "load_SVG_data": False,
                         'plot_cells_from_physicell_data': True,
                         "contour_options" : {'lowest_contour': 0.90, ### I woud like this to be cleaner - but it does work!!!
-                                           'upper_contour': 0.93,
+                                           'upper_contour': 0.92,
                                            'number_of_levels': 25,
-                                           'color_map_name': 'YlGnBu',
+                                           'color_map_name': 'Reds',
                                            'color_bar': True
                                            },
                         "quiver_options" : {"scale_quiver": False,
