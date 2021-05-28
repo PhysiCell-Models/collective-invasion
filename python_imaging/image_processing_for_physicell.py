@@ -35,19 +35,16 @@ except ImportError:
 # Add in module catch that says - ECM functionality will fail - load pyMCDS_ECM to use with ECM, otherwise your are fine
 
 class PhysiCellPlotter():
+
+    # # https://realpython.com/documenting-python-code/
+    # https://stackoverflow.com/questions/37019744/is-there-a-consensus-what-should-be-documented-in-the-classes-and-init-docst
     
     def __init__(self, parent = None):
 
         """
-        Produces multlilayer image: allows for one cell layer, a contour layer (with colorbar), vector field, 
-        and cell positional history, plotted as arrows (quiver plot) with final cell positions plotted as a cirle.
-        Options passed through a dictionary (see class consctructor for example). 
-
-        sample_step_interval * number_of_samples - starting_index yields the trail length in time steps. number_of_samples provides
-        the number of intervals plotted per image. 
-
-        Example: starting_index of 0, sample intervale of 1, and number of samples of 120 will produce a cell track 120 steps long, sampled at whatever rate the SVGs were produced, starting at 
-        snapshot 0 going until snapshot 119. 
+        Initializes a plot using matplotlib pyplot subplot routine, returning a figure and axis handle to self. Provides a default figure size, title, and all 
+        default options (self.default_options) required to make a plot that displays ONLY cell positions (and tracks if the generic_plotter is called with the appropriate variables).
+        self.default_options is used by generic_plotter to fill in any option values not set when pass the options to generic_plotter
 
         """
         self.figsize_width_svg = 7.0
