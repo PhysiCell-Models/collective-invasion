@@ -1,27 +1,33 @@
 import sys
 import matplotlib.pyplot as plt
-sys.path.append(r'/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/python_imaging')
+
+# To use the imaging module wihtout having to put it in every directory for analysis, put in the absolute path below. That directory
+# will also need either 'pyMCDS.py' or 'pyMCDS_ECM.py'. Otherwise, place 'imaging_processing_for_phyiscell.py' and either MCDS file 
+# in the current working directory. 
+
+# sys.path.append(r'')
 
 from image_processing_for_physicell import *
 
-options_for_figure2a = {}
+options_for_figure = {}
 
-options_for_figure2a = {"output_plot" : True,
+options_for_figure = {"output_plot" : True,
                        "show_plot" : True,
                        "produce_for_panel" : False,
-                        "plot_ECM_anisotropy" : True,
-                        "plot_ECM_orientation" : True,
-                        "retrieve_ECM_data": True,
+                        "plot_ECM_anisotropy" : False,
+                        "plot_ECM_orientation" : False,
+                        "retrieve_ECM_data": False,
+                        "retrieve_first_chemical_field_data" : True,
+                        'plot_chemical_field' : True, 
                         "load_full_physicell_data" : True,
                         "plot_cells_from_SVG" : True,
-                        "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
-                                           'upper_contour': 1.0,
-                                           'number_of_levels': 25,
-                                           'color_map_name': 'Reds',
+                        "contour_options" : {'lowest_contour': 0.0, ### I woud like this to be cleaner - but it does work!!!
+                                           'upper_contour': 38,
+                                           'number_of_levels': 38,
+                                           'color_map_name': 'summer',
                                            'color_bar': True
                                            },
-                        "quiver_options" : {"scale_quiver": False,
-                                          "mask_quiver": False}
+                        "quiver_options" : None
                        }
 
 #### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
@@ -39,9 +45,13 @@ mf = PhysiCellPlotter()
 #
 # plot_cell_tracks_from_svg(0, 1, 10)
 # general_image_plotter (filename: str, folder: str='.', output_folder='', cell_df: dict=None, cell_positions_from_SVG: dict=None, chemical_mesh: dict=None, ECM_mesh: dict=None, options=None):
-mf.generic_plotter (number_of_samples=10, options=options_for_figure2a)
-mf.create_separate_colorbar(contour_options=options_for_figure2a['contour_options'])
 
+image_list_for_figure = []
+
+image_list_for_figure = [100]
+
+for number in image_list_for_figure:
+    mf.generic_plotter(starting_index=0, number_of_samples=number, options=options_for_figure)
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #
 #     All based on options/logic- function

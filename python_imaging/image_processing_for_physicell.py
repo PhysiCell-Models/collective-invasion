@@ -59,6 +59,7 @@ class PhysiCellPlotter():
                        "retrieve_first_chemical_field_data" : False, # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
                        "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
+                        'plot_chemical_field': False, # Calls contour plotter with chemical field as input
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
@@ -121,6 +122,7 @@ class PhysiCellPlotter():
                        "retrieve_first_chemical_field_data" : False, # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
                        "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
+                       'plot_chemical_field' : False,
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
@@ -185,7 +187,9 @@ class PhysiCellPlotter():
         #                       levels=contour_spacing)
 
         # if contour_options['color_bar'] is True:
-
+        if options['plot_chemical_field'] is True:
+            self.create_contour_plot(x_mesh=xx, y_mesh=yy, data_to_contour=plane_oxy,
+                                     contour_options=options["contour_options"], options=options)
         if options['plot_ECM_anisotropy'] is True:
             self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"], options=options)
 
