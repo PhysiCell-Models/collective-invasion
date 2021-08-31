@@ -23,7 +23,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>data_for_paper/parameter_set_21_80_80_ECM_with_chemotaxis_null_model</folder>  
+		<folder>output</folder>  
 
 		<full_data>
 			<interval units="min">6</interval>
@@ -64,7 +64,7 @@
 		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
 		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0.05</default_chemotaxis_bias>
-		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">0.0</default_ECM_sensitivity>
+		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
 		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">1.0</default_hysteresis_bias>
 		<oxygen_migration_bias_for_leaders description="Chemotaxis  bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
 		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.001</anisotropy_increase_rate>
