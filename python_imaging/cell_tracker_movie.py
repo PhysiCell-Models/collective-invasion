@@ -11,6 +11,7 @@
 #
 # Author: function plot_cell_tracks_for_movie - Randy Heiland, modified by John Metzcar (see cell_track_plotter.py and cell_tracks.py as well for original functions)
 #         This script cell_tracker_movie.py - John Metzcar (Twitter - @jmetzcar). See also anim_svg_opac.py in PhysiCell tools for coloring functionality
+# Used to make at the movie for figure 2c - the circular ECM with no chemical cues
 
 import sys
 import xml.etree.ElementTree as ET
