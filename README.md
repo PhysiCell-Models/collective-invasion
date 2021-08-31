@@ -7,7 +7,7 @@ An extracellular matrix (ECM) model implemented in PhysiCell.
 
 The ECM model is built using [PhysiCell](https://github.com/MathCancer/PhysiCell), an open source cell-based, multicellular 3-D modeling framework written in C++.  If you are not already familiar with PhysiCell please start by reviewing it (see references and **Install** section below) prior to diving deeply into the modeling code here.  
 
-The ECM model has three components: `density` (relative quantity of the fibers), `anisotropy` (agreement of alignment) and `fiber orientation` (overall orientation of the fibers).  In the example code, we use two different cell types in the model: leader cells (K14+) and follower cells (K14-). Leader cells can influence the ECM but are not affected by the ECM while follower cells are affected by the ECM but cannot change it.
+The ECM model has three components: `density` (relative quantity of the fibers), `anisotropy` (agreement of alignment) and `fiber orientation` (overall orientation of the fibers).  In the example code, we use two different cell types in the model: leader cells and follower cells. Leader cells can influence the ECM but are not affected by the ECM while follower cells are affected by the ECM but cannot change it.
 
 **Model**
 
@@ -63,18 +63,17 @@ make data-cleanup-light : lightly cleans out the simulation data (*.xml, *.mat, 
 
 Most of the model settings can be edited in the [PhysiCell_settings.xml](config/PhysiCell_settings.xml).  While you don't have to edit this file you can get different behavior by changing the settings in the file.  Below are some of the settings you may want to play with.
 
-Leader and follower adhesion levels + default cell speeds - values of 6.5 and 10 for leader and follower adhesion (letting leader adhesion = follower adhesion) combined with default cell speeds of 0.3 and 0.5 respectively produce interesting simulations displaying leader-follower behavior. 
+The default parameter settings will reproduce Parameter Set 21 (speed = 0.5, adhesion = 10) with a large ECM unit size (80 microns by 80 microns) and with mild follower chemotaxis (b = 0.05). 
 
 ### Outputs
 
-The outputs from the simulation can be found in the [Output](Output/) and [SVG](SVG/) folders.  Leader (K14+) cells are drawn as blue circles and follower (K14-) cells are drawn as yellow circles.
+The outputs from the simulation can be found in the [Output](Output/) and [SVG](SVG/) folders.  Leader cells are drawn as blue circles and follower cells are drawn as yellow circles.
 
 In addition to the standard PhysiCell outputs, our model outputs an ECM specific MATLAB file at each save time.  The file is saved to the [Output](Output/) folder with the form `outputxxxxxxxx_ECM.mat` where `xxxxxxxx` is the current time step.  The MATLAB file contains one array named `ECM_Data` with each column representing a voxel (indexed using voxel id) and rows representing the x, y, and z voxel coordinates, ECM anisotropy, ECM density, fiber orientation x, y, and z components, and finally the oxygen gradient x, y, and z components from index 1 to 11 (assuming the file is being read into Matlab).  
 
-This data can be visualized using the scripts in [python_imaging](python_imaging/), particularly [finished-combined-plot.py](python_imaging/finished-combined-plot.py).  This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing the oxygen gradient and a quiver plot showing the fiber alignment, scaled by anisotropy.
-
+This data can be visualized using the scripts in [python_imaging](python_imaging/). We provide general image production through a general template script [image_processing_script.py](python_imaging/image_processing_script.py) which accesses the *PhysiCellPlotter* class in the module *Image processing for PhysiCell* in [image_processing_for_physicell.py](python_imaging/image_processing_for_physicell.py). For image production settings optimzied for the default parameter settings, see [figure_4_stills_script.py](python_imaging/figure_4_stills_script.py) and [figure_4_movie_script.py](python_imaging/figure_4_movie_script.py). This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing oxygen (in red) and a quiver plots showing cell movement history.
 
 ## Release summary:
 
-* ECM model for UROC poster
+* ECM model initial paper draft - September 2021
  
