@@ -15,6 +15,15 @@ from matplotlib.patches import Circle
 
 import distutils.util
 
+
+from psutil import Process
+
+PROCESS = Process()
+
+def memory_usage():
+    # return the memory usage in percentage like top
+    return PROCESS.memory_info().rss >> 20
+
 # from pyMCDS_ECM import *
 try:
     from pyMCDS_ECM import *
@@ -151,7 +160,7 @@ class PhysiCellPlotter():
             endpoint = starting_index + sample_step_interval * number_of_samples - 1
             final_snapshot_name = 'output' + f'{endpoint:08}'
             print(final_snapshot_name)
-            title_str = 'some one should add extracting the file name from teh .mat files or similar to the code!!!'
+            title_str = 'some one should add extracting the file name from the .mat files or similar to the code!!!'
             plot_x_extend = 1000
             plot_y_extend = 1000
             print("WARNING!!!!!!!!!!! Plot extent is not dynamic!!!!!!!!!!!!!! Load from SVG to get dynamic changes OR change pyMCDS to get bounding box then change Load Physicell Data method!!!!!")
@@ -371,6 +380,8 @@ class PhysiCellPlotter():
     
         if output_plot is True:
             plt.savefig(output_folder + file_name + '.png', dpi=256)
+            plt.clf()
+            plt.close("all")
         if show_plot is True:
             plt.show()
         # self.fig.clf()
@@ -456,10 +467,10 @@ class PhysiCellPlotter():
             ####################################################################################################################
     
             for file_index in file_indices:
-                print(os.getcwd())
+                # print(os.getcwd())
                 fname = "%0.8d" % file_index
                 fname = 'snapshot' + fname + '.svg'  # https://realpython.com/python-f-strings/
-                print(fname)
+                # print(fname)
     
                 ##### Parse XML tree into a dictionary called 'tree" and get root
                 # print('\n---- ' + fname + ':')
@@ -579,7 +590,7 @@ class PhysiCellPlotter():
     
                     #### num_cells becomes total number of cells per frame/sample
                     num_cells += 1
-                print(fname, ':  num_cells= ', num_cells)
+                # print(fname, ':  num_cells= ', num_cells)
 
             return d, d_attributes, title_str, plot_x_extend, plot_y_extend
 
@@ -698,7 +709,7 @@ class PhysiCellPlotter():
             else:
                 print(key, " has no x,y points")
 
-    def produce_movie(self, data_path: str=  '.',  save_path: str= '', start_file_index: int = 0, sample_step_interval: int = 1, 
+    def produce_movie(self, data_path: str=  '.',  save_path: str= '', save_name: str='default_movie', start_file_index: int = 0, sample_step_interval: int = 1,
                              end_file_index: int=120, trail_length: int=10, movie_options: dict=None, image_options: dict=None):
         if movie_options is None:
             movie_options =  {'INCLUDE_ALL_SVGs': True,
@@ -750,7 +761,7 @@ class PhysiCellPlotter():
             truncated_list_of_svgs.append(list_of_svgs[i])
 
         # print(list_of_svgs)
-        print(truncated_list_of_svgs)
+
 
         if movie_options['INCLUDE_ALL_SVGs'] :
             print('Including all SVGs')
@@ -761,7 +772,7 @@ class PhysiCellPlotter():
         if movie_options['INCLUDE_FULL_HISTORY']:
             print('Including full positional history of cells')
             max_number_of_samples = len(truncated_list_of_svgs)
-
+        print(truncated_list_of_svgs)
         print('Processing {} SVGs'.format(len(truncated_list_of_svgs)))
 
         # Also, as written it isn't very flexible
@@ -781,6 +792,8 @@ class PhysiCellPlotter():
     #             file_name: str = None, input_path: str= '.', output_path: str= '', naming_index: int=0, options=None):
 
             if i >= max_number_of_samples:
+                print(f'Line {i} of loop XYZ, memory usage is {memory_usage()} mb')
+
                 self.generic_plotter(starting_index, 1, max_number_of_samples, naming_index=i, options=image_options)
                 # print('middle')
 
@@ -791,6 +804,7 @@ class PhysiCellPlotter():
             #     print(max_samples_left)
             #     print('late')
             else:
+                print(f'Line {i} of loop XYZ, memory usage is {memory_usage()} mb')
                 self.generic_plotter(0, 1, j, naming_index=i, options=image_options)
                 # print('early')
 
@@ -807,9 +821,9 @@ class PhysiCellPlotter():
         # print(string_of_interest)
         os.system(
             'ffmpeg -start_number ' + str(
-                start_file_index) + ' -y -framerate 12 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
+                start_file_index) + ' -y -framerate 24 -i ' + save_path + 'output%08d.png' + ' -frames:v ' + str(
                 number_frames) + ' -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" "' + save_name + '.mp4"')
-
+        # ffmpeg -start_number 0 -y -framerate 24 -i output%08d.png -frames:v 1201 -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" figure_4_parameter_set_21_20_20_ECM_with_chemotaxsis.mp4
         # https://superuser.com/questions/666860/clarification-for-ffmpeg-input-option-with-image-files-as-input
         # https://superuser.com/questions/734976/ffmpeg-limit-number-of-images-converted-to-video
 

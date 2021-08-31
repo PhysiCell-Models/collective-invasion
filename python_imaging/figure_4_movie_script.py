@@ -16,6 +16,7 @@ options_for_figure4_movie = {"output_plot" : True,
                         "plot_cells_from_SVG" : True,
                         "load_SVG_data": True,
                         'plot_cells_from_physicell_data': False,
+                        "produce_for_movie" : True,
                         "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 1.0,
                                            'number_of_levels': 25,
@@ -26,7 +27,7 @@ options_for_figure4_movie = {"output_plot" : True,
 
 movie_options_for_figure_4 = {}
 
-movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True
+movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
                             'INCLUDE_FULL_HISTORY': True
                             }
 
@@ -51,7 +52,7 @@ mf = PhysiCellPlotter()
 
 #  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
 
-mf.produce_movie(movie_options=movie_options_for_figure_4, options=options_for_figure4)
+mf.produce_movie(save_name='figure_4_parameter_set_21_80_80_ECM_with_chemotaxsis', movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)
