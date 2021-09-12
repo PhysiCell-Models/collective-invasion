@@ -167,7 +167,7 @@ int main( int argc, char* argv[] )
 		alter_cell_uptake_secretion_saturation();
 	}
 
-	if(parameters.ints("unit_test_setup")==1)
+	if(parameters.ints("unit_test_setup")==1 || parameters.ints("discrete_ECM_remodeling") == 0)
 	{
 		set_cell_motility_vectors();
 	}

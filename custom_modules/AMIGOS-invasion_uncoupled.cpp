@@ -623,8 +623,8 @@ void setup_microenvironment( void )
 	// Temperarily eliminating leader/follower signal (except here)
     
 	// 50 micron length scale 
-    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
-    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+    // microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+    // microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 	// Temperarily eliminating leader/follower signal	
 	
@@ -633,15 +633,15 @@ void setup_microenvironment( void )
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
 
 	std::vector<double> bc_vector;
-
-	bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , leader signal, follower signal
+	bc_vector = { 38.0};
+	// bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , leader signal, follower signal
 
 	// Old for coupled uE.
 
 	if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
 	{
 
-		bc_vector = { 38.0 , 0.0, 0.0 }; // 5% o2 , leader signal, follower signal
+		bc_vector = { 38.0 }; // 5% o2 , leader signal, follower signal
 		default_microenvironment_options.X_range[0] = -500.0;
 		default_microenvironment_options.X_range[1] = 500.0;
 		default_microenvironment_options.Y_range[0] = -500.0;
@@ -651,7 +651,7 @@ void setup_microenvironment( void )
 
 	else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
 	{
-		bc_vector = { 38.0 , 0.0, 0.0 }; // 5% o2 , leader signal, follower signal
+		bc_vector = { 38.0}; // 5% o2 , leader signal, follower signal
 		default_microenvironment_options.X_range[0] = -500.0;
 		default_microenvironment_options.X_range[1] = 500.0;
 		default_microenvironment_options.Y_range[0] = -500.0;
@@ -660,7 +660,7 @@ void setup_microenvironment( void )
 
 	else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
 	{
-		bc_vector = { 38.0 , 0.0, 0.0 };  // 5% o2 , leader signal, follower signal
+		bc_vector = { 38.0 };  // 5% o2 , leader signal, follower signal
 	}
 
 	else
@@ -1310,7 +1310,10 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	normalize( &chemotaxis_grad ); 
 
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
-	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+
+	// New bias - bias such that the agents can more closely follow the gradient IF the written signals are stronger. 
+	std::vector<double> d_motility = (1-a) * d_random + a * chemotaxis_grad;
+	// std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
 	normalize( &d_motility ); 
 
 
@@ -2190,58 +2193,91 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
     double r = 1.0;
     
     ecm.ecm_voxels[nearest_ecm_voxel_index].density = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
-    
     // END Cell-ECM density interaction
-    
-    // Cell-ECM Fiber realingment
 
-	// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
-	// int n = pCell->get_current_voxel_index();
-	std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
+	// Cell-ECM Fiber realingment - continous then discrete
 
-	double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
-    double migration_speed = pCell->phenotype.motility.migration_speed;
-	
-    double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
-	// std::cout<<r_0<<std::endl;
-    double r_realignment = r_0 * (1-anisotropy);
-
-	double ddotf;
-	std::vector<double> norm_cell_motility;
-	norm_cell_motility.resize(3,0.0);
-	norm_cell_motility = phenotype.motility.motility_vector;
-	normalize(&norm_cell_motility);
-
-	ddotf = dot_product(ECM_orientation, norm_cell_motility);
-	
-	ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
-	
-	std::vector<double> f_minus_d;
-	f_minus_d.resize(3,0.0);
-
-	// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
-
-	for(int i = 0; i < 3; i++)
+	if( parameters.ints("discrete_ECM_remodeling") == 1)
 	{
-		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
-		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
+
+		// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
+		// int n = pCell->get_current_voxel_index();
+		std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
+
+		double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
+		double migration_speed = pCell->phenotype.motility.migration_speed;
+		double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+		// std::cout<<r_0<<std::endl;
+		double r_realignment = r_0 * (1-anisotropy);
+
+		double ddotf;
+		std::vector<double> norm_cell_motility;
+		norm_cell_motility.resize(3,0.0);
+		norm_cell_motility = phenotype.motility.motility_vector;
+		normalize(&norm_cell_motility);
+
+		ddotf = dot_product(ECM_orientation, norm_cell_motility);
+		
+		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
+		
+		std::vector<double> f_minus_d;
+		f_minus_d.resize(3,0.0);
+
+		// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
+
+		for(int i = 0; i < 3; i++)
+		{
+			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
+			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
+		}
+		
+		
+		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
+
+		// End Cell-ECM Fiber realingment
+	
+		// Cell-ECM Anisotrophy Modification
+		
+		double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
+		
+		double r_anisotropy = r_a0 * migration_speed;
+		
+		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+		
+		// END Cell-ECM Anisotropy Modification
+
+
+	}
+
+	else if (parameters.ints("discrete_ECM_remodeling") == 0)
+	{
+		if (ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy == 1)
+		{
+			// std::cout<<"pass code"<<std::endl;
+		}
+		
+		else
+		{
+		if (norm(phenotype.motility.motility_vector) == 0)
+		{std::cout<<"Motility vector norm = 0"<<std::endl;}
+
+ 		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
+		
+		if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
+		{std::cout<<"ECM orientation vector norm = 0"<<std::endl;}
+
+		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
+		}
+	}
+
+	else
+	{
+		std::cout<<"Must specify ECM remodeling mode - see XML parameter \"discrete_ECM_remodeling\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
 	}
 	
 	
-    normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
-
-
-    // End Cell-ECM Fiber realingment
-   
-    // Cell-ECM Anisotrophy Modification
-    
-    double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
-	
-    double r_anisotropy = r_a0 * migration_speed;
-   	
-    ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
-    
-    // END Cell-ECM Anisotropy Modification
     
     return;
 
