@@ -1050,8 +1050,18 @@ void setup_tissue( void )
 
 			double cell_radius = cell_defaults.phenotype.geometry.radius;
 			double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
-			double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+			double sqrt_adhesion_to_repulsion_ratio;
 			
+			if(parameters.doubles("follower_repulsion") == 0)
+			{
+				sqrt_adhesion_to_repulsion_ratio = 0.632455; // value for adhesion = 10 and repulsion = 25.0 - "parameter set 21"
+			}
+
+			else
+			{
+				sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+			} 
+
 			double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
 			cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
 			
@@ -1312,8 +1322,29 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
 
 	// New bias - bias such that the agents can more closely follow the gradient IF the written signals are stronger. 
-	std::vector<double> d_motility = (1-a) * d_random + a * chemotaxis_grad;
-	// std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+
+	std::vector<double> d_motility;
+
+	// d_motility = {0,0,0};
+	
+	if (parameters.ints("link_anisotropy_and_bias") == 0)
+	{
+		d_motility = (1-a) * d_random + a * chemotaxis_grad;
+	}
+
+	else if (parameters.ints("link_anisotropy_and_bias") == 1)
+	{
+		// NON-ECM linked way to signal 
+		d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+	}
+
+	else
+	{
+		std::cout<<"Must specify reader chemotaxis modeling mode - see XML parameter \"link_anisotropy_and_bias\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
+	}
+
 	normalize( &d_motility ); 
 
 

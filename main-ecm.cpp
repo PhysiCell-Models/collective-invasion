@@ -167,10 +167,10 @@ int main( int argc, char* argv[] )
 		alter_cell_uptake_secretion_saturation();
 	}
 
-	if(parameters.ints("unit_test_setup")==1 || parameters.ints("discrete_ECM_remodeling") == 0)
-	{
-		set_cell_motility_vectors();
-	}
+	// if(parameters.ints("unit_test_setup")==1 || parameters.ints("discrete_ECM_remodeling") == 1)
+	// {
+	set_cell_motility_vectors(); // Required for instant writing and unit test. To make all simulations have similar initial conditions, requiring it for all simulations at this time 05.27.22
+	// }
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
