@@ -24,6 +24,7 @@ def memory_usage():
     # return the memory usage in percentage like top
     return PROCESS.memory_info().rss >> 20
 
+
 # from pyMCDS_ECM import *
 try:
     from pyMCDS_ECM import *
@@ -59,6 +60,7 @@ class PhysiCellPlotter():
         self.figsize_width_svg = 7.0
         self.figsize_height_svg = 7.0
         self.title = "title"
+        
         self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
         self.default_options = {"output_plot": True,
                        "show_plot": True,
@@ -119,7 +121,7 @@ class PhysiCellPlotter():
             Produces a png image using specified PhysiCell inputs etc as specified in the options dictionary. 
 
         """
-
+        
         self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
 
         if options is None:
@@ -268,19 +270,23 @@ class PhysiCellPlotter():
                     cb = self.fig.colorbar(cs, cax=cax, format='%.2f', ticks=tick_spacing)
                     cb.ax.tick_params(labelsize=20)
 
-    def create_separate_colorbar(self, file_name='just_colorbar', contour_options: dict=None):
+    def create_separate_colorbar(self, file_name='just_colorbar', output_folder: str= '', contour_options: dict=None):
         print('Working - gives continous colorbar instead of discrete - could fix possibly but not sure how to match N')
 
         if contour_options is not None:
             contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'],
                                           contour_options['number_of_levels'])
-            fig, ax = plt.subplots(figsize=(1, 8))
+            # cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing)
+            tick_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], 5) # Mimicks standard "for panel functionality of create_contour_plot"
+            
+            fig, ax = plt.subplots(figsize=(0.20, 8))
             cmap_str = 'mpl.cm.' + contour_options['color_map_name']
 
             cmap = eval(cmap_str)
             norm = mpl.colors.Normalize(vmin=contour_options['lowest_contour'], vmax=contour_options['upper_contour'])
             cb = colorbar.ColorbarBase(ax, orientation='vertical',
-                                           cmap=cmap, norm=norm)
+                                           cmap=cmap, norm=norm, ticks=tick_spacing)
+            # mpl.colorbar.ColorbarBase.add_lines(levels = contour_spacing)
 
             plt.savefig(output_folder + file_name, bbox_inches='tight', dpi=256)
             plt.show()
@@ -379,9 +385,17 @@ class PhysiCellPlotter():
         # Produce plot following the available options.
     
         if output_plot is True:
+            # self.ax.cla()
+            # self.fig.clf()
+            # self.fig.clear()
+
             plt.savefig(output_folder + file_name + '.png', dpi=256)
+
             plt.clf()
-            plt.close("all")
+            plt.cla()
+            plt.close()
+            print('hello')
+
         if show_plot is True:
             plt.show()
         # self.fig.clf()
