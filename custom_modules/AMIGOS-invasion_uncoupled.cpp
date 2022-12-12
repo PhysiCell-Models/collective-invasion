@@ -1004,7 +1004,7 @@ void setup_tissue( void )
 
 		}
 
-		if(parameters.strings("cell_setup") == "random")
+		else if(parameters.strings("cell_setup") == "random")
 		{
 			std::cout<<"string worked"<<std::endl;
 		

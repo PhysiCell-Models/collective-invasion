@@ -300,9 +300,11 @@ class PhysiCellPlotter():
             ECM_x = np.multiply(x_orientation, scaling_values)
             ECM_y = np.multiply(y_orientation, scaling_values)
             self.ax.quiver(x_mesh[mask], y_mesh[mask], ECM_x[mask], ECM_y[mask],
-                           pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
+                           pivot='middle', angles='xy', scale_units='inches', scale=12.0, headwidth=0,headlength=0, headaxislength=0, alpha = 0.3)
         else:
             if quiver_options["scale_quiver"] is True:
+                sfact = 0.45   # rwh 0.6
+                scaling_values = scaling_values * sfact
                 ECM_x = np.multiply(x_orientation, scaling_values)
                 ECM_y = np.multiply(y_orientation, scaling_values)
             else:
@@ -316,10 +318,10 @@ class PhysiCellPlotter():
             mask = scaling_values > 0.0001
             if quiver_options["mask_quiver"] is True:
                 self.ax.quiver(x_mesh[mask], y_mesh[mask], ECM_x[mask], ECM_y[mask],
-                               pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
+                               pivot='middle', angles='xy', scale_units='inches', scale=12.0, headwidth=0,headlength=0, headaxislength=0, alpha = 0.3)
             else:
                 self.ax.quiver(x_mesh, y_mesh, ECM_x, ECM_y,
-                pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0, alpha = 0.3)
+                pivot='middle', angles='xy', scale_units='inches', scale=12.0, headwidth=0,headlength=0, headaxislength=0, alpha = 0.3)
 
     def load_chemical_field(self, field_name: str=None):
 
