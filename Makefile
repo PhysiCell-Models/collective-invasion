@@ -45,7 +45,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := AMIGOS-invasion.o
+PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o Extracellular_matrix.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -134,8 +134,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-AMIGOS-invasion.o: ./custom_modules/AMIGOS-invasion.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion.cpp
+Extracellular_matrix.o: ./custom_modules/extracellular_matrix.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/extracellular_matrix.cpp
+
+AMIGOS-invasion_uncoupled.o: ./custom_modules/AMIGOS-invasion_uncoupled.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion_uncoupled.cpp
 
 # cleanup
 
@@ -174,6 +177,7 @@ data-cleanup-light:
 	rm -f ./Output/*.svg
 	rm -f ./Output/*.png
 	rm -f ./SVG/*
+	touch ./output/empty.txt
 
 # archival 
 	
@@ -190,7 +194,7 @@ zip-data:
 	mv *.zip data_archives/
 
 zip-source:
-	zip -r latest-data.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* output/*.m
+	zip -r latest-data.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* python_imaging/* modules/* output/*.m
 	cp latest-data.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest-data.zip VERSION_$(VERSION).zip 
 	mv *.zip data_archives/

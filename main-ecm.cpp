@@ -74,7 +74,8 @@
 
 // custom user modules 
 
-#include "./custom_modules/AMIGOS-invasion.h" 
+#include "./custom_modules/AMIGOS-invasion_uncoupled.h" 
+// #include "./custom_modules/AMIGOS-invasion.h" 
 // #include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
@@ -83,10 +84,12 @@ using namespace PhysiCell;
 
 // set number of threads for OpenMP (parallel computing)
 
-void ecm_update(void);
+// void ecm_update(void); // I think this from an old implentation. Noted and commented out 09.01.20
+
 
 int main( int argc, char* argv[] )
 {
+	std::cout<<"test"<<std::endl;
 	// load and parse settings file(s)
  
 	bool XML_status = false; 
@@ -110,8 +113,11 @@ int main( int argc, char* argv[] )
 	
 	double t_max = PhysiCell_settings.max_time;  // 1 days
 
+	std::cout<<"test"<<std::endl;
+
 	/* Microenvironment setup */ 
 	setup_microenvironment();
+	setup_extracellular_matrix(); // NEW LINE!!!!
 
 	/* PhysiCell setup */ 
  	
@@ -150,7 +156,7 @@ int main( int argc, char* argv[] )
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = AMIGOS_invasion_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );
 	
 	display_citations(); 
 	
@@ -161,10 +167,10 @@ int main( int argc, char* argv[] )
 		alter_cell_uptake_secretion_saturation();
 	}
 
-	if(parameters.ints("unit_test_setup")==1)
-	{
-		set_cell_motility_vectors();
-	}
+	// if(parameters.ints("unit_test_setup")==1 || parameters.ints("discrete_ECM_remodeling") == 1)
+	// {
+	set_cell_motility_vectors(); // Required for instant writing and unit test. To make all simulations have similar initial conditions, requiring it for all simulations at this time 05.27.22
+	// }
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
@@ -173,7 +179,7 @@ int main( int argc, char* argv[] )
 	std::ofstream report_file;
 
 	//variables for March Project
-	double reset_Cells_interval = 980.0; // for a 1000 by 1000 um computational domain
+	double reset_Cells_interval = 1960.0; // for a 1000 by 1000 um computational domain (use 980.0 for speed = 1.0. Doulbe it for speed equals 0.5. )
 	bool enable_cell_resets = true;
 
 	// main loop 
@@ -220,7 +226,7 @@ int main( int argc, char* argv[] )
 				if( PhysiCell_settings.enable_SVG_saves == true )
 				{	
 					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
-					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+					SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern"));
 					
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
@@ -233,7 +239,7 @@ int main( int argc, char* argv[] )
 				if (enable_cell_resets == true )
 				{
 					reset_cell_position();
-					reset_Cells_interval += 980.0; // for a 1000 by 1000 um computational domain
+					reset_Cells_interval += 1960.0; // for a 1000 by 1000 um computational domain (use 980.0 for speed = 1.0. Doulbe it for speed equals 0.5. )
 				}
 				
 			}
@@ -279,7 +285,7 @@ int main( int argc, char* argv[] )
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
-	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );
 	
 	// timer 
 	

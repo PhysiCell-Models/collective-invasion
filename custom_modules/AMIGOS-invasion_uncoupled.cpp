@@ -61,12 +61,12 @@
 ###############################################################################
 */
 
-#include "./AMIGOS-invasion.h"
-// #include "./ECM.h"
+#include "./AMIGOS-invasion_uncoupled.h"
+#include "./extracellular_matrix.h"
 #include <chrono>  // for high_resolution_clock - https://www.pluralsight.com/blog/software-development/how-to-measure-execution-time-intervals-in-c--
 Cell_Definition leader_cell; 
 Cell_Definition follower_cell; 
-std::vector< std::vector<double> > ECM_fiber_alignment; 
+// std::vector< std::vector<double> > ECM_fiber_alignment; 
 unsigned long long int counter=0; // counter for calculating average for the ad hoc timing I am doing ... 
 int time_total = 0;
 
@@ -81,11 +81,11 @@ void create_cell_types( void )
 	// housekeeping 
 	
 	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
 	
 	// turn the default cycle model to live, 
 	// so it's easier to turn off proliferation
-	
+
 	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
 	
 	// Make sure we're ready for 2D
@@ -284,7 +284,7 @@ void create_cell_types( void )
 	if( parameters.ints("unit_test_setup") == 1)
 	{
 		leader_cell.phenotype.motility.persistence_time = 10.0;
-		leader_cell.phenotype.motility.migration_speed = 1.0;
+		leader_cell.phenotype.motility.migration_speed = 0.50;
 		leader_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
 		leader_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
 		leader_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
@@ -372,15 +372,236 @@ void create_cell_types( void )
     
 	// Temperarily eliminating leader/follower signal
 	return; 
-}
+}	
+
+// ECM STUFF
+
+// ECM_Cartesian_Mesh::ECM_Cartesian_Mesh()
+// {
+
+// Cartesian_Mesh();
+
+// }
+
+// ECM_Voxel::ECM_Voxel()
+// {
+
+// 	anisotropy = 0;
+// 	density = 0.5;
+// 	ecm_fiber_alignment.assign( 3 , 0.0 ); 
+
+// }
+
+// ECM::ECM()
+// {
+// 	ECM_Voxel template_ecm_voxel;
+
+// 	// ECM_Cartesian_Mesh ecm_mesh;
+
+// 	ecm_mesh.resize(1,1,1); 
+
+// 	make_ecm_units();
+
+// 	// ecm_voxels.push_back(template_ecm_voxel);
+// }
+
+// void ECM::make_ecm_units(void)
+// {
+// 	// you want to ... grab the centers and ordering from ecm_mesh.voxels ... one by one. This will make it First - resize the mesh, then Second, resize the ECM. And you can make that happen in the constructor also, which might be the best idea???
+
+// 	for (int i=0; i<ecm_mesh.voxels.size(); i++)
+// 	{
+		
+// 		ecm_voxels.push_back(ecm_voxel);
+// 		ecm_voxels[i].mesh_index = ecm_mesh.voxels[i].mesh_index;
+// 	}
+
+
+// 	initialize_ECM();
+
+// }
+
+// void ECM::resize_ecm_units_from_ecm_mesh(void)
+// {
+// 	ecm_voxels.resize(0);
+
+// 	for (int i=0; i<ecm_mesh.voxels.size(); i++)
+// 	{	
+// 		ecm_voxels.push_back(ecm_voxel);
+// 		ecm_voxels[i].mesh_index = ecm_mesh.voxels[i].mesh_index;
+// 		ecm_voxels[i].center = ecm_mesh.voxels[i].center;
+// 		ecm_voxels[i].volume = ecm_mesh.voxels[i].volume;
+// 	}
+
+// 	initialize_ECM();
+// }
+
+// void ECM::initialize_ECM( void )
+// {
+	
+// 	if (ecm_mesh.voxels.size() != ecm_voxels.size())
+// 	{
+// 		std::cout<<"Resize ECM mesh to match ECM voxels before initializing ECM units to initial values"<<std::endl;
+// 		std::cout<<" hit Enter to continue:"<<std::flush;
+// 	 	std::cin.get();
+// 	}
+
+// 	for( int n = 0; n < ecm_voxels.size() ; n++ )
+// 	{
+// 			double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+// 			// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+// 			// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+// 			// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+// 			ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+
+// 		// // For random 2-D initalization 
+// 		// if(parameters.strings( "ECM_orientation_setup") == "random")
+// 		// {
+// 		// 	double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+// 		// 	// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+// 		// 	// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+// 		// 	// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+// 		// 	ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+// 		// }
+
+// 		// // for starburst initialization 
+// 		// else if(parameters.strings( "ECM_orientation_setup") == "starburst")
+// 		// {
+// 		// 	std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+// 		// 	normalize( &position ); 
+// 		// 	ecm_voxels[n].ecm_fiber_alignment =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
+// 		// 	normalize(&ecm_voxels[n].ecm_fiber_alignment );
+// 		// }
+
+// 		// // for circular initialization 
+// 		// else if(parameters.strings( "ECM_orientation_setup") == "circular")
+// 		// {
+// 		// 	std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+// 		// 	normalize( &position );
+// 		// 	ecm_voxels[n].ecm_fiber_alignment  =  { position[1],-position[0],0}; // oriented in cirlce
+// 		// 	normalize(&ecm_voxels[n].ecm_fiber_alignment );
+// 		// }
+
+// 		// else if(parameters.strings( "ECM_orientation_setup") == "horizontal")
+// 		// {
+// 		// 	ecm_voxels[n].ecm_fiber_alignment  =  { 1.0, 0.0, 0.0}; 
+// 		// 	normalize(&ecm_voxels[n].ecm_fiber_alignment );
+// 		// }
+
+// 		// else if(parameters.strings( "ECM_orientation_setup") == "vertical")
+// 		// {
+// 		// 	ecm_voxels[n].ecm_fiber_alignment =  { 0.0, 1.0, 0.0}; 
+// 		// 	normalize(&ecm_voxels[n].ecm_fiber_alignment );
+// 		// }
+
+// 		// else
+// 		// {
+// 		// 	std::cout<<"WARNING: NO ECM ORIENTATION SPECIFIED. FIX THIS!!!"<<std::endl;
+// 		// 	std::cout<<"Halting program!!!"<<std::endl;
+// 		// 	abort();
+// 		// 	return;
+// 		// }
+
+
+// 		// if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
+// 		// {
+
+// 		// 	ecm_voxels[n].density = 0.5;
+// 		// 	ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+
+// 		// }
+
+// 		// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+// 		// {
+			
+// 		// 	ecm_voxels[n].density = 0.5;
+// 		// 	ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+			
+// 		// }
+
+// 		// else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
+// 		// {
+// 		// 	ecm_voxels[n].density = parameters.doubles("initial_ECM_density");
+// 		// 	ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+			
+// 		// }
+
+// 		// else
+// 		// {
+// 		// 	std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+// 		// 	std::cout<<"Halting!"<<std::endl;
+// 		// 	abort();
+// 		// 	return;
+// 		// }
+// 			// if(parameters.strings( "ECM_orientation_setup") == "random")
+// 			// {
+// 			// 	double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+// 			// 	// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+// 			// 	// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+// 			// 	// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+// 			// 	ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0};
+// 			// }
+// 		}
+		
+// 	}
+
+	
+
+// ECM_options::ECM_options()
+// {
+ 
+// }
+
+ECM ecm;
+
+
+// END ECM STUFF
 
 void setup_microenvironment( void )
 {
+	
+	// ECM_Voxel ecm_voxel;
+
+	// ECM ecm;
+
+	// std::cout<<ecm_voxel.anisotropy<<std::endl;
+	// std::cout<<ecm_voxel.density<<std::endl;
+	// std::cout<<ecm_voxel.ecm_fiber_alignment.size()<<std::endl;
+
+	// ECM_Cartesian_Mesh ECM_mesh;
+
+	// ECM();
+
+	// std::cout<<ecm.ecm_voxels[0].anisotropy<<std::endl;
+	// std::cout<<ecm.ecm_voxels[0].density<<std::endl;
+	// std::cout<<ecm.ecm_voxels[0].ecm_fiber_alignment<<std::endl;
+	// std::cin.get();
+	
+	// std::cout<<ecm.ecm_mesh.voxels.size()<<std::endl;
+	// std::cout<<ecm.ecm_voxels.size()<<std::endl;
+
+	// std::cout<<ecm.ecm_mesh.voxels.size()<<std::endl;
+	// std::cout<<ecm.ecm_voxels.size()<<std::endl;
+	// std::cout<<ecm.ecm_mesh.dx<<std::endl;
+	// std::cout<<ecm.ecm_mesh.dy<<std::endl;
+	// std::cout<<ecm.ecm_mesh.dz<<std::endl;
+
+	// std::vector<double> position = {20,20,20};
+	// position
+
+	// std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
+	// std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
+	// std::cout<<" hit Enter to continue:"<<std::flush;
+	// std::cin.get();
+
+
 	// set domain parameters - see XML	
+
+	// Add uncoupled ECM structure
 	
 	// Add ECM structures
-	microenvironment.add_density( "ECM", "dimensionless", 0.0 , 0.0 ); 
-	microenvironment.add_density( "ECM anisotropy" , "dimensionless" , 0.0 , 0.0 ); 
+	// microenvironment.add_density( "ECM", "dimensionless", 0.0 , 0.0 ); 
+	// microenvironment.add_density( "ECM anisotropy" , "dimensionless" , 0.0 , 0.0 ); 
 
 	// Turn on gradients - oxygen chemotaxis
 
@@ -402,8 +623,8 @@ void setup_microenvironment( void )
 	// Temperarily eliminating leader/follower signal (except here)
     
 	// 50 micron length scale 
-    microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
-    microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
+    // microenvironment.add_density( "leader signal", "dimensionless", 1e5 , 1 );
+    // microenvironment.add_density( "follower signal", "dimensionless", 1e5 , 1 );
 
 	// Temperarily eliminating leader/follower signal	
 	
@@ -412,11 +633,15 @@ void setup_microenvironment( void )
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
 
 	std::vector<double> bc_vector;
+	bc_vector = { 38.0};
+	// bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , leader signal, follower signal
+
+	// Old for coupled uE.
 
 	if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
 	{
 
-		bc_vector = { 38.0 , 0.5, parameters.doubles("initial_anisotropy") , 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
+		bc_vector = { 38.0 }; // 5% o2 , leader signal, follower signal
 		default_microenvironment_options.X_range[0] = -500.0;
 		default_microenvironment_options.X_range[1] = 500.0;
 		default_microenvironment_options.Y_range[0] = -500.0;
@@ -426,7 +651,7 @@ void setup_microenvironment( void )
 
 	else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
 	{
-		bc_vector = { 38.0 , 0.5, parameters.doubles("initial_anisotropy"), 0.0, 0.0 }; // 5% o2 , half max ECM , anisotropic, leader signal, follower signal
+		bc_vector = { 38.0}; // 5% o2 , leader signal, follower signal
 		default_microenvironment_options.X_range[0] = -500.0;
 		default_microenvironment_options.X_range[1] = 500.0;
 		default_microenvironment_options.Y_range[0] = -500.0;
@@ -435,7 +660,7 @@ void setup_microenvironment( void )
 
 	else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
 	{
-		bc_vector = { 38.0 , parameters.doubles("initial_ECM_density") , parameters.doubles("initial_anisotropy") , 0.0, 0.0 };  // 5% o2 , half max ECM , isotropic, leader signal, follower signal
+		bc_vector = { 38.0 };  // 5% o2 , leader signal, follower signal
 	}
 
 	else
@@ -451,10 +676,23 @@ void setup_microenvironment( void )
     
 	// Temperarily eliminating leader/follower signal	
     
-	// default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
+	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
     
 	initialize_microenvironment(); 
+
+	// ecm.ecm_mesh.resize(default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
+	// 	default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1],default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], \
+	// 	parameters.doubles("ECM_dx"), parameters.doubles("ECM_dy"),parameters.doubles("ECM_dz"));
+	// ecm.resize_ecm_units_from_ecm_mesh();
+
+
+	// ecm.ecm_mesh.display_information(std::cout );
+
+	// std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
+	// std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
+	// std::cout<<" hit Enter to continue:"<<std::flush;
+	// std::cin.get();
 
 	microenvironment.decay_rates[0] = parameters.doubles("chemotactic_substrate_decay_rate");
 
@@ -546,8 +784,8 @@ void setup_microenvironment( void )
 	*/
 
 	// set up ECM density and anisotropy profile as needed
-	int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-	int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	// int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 
 	/*for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
 	{
@@ -558,14 +796,33 @@ void setup_microenvironment( void )
 			microenvironment(n)[ECM_anisotropy_index] = 1.0; 
 		}
 	}*/
+	
+	return; 
+}	
+
+void setup_extracellular_matrix( void )
+{
+	// DEPENDS ON MICROENVIRONMENT - CALL SETUP MICROENVIRONEMNT FIRST!!!!!
+
+	ecm.ecm_mesh.resize(default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
+	default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1],default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], \
+	parameters.doubles("ECM_dx"), parameters.doubles("ECM_dy"),parameters.doubles("ECM_dz"));
+	ecm.resize_ecm_units_from_ecm_mesh();
+
+	ecm.ecm_mesh.display_information(std::cout );
+
+	if(parameters.bools("unit_test_setup") == 1)
+	{
+
+	}
 
 	// set up ECM alignment 
 
 	// <ECM_orientation_setup description="Specifies the initial ECM orientation: random, circular, starburt, oriented to the right, or oriented to the top" type="string" units="NA">circular</ECM_orientation_setup> parameters.string( "ECM_orientation_setup")
-	std::vector<double> fiber_direction = { 1.0 , 0.0, 0.0 }; 
-	ECM_fiber_alignment.resize( microenvironment.mesh.voxels.size() , fiber_direction );  
+	// std::vector<double> fiber_direction = { 1.0 , 0.0, 0.0 }; 
+	// ECM_fiber_alignment.resize( microenvironment.mesh.voxels.size() , fiber_direction );  
 
-	for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
+	for( int n = 0; n < ecm.ecm_mesh.voxels.size() ; n++ )
 	{
 		// For random 2-D initalization 
 		if(parameters.strings( "ECM_orientation_setup") == "random")
@@ -574,37 +831,56 @@ void setup_microenvironment( void )
 			// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
 			// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 			// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
-			ECM_fiber_alignment[n] = {cos(theta), sin(theta), 0.0};
+			ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
 		}
 
 		// for starburst initialization 
 		else if(parameters.strings( "ECM_orientation_setup") == "starburst")
 		{
-			std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+			std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
 			normalize( &position ); 
-			ECM_fiber_alignment[n] =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
-			normalize(&ECM_fiber_alignment[n]);
+			ecm.ecm_voxels[n].ecm_fiber_alignment =  { position[0],position[1],0}; // oriented out (perpindeicular to concentric circles)
+			normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
 		}
 
 		// for circular initialization 
 		else if(parameters.strings( "ECM_orientation_setup") == "circular")
 		{
-			std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+			std::vector<double> position = ecm.ecm_mesh.voxels[n].center;; 
 			normalize( &position );
-			ECM_fiber_alignment[n] =  { position[1],-position[0],0}; // oriented in cirlce
-			normalize(&ECM_fiber_alignment[n]);
+			ecm.ecm_voxels[n].ecm_fiber_alignment =  { position[1],-position[0],0}; // oriented in cirlce
+			normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
 		}
 
 		else if(parameters.strings( "ECM_orientation_setup") == "horizontal")
 		{
-			ECM_fiber_alignment[n] =  { 1.0, 0.0, 0.0}; 
-			normalize(&ECM_fiber_alignment[n]);
+			ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1.0, 0.0, 0.0}; 
+			normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
 		}
 
 		else if(parameters.strings( "ECM_orientation_setup") == "vertical")
 		{
-			ECM_fiber_alignment[n] =  { 0.0, 1.0, 0.0}; 
-			normalize(&ECM_fiber_alignment[n]);
+			ecm.ecm_voxels[n].ecm_fiber_alignment=  { 0.0, 1.0, 0.0}; 
+			normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
+		}
+
+		else if(parameters.strings( "ECM_orientation_setup") == "split")
+		{
+			std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
+			normalize( &position ); 
+
+			if(position[1]<=0)
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1,-1,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
+			}
+
+			else
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1,1,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);				
+			}
+
 		}
 
 		else
@@ -614,11 +890,42 @@ void setup_microenvironment( void )
 			abort();
 			return;
 		}
+
+		if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
+		{
+
+			ecm.ecm_voxels[n].density = 0.5;
+			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+
+		}
+
+		else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+		{
+			
+			ecm.ecm_voxels[n].density = 0.5;
+			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+			
+		}
+
+		else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
+		{
+			ecm.ecm_voxels[n].density = parameters.doubles("initial_ECM_density");
+			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+			
+		}
+
+		else
+		{
+			std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+			std::cout<<"Halting!"<<std::endl;
+			abort();
+			return;
+		}
 		
 	}
-	
-	return; 
-}	
+
+
+}
 
 void run_biotransport( double t_max ) // used to set up initial chemical conditions to prevent unwanted phenotype switching due to starting the simulation
 {
@@ -697,7 +1004,7 @@ void setup_tissue( void )
 
 		}
 
-		if(parameters.strings("cell_setup") == "random")
+		else if(parameters.strings("cell_setup") == "random")
 		{
 			std::cout<<"string worked"<<std::endl;
 		
@@ -743,8 +1050,18 @@ void setup_tissue( void )
 
 			double cell_radius = cell_defaults.phenotype.geometry.radius;
 			double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
-			double sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+			double sqrt_adhesion_to_repulsion_ratio;
 			
+			if(parameters.doubles("follower_repulsion") == 0)
+			{
+				sqrt_adhesion_to_repulsion_ratio = 0.632455; // value for adhesion = 10 and repulsion = 25.0 - "parameter set 21"
+			}
+
+			else
+			{
+				sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("follower_adhesion")/parameters.doubles("follower_repulsion"));
+			} 
+
 			double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
 			cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
 			
@@ -854,6 +1171,11 @@ void setup_tissue( void )
 			while( n <= default_microenvironment_options.X_range[1] )
 			{
 				pCell = create_cell(follower_cell); 
+
+				// To prevent droping cells in areas of high ECM curvature. 
+				while(abs(n) < 70)
+				{n = n + 30.0;}
+
 				pCell->assign_position( n , 0.0 , 0.0 );
 				n = n + 30.0;
 			}
@@ -956,8 +1278,8 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
 	
 	// find location of variables and base parameter values
-	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
@@ -967,11 +1289,13 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
 	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
 	
-	// sample ECM 
-	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
-	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
-	int n = pCell->get_current_voxel_index();
-	std::vector<double> f = ECM_fiber_alignment[n];
+	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+
+	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
+	double a = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy; 
+	std::vector<double> f = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment;
 	
 	
 	/****************************************Begin new migration direction update****************************************/
@@ -996,7 +1320,31 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	normalize( &chemotaxis_grad ); 
 
 	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
-	std::vector<double> d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+
+	// New bias - bias such that the agents can more closely follow the gradient IF the written signals are stronger. 
+
+	std::vector<double> d_motility;
+
+	// d_motility = {0,0,0};
+	
+	if (parameters.ints("link_anisotropy_and_bias") == 0)
+	{
+		d_motility = (1-a) * d_random + a * chemotaxis_grad;
+	}
+
+	else if (parameters.ints("link_anisotropy_and_bias") == 1)
+	{
+		// NON-ECM linked way to signal 
+		d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+	}
+
+	else
+	{
+		std::cout<<"Must specify reader chemotaxis modeling mode - see XML parameter \"link_anisotropy_and_bias\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
+	}
+
 	normalize( &d_motility ); 
 
 
@@ -1165,11 +1513,14 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
 	static int base_motility_hysteresis_bias = pCell->custom_data.find_variable_index( "Base hysteresis bias");
 	static int previous_anistropy = pCell->custom_data.find_variable_index( "previous anisotropy" );
-	// sample ECM 
-	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
-	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
-	int n = pCell->get_current_voxel_index();
-	std::vector<double> f = ECM_fiber_alignment[n];
+
+	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+
+	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
+	double a = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy; 
+	std::vector<double> f = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment;
 	
 	
 	/****************************************Begin new migration direction update****************************************/
@@ -1370,8 +1721,8 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
 	
 	// find location of variables and base parameter values
-	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
 	
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
@@ -1381,11 +1732,13 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
 	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
 	
-	// sample ECM 
-	double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
-	double a = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
-	int n = pCell->get_current_voxel_index();
-	std::vector<double> f = ECM_fiber_alignment[n];
+	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+
+	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
+	double a = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy; 
+	std::vector<double> f = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment;
 	
 	
 	/****************************************Begin new migration direction update****************************************/
@@ -1649,8 +2002,8 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
     
 	if( pCell->type == 2 )
     {
-		output[0] = "yellow";
         output[2] = "yellow";	
+		output[0] = "yellow";
 		
 		// Return yellow for followers and exit statement
 
@@ -1666,7 +2019,10 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
         	return output;
 		}
 
-		// If doing unit testing AND cell not selected as marker cell, return yellow (assigned prior to first if statement)
+		// If doing unit testing AND cell not selected as marker cell, return blue. 
+		output[2] = "blue";	
+		output[0] = "blue";
+
 
         return output;
     }
@@ -1847,73 +2203,112 @@ long fibonacci(unsigned n) // just being used for timing.
 
 // uses cell motility vector for fiber reorientation
 
-void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , double dt)
+void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , double dt) 
 {
 
-	// Find correct fields
-	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	// Find correct items
+	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	std::vector<double> cell_position = pCell->position;
+	// std::cout<<cell_position<<std::endl;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+	// std::cout<<nearest_ecm_voxel_index<<std::endl;
+	// std::cin.get();
 	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
 	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy increase rate");
 	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber realignment rate");
     
     // Cell-ECM density interaction
-    double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
+
+    double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density;
     double r = 1.0;
     
-    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
-    
+    ecm.ecm_voxels[nearest_ecm_voxel_index].density = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
     // END Cell-ECM density interaction
-    
-    // Cell-ECM Fiber realingment
 
-	// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
-	int n = pCell->get_current_voxel_index();
-	std::vector<double> ECM_orientation = ECM_fiber_alignment[n];
+	// Cell-ECM Fiber realingment - continous then discrete
 
-	double anisotropy = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
-    double migration_speed = pCell->phenotype.motility.migration_speed;
-	
-    double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
-	// std::cout<<r_0<<std::endl;
-    double r_realignment = r_0 * (1-anisotropy);
-
-	double ddotf;
-	std::vector<double> norm_cell_motility;
-	norm_cell_motility.resize(3,0.0);
-	norm_cell_motility = phenotype.motility.motility_vector;
-	normalize(&norm_cell_motility);
-
-	ddotf = dot_product(ECM_orientation, norm_cell_motility);
-	
-	ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
-	
-	std::vector<double> f_minus_d;
-	f_minus_d.resize(3,0.0);
-
-	// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
-
-	for(int i = 0; i < 3; i++)
+	if( parameters.ints("discrete_ECM_remodeling") == 1)
 	{
-		f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
-		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; 
+
+		// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
+		// int n = pCell->get_current_voxel_index();
+		std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
+
+		double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
+		double migration_speed = pCell->phenotype.motility.migration_speed;
+		double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+		// std::cout<<r_0<<std::endl;
+		double r_realignment = r_0 * (1-anisotropy);
+
+		double ddotf;
+		std::vector<double> norm_cell_motility;
+		norm_cell_motility.resize(3,0.0);
+		norm_cell_motility = phenotype.motility.motility_vector;
+		normalize(&norm_cell_motility);
+
+		ddotf = dot_product(ECM_orientation, norm_cell_motility);
+		
+		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
+		
+		std::vector<double> f_minus_d;
+		f_minus_d.resize(3,0.0);
+
+		// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
+
+		for(int i = 0; i < 3; i++)
+		{
+			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
+			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
+		}
+		
+		
+		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
+
+		// End Cell-ECM Fiber realingment
+	
+		// Cell-ECM Anisotrophy Modification
+		
+		double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
+		
+		double r_anisotropy = r_a0 * migration_speed;
+		
+		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+		
+		// END Cell-ECM Anisotropy Modification
+
+
+	}
+
+	else if (parameters.ints("discrete_ECM_remodeling") == 0)
+	{
+		if (ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy == 1)
+		{
+			// std::cout<<"pass code"<<std::endl;
+		}
+		
+		else
+		{
+		if (norm(phenotype.motility.motility_vector) == 0)
+		{std::cout<<"Motility vector norm = 0"<<std::endl;}
+
+ 		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
+		
+		if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
+		{std::cout<<"ECM orientation vector norm = 0"<<std::endl;}
+
+		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
+		}
+	}
+
+	else
+	{
+		std::cout<<"Must specify ECM remodeling mode - see XML parameter \"discrete_ECM_remodeling\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
 	}
 	
 	
-    normalize(&(ECM_fiber_alignment[n])); // why by reference??
-
-
-    // End Cell-ECM Fiber realingment
-    
-    // Cell-ECM Anisotrophy Modification
-    
-    double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
-	
-    double r_anisotropy = r_a0 * migration_speed;
-   	
-    pCell->nearest_density_vector()[ECM_anisotropy_index] = anisotropy + r_anisotropy * dt  * (1- anisotropy);
-    
-    // END Cell-ECM Anisotropy Modification
     
     return;
 
@@ -1926,27 +2321,27 @@ void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , d
 {
 
 	// Find correct fields
-	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
 	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy increase rate");
 	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber realignment rate");
     
     // Cell-ECM density interaction
-    double ECM_density = pCell->nearest_density_vector()[ECM_density_index]; 
+    double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density;
     double r = 1.0;
     
-    pCell->nearest_density_vector()[ECM_density_index] = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
+    ecm.ecm_voxels[nearest_ecm_voxel_index].density = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
     
     // END Cell-ECM density interaction
     
     // Cell-ECM Fiber realingment
 
 	// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
-	int n = pCell->get_current_voxel_index();
-	std::vector<double> ECM_orientation = ECM_fiber_alignment[n];
+	// int n = pCell->get_current_voxel_index();
+	std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
 
-	double anisotropy = pCell->nearest_density_vector()[ECM_anisotropy_index]; 
+	double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
     double migration_speed = pCell->phenotype.motility.migration_speed;
 	
     double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
@@ -1971,11 +2366,11 @@ void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , d
 	for(int i = 0; i < 3; i++)
 	{
 		f_minus_d[i] = ECM_orientation[i] - norm_cell_velocity[i]; // 06.05.19 - fixed 
-		ECM_fiber_alignment[n][i] -= dt * r_realignment * f_minus_d[i]; 
+		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
 	}
 	
 	
-    normalize(&(ECM_fiber_alignment[n])); // why by reference??
+    normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
 
 
     // End Cell-ECM Fiber realingment
@@ -1986,25 +2381,320 @@ void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , d
 	
     double r_anisotropy = r_a0 * migration_speed;
    	
-    pCell->nearest_density_vector()[ECM_anisotropy_index] = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+    ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
     
     // END Cell-ECM Anisotropy Modification
     
     return;
 
 }
-    
+
+void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern )
+{
+	double X_lower = M.mesh.bounding_box[0];
+	double X_upper = M.mesh.bounding_box[3];
+ 
+	double Y_lower = M.mesh.bounding_box[1]; 
+	double Y_upper = M.mesh.bounding_box[4]; 
+
+	double plot_width = X_upper - X_lower; 
+	double plot_height = Y_upper - Y_lower; 
+
+	double font_size = 0.025 * plot_height; // PhysiCell_SVG_options.font_size; 
+	double top_margin = font_size*(.2+1+.2+.9+.5 ); 
+
+	// open the file, write a basic "header"
+	std::ofstream os( filename , std::ios::out );
+	if( os.fail() )
+	{ 
+		std::cout << std::endl << "Error: Failed to open " << filename << " for SVG writing." << std::endl << std::endl; 
+
+		std::cout << std::endl << "Error: We're not writing data like we expect. " << std::endl
+		<< "Check to make sure your save directory exists. " << std::endl << std::endl
+		<< "I'm going to exit with a crash code of -1 now until " << std::endl 
+		<< "you fix your directory. Sorry!" << std::endl << std::endl; 
+		exit(-1); 
+	} 
+	
+	Write_SVG_start( os, plot_width , plot_height + top_margin );
+
+	// draw the background 
+	Write_SVG_rect( os , 0 , 0 , plot_width, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
+	
+	// bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
+    //                    std::string stroke_color , std::string fill_color )
+
+	// write the simulation time to the top of the plot
+ 
+	char* szString; 
+	szString = new char [1024]; 
+ 
+	int total_cell_count = all_cells->size(); 
+ 
+	double temp_time = time; 
+
+	std::string time_label = formatted_minutes_to_DDHHMM( temp_time ); 
+ 
+	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str(), 
+		z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
+	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), 
+		font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	sprintf( szString , "%u agents" , total_cell_count ); 
+	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9), 
+		0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	
+	delete [] szString; 
+
+	
+	// add an outer "g" for coordinate transforms 
+	
+	os << " <g id=\"tissue\" " << std::endl 
+	   << "    transform=\"translate(0," << plot_height+top_margin << ") scale(1,-1)\">" << std::endl; 
+	   
+	// prepare to do mesh-based plot (later)
+	
+	double dx_stroma = M.mesh.dx; 
+	double dy_stroma = M.mesh.dy; 
+	
+	os << "  <g id=\"ECM\">" << std::endl; 
+  
+	int ratio = 1; 
+	double voxel_size = dx_stroma / (double) ratio ; 
+  
+	double half_voxel_size = voxel_size / 2.0; 
+	double normalizer = 78.539816339744831 / (voxel_size*voxel_size*voxel_size); 
+ 
+ // color in the background ECM
+/* 
+ if( ECM.TellRows() > 0 )
+ {
+  // find the k corresponding to z_slice
+  
+  
+  
+  Vector position; 
+  *position(2) = z_slice; 
+  
+
+  // 25*pi* 5 microns^2 * length (in source) / voxelsize^3
+  
+  for( int j=0; j < ratio*ECM.TellCols() ; j++ )
+  {
+   // *position(1) = *Y_environment(j); 
+   *position(1) = *Y_environment(0) - dy_stroma/2.0 + j*voxel_size + half_voxel_size; 
+   
+   for( int i=0; i < ratio*ECM.TellRows() ; i++ )
+   {
+    // *position(0) = *X_environment(i); 
+    *position(0) = *X_environment(0) - dx_stroma/2.0 + i*voxel_size + half_voxel_size; 
+	
+    double E = evaluate_Matrix3( ECM, X_environment , Y_environment, Z_environment , position );	
+	double BV = normalizer * evaluate_Matrix3( OxygenSourceHD, X_environment , Y_environment, Z_environment , position );
+	if( isnan( BV ) )
+	{ BV = 0.0; }
+
+	vector<string> Colors;
+	Colors = hematoxylin_and_eosin_stroma_coloring( E , BV );
+	Write_SVG_rect( os , *position(0)-half_voxel_size-X_lower , *position(1)-half_voxel_size+top_margin-Y_lower, 
+	voxel_size , voxel_size , 1 , Colors[0], Colors[0] );
+   
+   }
+  }
+ 
+ }
+*/
+	os << "  </g>" << std::endl; 
+ 
+	// Now draw vessels
+
+	/*
+	 std::vector<std::string> VesselColors = hematoxylin_and_eosin_stroma_coloring( 0,1 );
+
+	 os << " <g id=\"BloodVessels\">" << endl; 
+	 extern vector<BloodVesselSegment*> BloodVesselSegments; 
+	 Vector Offset; 
+	 *Offset(0) = X_lower; 
+	 *Offset(1) = Y_lower-top_margin;
+	*/
+ 
+
+ 
+	// plot intersecting cells 
+	os << "  <g id=\"cells\">" << std::endl; 
+	for( int i=0 ; i < total_cell_count ; i++ )
+	{
+		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
+  
+		static std::vector<std::string> Colors; 
+		if( fabs( (pC->position)[2] - z_slice ) < pC->phenotype.geometry.radius )
+		{
+			double r = pC->phenotype.geometry.radius ; 
+			double rn = pC->phenotype.geometry.nuclear_radius ; 
+			double z = fabs( (pC->position)[2] - z_slice) ; 
+   
+			Colors = cell_coloring_function( pC ); 
+
+			os << "   <g id=\"cell" << pC->ID << "\">" << std::endl; 
+  
+			// figure out how much of the cell intersects with z = 0 
+   
+			double plot_radius = sqrt( r*r - z*z ); 
+
+			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
+				plot_radius , 0.5, Colors[1], Colors[0] ); 
+
+			// plot the nucleus if it, too intersects z = 0;
+			if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
+			{   
+				plot_radius = sqrt( rn*rn - z*z ); 
+			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
+					plot_radius, 0.5, Colors[3],Colors[2]); 
+			}					  
+			os << "   </g>" << std::endl;
+		}
+	}
+	os << "  </g>" << std::endl; 
+
+	// Plot guidelines the circle guides
+	
+	if (line_pattern == "concentric circles")
+	{
+		for (int i=0; i<plot_width/(2*parameters.doubles("ECM_dx")); i++)
+		{
+			double radius = plot_width/2 - (i *parameters.doubles("ECM_dx"));
+			// std::cout<<"Index "<<i<<std::endl;
+			// std::cout<<"Radius "<<radius<<std::endl;
+			Write_SVG_circle( os, plot_width/2, plot_height/2, radius, 0.5, "black" , "none" );
+
+		}
+	}
+
+	else if (line_pattern == "vertical lines")
+	{
+		for (int i=0; i<plot_width/parameters.doubles("ECM_dx"); i++)
+		{
+			double x_line_position = parameters.doubles("ECM_dx")*i;
+			// std::cout<<"Index "<<i<<std::endl;
+			// std::cout<<"X position "<<x_line_position<<std::endl;			
+			Write_SVG_line(os, x_line_position, 0, x_line_position, plot_height, 0.5, "black");
+			// bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
+            //         std::string stroke_color )
+		}
+	}
+
+	else if (line_pattern == "horizontal lines")
+	{
+		for (int i=0; i<plot_height/parameters.doubles("ECM_dy"); i++)
+		{
+			double y_line_position = parameters.doubles("ECM_dy")*i;
+			// std::cout<<"Index "<<i<<std::endl;
+			// std::cout<<"Y position "<<y_line_position<<std::endl;			
+			Write_SVG_line(os, 0, y_line_position, plot_width, y_line_position, 0.5, "black");
+			// bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
+            //         std::string stroke_color )
+		}
+	}
+
+	else if (line_pattern == "none") {} // Don't make lines!!!
+
+	else if (line_pattern != "none" || "horizontal lines" || "vertical lines" || "concentric circles")
+	{
+		std::cout<<"Use of this custom SVG output function requires specifying \"none\" or a line pattern" <<std::endl;
+		std::cout<<"Halting: see inputs to custom SVG function \"SVG_plot_custom\"" << std::endl;
+		abort();
+		return;
+
+	}
+
+
+	// plot intersecting BM points
+	/* 
+	 for( int i=0 ; i < BasementMembraneNodes.size() ; i++ )
+	 {
+		// vector<string> Colors = false_cell_coloring( pC ); 
+		BasementMembraneNode* pBMN = BasementMembraneNodes[i]; 
+		double thickness =0.1; 
+		
+		if( fabs( *(pBMN->Position)(2) - z_slice ) < thickness/2.0 ) 
+		{
+		 string bm_color ( "rgb(0,0,0)" );
+		 double r = thickness/2.0; 
+		 double z = fabs( *(pBMN->Position)(2) - z_slice) ; 
+
+		 os << " <g id=\"BMN" << pBMN->ID << "\">" << std::endl; 
+		 Write_SVG_circle( os,*(pBMN->Position)(0)-X_lower, *(pBMN->Position)(1)+top_margin-Y_lower, 10*thickness/2.0 , 0.5 , bm_color , bm_color ); 
+		 os << " </g>" << std::endl;
+		}
+		// pC = pC->pNextCell;
+	 }
+	*/ 
+	
+	// end of the <g ID="tissue">
+	os << " </g>" << std::endl; 
+ 
+	// draw a scale bar
+ 
+	double bar_margin = 0.025 * plot_height; 
+	double bar_height = 0.01 * plot_height; 
+	double bar_width = PhysiCell_SVG_options.length_bar; 
+	double bar_stroke_width = 0.001 * plot_height; 
+	
+	std::string bar_units = PhysiCell_SVG_options.simulation_space_units; 
+	// convert from micron to mm
+	double temp = bar_width;  
+
+	if( temp > 999 && std::strstr( bar_units.c_str() , PhysiCell_SVG_options.mu.c_str() )   )
+	{
+		temp /= 1000;
+		bar_units = "mm";
+	}
+	// convert from mm to cm 
+	if( temp > 9 && std::strcmp( bar_units.c_str() , "mm" ) == 0 )
+	{
+		temp /= 10; 
+		bar_units = "cm";
+	}
+	
+	szString = new char [1024];
+	sprintf( szString , "%u %s" , (int) round( temp ) , bar_units.c_str() );
+ 
+	Write_SVG_rect( os , plot_width - bar_margin - bar_width  , plot_height + top_margin - bar_margin - bar_height , 
+		bar_width , bar_height , 0.002 * plot_height , "rgb(255,255,255)", "rgb(0,0,0)" );
+	Write_SVG_text( os, szString , plot_width - bar_margin - bar_width + 0.25*font_size , 
+		plot_height + top_margin - bar_margin - bar_height - 0.25*font_size , 
+		font_size , PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() ); 
+	
+	delete [] szString; 
+
+	// // plot runtime 
+	// szString = new char [1024]; 
+	// RUNTIME_TOC(); 
+	// std::string formatted_stopwatch_value = format_stopwatch_value( runtime_stopwatch_value() );
+	// Write_SVG_text( os, formatted_stopwatch_value.c_str() , bar_margin , top_margin + plot_height - bar_margin , 0.75 * font_size , 
+	// 	PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+	// delete [] szString; 
+
+	// draw a box around the plot window
+	Write_SVG_rect( os , 0 , top_margin, plot_width, plot_height , 0.002 * plot_height , "rgb(0,0,0)", "none" );
+	
+	// close the svg tag, close the file
+	Write_SVG_end( os ); 
+	os.close();
+ 
+	return; 
+}
+
 void write_ECM_Data_matlab( std::string filename )
 
 {
 
-    int number_of_data_entries = microenvironment.number_of_voxels();
+    int number_of_data_entries = ecm.ecm_mesh.voxels.size();
 
-    int size_of_each_datum = 11;
+    int size_of_each_datum = 8;
 
 	
-	static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
-	static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 
     FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
 
@@ -2012,27 +2702,29 @@ void write_ECM_Data_matlab( std::string filename )
 
     {
 
-	    fwrite( (char*) &( microenvironment.mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
+	    fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
 
-        fwrite( (char*) &( microenvironment.mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
+        fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
 
-        fwrite( (char*) &( microenvironment.mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
+        fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
 		
-		fwrite( (char*) &( microenvironment.density_vector(i)[ECM_anisotropy_index]), sizeof(double) , 1 , fp ); // 4
+		fwrite( (char*) &( ecm.ecm_voxels[i].anisotropy), sizeof(double) , 1 , fp ); // 4
 	
-        fwrite( (char*) &( microenvironment.density_vector(i)[ECM_density_index]), sizeof(double) , 1 , fp ); // 5
+        fwrite( (char*) &( ecm.ecm_voxels[i].density), sizeof(double) , 1 , fp ); // 5
 
-        fwrite( (char*) &( ECM_fiber_alignment[i][0]), sizeof(double) , 1 , fp ); // 6
+        fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[0]), sizeof(double) , 1 , fp ); // 6
 
-        fwrite( (char*) &( ECM_fiber_alignment[i][1]), sizeof(double) , 1 , fp ); // 7
+        fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[1]), sizeof(double) , 1 , fp ); // 7
 
-        fwrite( (char*) &( ECM_fiber_alignment[i][2]), sizeof(double) , 1 , fp ); // 8
+        fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[2]), sizeof(double) , 1 , fp ); // 8
 
-		fwrite( (char*) &( microenvironment.gradient_vector(i)[0][0]), sizeof(double) , 1 , fp ); // 9
+		// This will only work if the diffusion and ECM meshes are the same size. Commenting out for actualrunning. To do a direct comparison, leave them in and change length. Will have to change the vizualization to get this from the regular BioFVM outputs.
 
-		fwrite( (char*) &( microenvironment.gradient_vector(i)[0][1]), sizeof(double) , 1 , fp ); // 10
+		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][0]), sizeof(double) , 1 , fp ); // 9
 
-		fwrite( (char*) &( microenvironment.gradient_vector(i)[0][2]), sizeof(double) , 1 , fp ); // 11
+		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][1]), sizeof(double) , 1 , fp ); // 10
+
+		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][2]), sizeof(double) , 1 , fp ); // 11
 
     }
 

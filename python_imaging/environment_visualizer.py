@@ -112,8 +112,8 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
     scaled_ECM_y = np.multiply(mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0], plane_anisotropy)
 
     # if we want the arrows the same length instead
-    # ECM_x = mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0]
-    # ECM_y = mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
+    ECM_x = mcds.data['ecm']['ECM_fields']['x_fiber_orientation'][:, :, 0]
+    ECM_y = mcds.data['ecm']['ECM_fields']['y_fiber_orientation'][:, :, 0]
 
     # mask out zero vectors
     mask = plane_anisotropy > 0.0001
@@ -129,43 +129,45 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
 
     # start plot and make correct size
     fig, ax = plt.subplots(figsize=(12, 12))
-    plt.ylim(-800, 800)
-    plt.xlim(-800, 800)
+    plt.ylim(-500, 500)
+    plt.xlim(-500, 500)
 
     # add contour layer
-    # cs = plt.contourf(xx, yy, plane_oxy, cmap="Greens_r", levels=levels)
-    cs = plt.contourf(xx_ecm, yy_ecm, plane_anisotropy, cmap="Reds", levels=levels_ecm)
+    # cs = plt.contourf(xx, yy, plane_oxy, cmap="Greens_r", levels=levels_o2)
+    # cs = plt.contourf(xx_ecm, yy_ecm, plane_anisotropy, cmap="Reds", levels=levels_ecm)
 
     # Add cells layer
-    for i, ct in enumerate(types):
-        plot_df = cell_df[cell_df['cell_type'] == ct]
-        for j in plot_df.index:
-            circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
-                          color=colors[i], radius=plot_df.loc[j, 'radius'], alpha=0.7)
-            ax.add_artist(circ)
+    # for i, ct in enumerate(types):
+    #     plot_df = cell_df[cell_df['cell_type'] == ct]
+    #     for j in plot_df.index:
+    #         circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
+    #                       color=colors[i], radius=plot_df.loc[j, 'radius'], alpha=0.7)
+    #         ax.add_artist(circ)
 
     # add quiver layer with scaled arrows ###
-    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
-                  width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
+    # q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
+    #               width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
 
     # add unscaled arrows ###
-    # plt.quiver(xx[mask], yy[mask], ECM_x[mask], ECM_y[mask],
-    # pivot='mid', angles='xy', headwidth=3)
+    plt.quiver(xx[mask], yy[mask], ECM_x[mask], ECM_y[mask],
+    pivot='middle', angles='xy', scale_units='inches', scale=3.0, headwidth=0)
 
     # ax.axis('scaled') #used to be 'equal' https://stackoverflow.com/questions/45057647/difference-between-axisequal-and-axisscaled-in-matplotlib
     # This changes teh axis from -750,750 to ~-710,730. It looks better with scaled compared to axix, but either way it changes the plot limits
 
     # Labels and title
-    ax.set_xlabel('x [micron]')
-    ax.set_ylabel('y [micron]')
-    fig.colorbar(cs, ax=ax)
-    plt.title(snapshot)
+    # ax.set_xlabel('x [micron]')
+    # ax.set_ylabel('y [micron]')
+    # fig.colorbar(cs, ax=ax)
+    # plt.title(snapshot)
 
     # Carefully place the command to make the plot square AFTER the color bar has been added.
     ax.axis('scaled')
-
-    plt.ylim(-800, 800)
-    plt.xlim(-800, 800)
+    fig.tight_layout()
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.ylim(-500, 500)
+    plt.xlim(-500, 500)
 
     # Plot output
     if output_plot is True:
