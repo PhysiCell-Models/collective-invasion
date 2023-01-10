@@ -223,6 +223,7 @@ class PhysiCellPlotter():
         types = cell_df['cell_type'].unique()
         colors = ['yellow', 'blue']
         print('WARNING!!!!!! WARNING!!!!!!!!!! These colors are hard coded AND WONT WORK ON NON-ECM SIMS!!!!!')
+        print('To make \'March\' images - must hard code both colors to blue!!!!')
         # Add cells layer
         for i, ct in enumerate(types):
             plot_df = cell_df[cell_df['cell_type'] == ct]
