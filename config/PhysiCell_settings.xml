@@ -1,9 +1,9 @@
 <PhysiCell_settings version="1.4.1">
 	<domain>
-		<x_min>-800</x_min>
-		<x_max>800</x_max>
-		<y_min>-800</y_min>
-		<y_max>800</y_max>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -19,11 +19,11 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>8</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
-		<folder>output</folder>  
+		<folder>.</folder>  
 
 		<full_data>
 			<interval units="min">6</interval>
@@ -41,66 +41,30 @@
 	</save>
 	
 	<user_parameters>
-		<Model_Initialization description="This is a spacer" type="double" units="dimensionless">0</Model_Initialization>
-		<ECM_initialization_parameters description="ECM_initialization_parameters" type="double" units="dimensionless">0</ECM_initialization_parameters>
-        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">0.0</initial_anisotropy>
-		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
+		<Model_Initialization type="double" units="dimensionless" description="This is a spacer">0</Model_Initialization>
+		<ECM_initialization_parameters type="double" units="dimensionless" description="ECM_initialization_parameters">0</ECM_initialization_parameters>
+        <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
+		<initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
 
-		<Lesion_intialization description="Lesion_intialization" type="double" units="dimensionless">0</Lesion_intialization>
-        <tumor_radius description="Initial cell mass radius" type="double" units="microns">175</tumor_radius>
-		<initial_leader_cell_fraction description="Average percentage of leaders initialized" type="double" units="dimensionless">0.05</initial_leader_cell_fraction>
+		<Lesion_intialization type="double" units="dimensionless" description="Lesion_intialization">0</Lesion_intialization>
+        <tumor_radius type="double" units="microns" description="Initial cell mass radius">150</tumor_radius>
+		<initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized">0.0</initial_leader_cell_fraction>
 
-		<Cell_properties description="Cell_properties" type="double" units="dimensionless">0</Cell_properties>
-		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10</oxygen_uptake>
-
-		<leader_adhesion description="Strength of leader cells\' cell-cell adhesion" type="double" units="dimensionless">10.0</leader_adhesion>
-		<leader_repulsion description="Strength of leader cells\' cell-cell repulsion" type="double" units="dimensionless">25.0</leader_repulsion>
-   		<follower_adhesion description="Strength of follower cells\' cell-cell adhesion" type="double" units="dimensionless">10.0</follower_adhesion>
-    	<follower_repulsion description="Strength of follower cells\' cell-cell repulsion" type="double" units="dimensionless">25.0</follower_repulsion>
-    	<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.5</default_cell_speed>
-		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
-		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
-		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
-		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
-		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
-		<default_chemotaxis_bias description="Chemotaxis bias for ECM following type cells" hidden="true" type="double" units="dimensionless">0.05</default_chemotaxis_bias>
-		<default_ECM_sensitivity description="Cell sensitivity to ECM orientation for ECM following type cells" type="double" units="dimensionless">1.0</default_ECM_sensitivity>
-		<default_hysteresis_bias description="Cell's base sensivity to previous cell direction - cell motility history bias" type="double" units="dimensionless">1.0</default_hysteresis_bias>
-		<oxygen_migration_bias_for_leaders description="Chemotaxis  bias for non-ECM influenced cell types" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_leaders>
-		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.001</anisotropy_increase_rate>
-		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">1.0</fiber_realignment_rate>
-		<leader_motility_mode hidden="true" type="bool" units="dimensionless">true</leader_motility_mode>
-        <follower_motility_mode hidden="true" type="bool" units="dimensionless">true</follower_motility_mode>
-
-		<Microenvironment_parameters description="Microenvironment parameters" type="double" units="dimensionlesss">0</Microenvironment_parameters>
-		<chemotactic_substrate_decay_rate description="Chemotactic subsrate decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>
-
-		<ECM_unit_size description="Size of ECM units" type="double" units="dimensionlesss">0</ECM_unit_size>
-		<ECM_dx description="Length of ECM unit in x-direction" type="double" units="um">20</ECM_dx>
-		<ECM_dy description="Length of ECM unit in y-direction" type="double" units="um">20</ECM_dy>
-		<ECM_dz description="Length of ECM unit in z-direction" type="double" units="um">20</ECM_dz>
-
-		<Model_Selection_Parameters description="Allows selection of various cell motility-ECM models" type="double">1</Model_Selection_Parameters>
-		<cell_motility_ECM_interaction_model_selector description="Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis" type="string">follower chemotaxis/no follower hysteresis</cell_motility_ECM_interaction_model_selector>
-		<discrete_ECM_remodeling description="Specifies discrete versus continous ECM remodeling: 1 = continous; 0 = discrete" type="int">1</discrete_ECM_remodeling>
-		<link_anisotropy_and_bias description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled" type="int">0</link_anisotropy_and_bias>
-
-		<Testing_and_setup_parameters description="Testing and setup parameters" type="double" units="dimensionlesss">0</Testing_and_setup_parameters>
-		<ecm_update_model decription="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector" type="string">ecm_update_from_cell_motility_vector</ecm_update_model>
-		<normalize_ECM_influenced_motility_vector hidden="false" type="bool">false</normalize_ECM_influenced_motility_vector>
-		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10</duration_of_uE_conditioning>
-		<freeze_uE_profile hidden="false" type="bool">0</freeze_uE_profile>
-		<unit_test_setup description="Specifies cell, ECM, and domain parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM: 1 for testing set up, 0 for regular set up" type="int">0</unit_test_setup>
-		<march_unit_test_setup description="Specifies that cells will reset their position to the left boundary and that density is 0.5 for the behavior to ECM march test 1 for march set up, 0 for regular set up" type="int">0</march_unit_test_setup>
-		<visual_guideline_pattern description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles" hidden="false" type="string">none</visual_guideline_pattern>
-		<cell_setup description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">lesion</cell_setup>
-		<ECM_orientation_setup description="Specifies the initial ECM orietation: random, horizontal, vertical, circular, starburst, or split" type="string">random</ECM_orientation_setup>
-		<chemical_field_setup description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, angle, or none" type="string">none</chemical_field_setup>
-		<angle_of_chemical_field_gradient description="Angle of chemical field gradient orientation, specified in degrees" type="double">45.0</angle_of_chemical_field_gradient>
-		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>
-		
-		
-		
+		<Cell_properties type="double" units="dimensionless" description="Cell_properties">0</Cell_properties>
+        <leader_adhesion type="double" units="dimensionless" description="Strength of leader cells\' cell-cell adhesion">6.5</leader_adhesion>
+        <leader_repulsion type="double" units="dimensionless" description="Strength of leader cells\' cell-cell repulsion">25</leader_repulsion>
+        <follower_adhesion type="double" units="dimensionless" description="Strength of follower cells\' cell-cell adhesion">6.5</follower_adhesion>
+        <follower_repulsion type="double" units="dimensionless" description="Strength of follower cells\' cell-cell repulsion">25</follower_repulsion>
+        <default_cell_speed type="double" units="microns/minute" description="Base/maximum cell speed">0.3</default_cell_speed>
+		<default_persistence_time type="double" units="minutes" description="Cell directional persistence time">10.0</default_persistence_time>
+		<default_chemotaxis_bias type = "double" units="dimensionless" description="Chemotaxis bias for ECM following type cells" hidden="true">0.0</default_chemotaxis_bias>
+		<default_ECM_sensitivity type = "double" units="dimensionless" description="Cell sensitivity to ECM orientation for ECM following type cells">1.0</default_ECM_sensitivity>
+		<oxygen_migration_bias_for_leaders type = "double" units="dimensionless" description="Chemotaxis bias for non-ECM influenced cell types">0.95</oxygen_migration_bias_for_leaders>
+		<leader_motility_mode type="bool" units="dimensionless" hidden="true">true</leader_motility_mode>
+        <follower_motility_mode type="bool" units="dimensionless" hidden="true">true</follower_motility_mode>
+		<enable_ecm_.s type="bool" hidden="true">false</enable_ecm_.s>
+		<!-- <max_migration_speed type="double">0.3</max_migration_speed> -->
+		<!-- <ecm_uptake_rate type = "double">0.0</ecm_uptake_rate> -->
 		
 	</user_parameters>
 	
