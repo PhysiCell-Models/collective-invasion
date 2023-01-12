@@ -25,3 +25,6 @@ initial*.mat
 *.ipch
 *.pyc
 
+# Mac specific
+.DS_store
+
