@@ -1,5 +1,7 @@
-from pyMCDS_ECM import *
+import sys
 import numpy as np
+sys.path.append(r'../python_imaging')
+from pyMCDS_ECM import *
 
 # Script REQUIRES ffmpeg to make movei!!!!!!!
 
@@ -32,8 +34,8 @@ def print_stats(arr):
 
 def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot=False):
     """
-    Creates a plot as per instructions inside the function. As of 10.13.20 this was a plot of ECM-organoid simulations:
-    a base layer of a contour plot of either the anisotropy or the oxygen, the cells in the smulation as a scatter plot,
+    Creates a plot as per instructions inside the function. 
+    A base layer of a contour plot of either the anisotropy or the oxygen, the cells in the smulation as a scatter plot,
     and finally the ECM orientation overlaid with a quiver plot.
 
     Parameters
@@ -152,7 +154,7 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
 
     # add ECM orientation vectors unscaled by anistorpy ###
     plt.quiver(xx, yy, ECM_x, ECM_y,
-    pivot='middle', angles='xy', scale_units='inches', scale=3.0, headwidth=0)
+    pivot='middle', angles='xy', scale_units='inches', scale=3.0, hheadwidth=0,headlength=0, headaxislength=0)
 
     # ax.axis('scaled') #used to be 'equal' https://stackoverflow.com/questions/45057647/difference-between-axisequal-and-axisscaled-in-matplotlib
     # This changes teh axis from -750,750 to ~-710,730. It looks better with scaled compared to axix, but either way it changes the plot limits

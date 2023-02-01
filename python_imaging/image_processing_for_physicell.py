@@ -221,7 +221,7 @@ class PhysiCellPlotter():
         cell_df = self.mcds.get_cell_df()
         cell_df['radius'] = (cell_df['total_volume'].values * 3 / (4 * np.pi)) ** (1 / 3)
         types = cell_df['cell_type'].unique()
-        colors = ['yellow', 'blue']
+        colors = ['blue', 'blue']
         print('WARNING!!!!!! WARNING!!!!!!!!!! These colors are hard coded AND WONT WORK ON NON-ECM SIMS!!!!!')
         print('To make \'March\' images - must hard code both colors to blue!!!!')
         # Add cells layer
