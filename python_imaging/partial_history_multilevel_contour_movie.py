@@ -4,31 +4,35 @@ sys.path.append(r'/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/python_ima
 
 from image_processing_for_physicell import *
 
-options_for_figure4 = {}
+options_for_figure4_movie = {}
 
-options_for_figure4 = {"output_plot" : True,
+options_for_figure4_movie = {"output_plot" : True,
                        "show_plot" : False,
-                       "produce_for_panel" : True,
+                       "produce_for_panel" : False,
                         "plot_ECM_anisotropy" : True,
-                        "plot_ECM_orientation" : False,
+                        "plot_ECM_orientation" : True,
                         "retrieve_ECM_data": True,
                         "load_full_physicell_data" : True,
                         "plot_cells_from_SVG" : True,
                         "load_SVG_data": True,
                         'plot_cells_from_physicell_data': False,
+                        "produce_for_movie" : True,
                         "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 1.0,
                                            'number_of_levels': 25,
                                            'color_map_name': 'Reds',
-                                           'color_bar': True
+                                           'color_bar': False
                                            },
                        }
 
-#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
-#### is a better/more robust way to do it (kwargs???, lots of "trapping"??) but this will be handled later ... and I can ask Randy etc
-### What is up with scaling - hum ...
+movie_options_for_figure_4 = {}
 
-# oof - I got different results on the two runs when I did and didn't scale by anistoropy ... yikes! How do I manage that!!
+movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
+                            'INCLUDE_FULL_HISTORY': False
+                            }
+
+#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
+#### is a better/more robust way to do it (kwargs???, lots of "trapping"??) but this will be handled later ...
 
 mf = PhysiCellPlotter()
 # m2 = PhysiCellPlotter()
@@ -42,10 +46,12 @@ mf = PhysiCellPlotter()
 
 # for number in image_list_for_figure2a:
 #     mf.generic_plotter(starting_index=number, number_of_samples=1, options=options_for_figure2a, file_name='march_' + str(number))
-
+mf.produce_movie(save_name='1parameter_set_21_20_20_ECM_with_chemotaxsis_revised_05_leaders_increased_realignment_2', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 #  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
 
-mf.generic_plotter( number_of_samples = 481, file_name='parameter_set_21_80_80_ECM_with_chemotaxsis', options=options_for_figure4)
+# mf.produce_movie(save_name='parameter_set_21_20_20_ECM_with_chemotaxsis_revised_2_05_leaders', trail_length=15, movie_options=movie_options_for_figure_4, \
+    # image_options=options_for_figure4_movie, start_file_index = 0, sample_step_interval = 1, end_file_index =1200)
+# mf.produce_movie(save_name='1parameter_set_21_20_20_ECM_with_chemotaxsis_revised_05_leaders_increased_realignment_2', trail_length=1, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)

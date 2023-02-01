@@ -4,20 +4,24 @@ sys.path.append(r'/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/python_ima
 
 from image_processing_for_physicell import *
 
-options_for_figure2b = {}
+options_for_figure5a = {}
 
-options_for_figure2b = {"output_plot" : True,
+options_for_figure5a = {"output_plot" : True,
                        "show_plot" : False,
                        "produce_for_panel" : True,
-                        "plot_ECM_anisotropy" : False,
+                        "plot_ECM_anisotropy" : True,
                         "plot_ECM_orientation" : True,
                         "retrieve_ECM_data": True,
                         "load_full_physicell_data" : True,
                         "plot_cells_from_SVG" : True,
                         "load_SVG_data": True,
                         'plot_cells_from_physicell_data': False,
-                        "quiver_options" : {"scale_quiver": False,
-                                          "mask_quiver": False}
+                        "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
+                                           'upper_contour': 1.0,
+                                           'number_of_levels': 2,
+                                           'color_map_name': 'Reds',
+                                           'color_bar': False
+                                           },
                        }
 
 #### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
@@ -30,20 +34,20 @@ mf = PhysiCellPlotter()
 # m2 = PhysiCellPlotter()
 # m3 = PhysiCellPlotter()
 
-mf.generic_plotter(starting_index=0, number_of_samples=1, options=options_for_figure2b, file_name='split_ECM_w_chemical_cue_0')
+# image_list_for_figure2a = []
 
-image_list_for_figure2b = []
+image_list_for_figure5a = [60, 160]
 
-image_list_for_figure2b = [50, 150]
+# file_name = 'march_' + str(90)
 
-# file_name = 'horizontal_ECM_w_chemical_cue_' + str(90)
+number_of_samples = 12
+for number in image_list_for_figure5a:
+    starting_index = number-number_of_samples + 1
+    mf.generic_plotter(starting_index=starting_index, number_of_samples=number_of_samples, options=options_for_figure5a, file_name='Figure_5a' + str(number))
 
-options_for_figure2b['plot_ECM_orientation'] = False
-options_for_figure2b['retrieve_ECM_data'] = False
-options_for_figure2b['load_full_physicell_data'] = False
+#  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
 
-for number in image_list_for_figure2b:
-    mf.generic_plotter(starting_index=0, number_of_samples=number, options=options_for_figure2b, file_name='split_ECM_w_chemical_cue_' + str(number))
+# mf.generic_plotter( number_of_samples = 481, file_name='parameter_set_21_80_80_ECM_with_chemotaxsis', options=options_for_figure4)
 
 # mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
 # m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)
