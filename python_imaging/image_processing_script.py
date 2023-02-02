@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # will also need either 'pyMCDS.py' or 'pyMCDS_ECM.py'. Otherwise, place 'imaging_processing_for_phyiscell.py' and either MCDS file 
 # in the current working directory. 
 
-# sys.path.append(r'')
+sys.path.append(r'../python_imaging')
 
 from image_processing_for_physicell import *
 
@@ -30,21 +30,12 @@ options_for_figure = {"output_plot" : True,
                         "quiver_options" : None
                        }
 
-#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
-#### is a better/more robust way to do it (kwargs???, lots of "trapping"??) but this will be handled later ... and I can ask Randy etc
-### What is up with scaling - hum ...
-
-# oof - I got different results on the two runs when I did and didn't scale by anistoropy ... yikes! How do I manage that!!
+#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... 
 
 mf = PhysiCellPlotter()
 
-# options['']
-
-# plot_cells_and_uE_for_movie (0, 1, 10, 1999)
-#
-#
-# plot_cell_tracks_from_svg(0, 1, 10)
-# general_image_plotter (filename: str, folder: str='.', output_folder='', cell_df: dict=None, cell_positions_from_SVG: dict=None, chemical_mesh: dict=None, ECM_mesh: dict=None, options=None):
+# mf.plot_cell_tracks_from_svg(0, 1, 10)
+# mf.general_image_plotter (filename: str, folder: str='.', output_folder='', cell_df: dict=None, cell_positions_from_SVG: dict=None, chemical_mesh: dict=None, ECM_mesh: dict=None, options=None):
 
 image_list_for_figure = []
 
@@ -52,6 +43,7 @@ image_list_for_figure = [100]
 
 for number in image_list_for_figure:
     mf.generic_plotter(starting_index=0, number_of_samples=number, options=options_for_figure)
+
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #
 #     All based on options/logic- function

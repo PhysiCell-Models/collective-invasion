@@ -1,6 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
-sys.path.append(r'/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/python_imaging')
+sys.path.append(r'../python_imaging')
 
 from image_processing_for_physicell import *
 
@@ -20,11 +20,7 @@ options_for_figure2d = {"output_plot" : True,
                                           "mask_quiver": False}
                        }
 
-#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
-#### is a better/more robust way to do it (kwargs???, lots of "trapping"??) but this will be handled later ... and I can ask Randy etc
-### What is up with scaling - hum ...
-
-# oof - I got different results on the two runs when I did and didn't scale by anistoropy ... yikes! How do I manage that!!
+#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... 
 
 mf = PhysiCellPlotter()
 

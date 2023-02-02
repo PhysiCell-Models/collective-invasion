@@ -88,21 +88,6 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
     levels_o2 = np.linspace(1e-14, 38, num_levels)
     levels_ecm = np.linspace(1e-14, 1.0, num_levels)
 
-    # Old function and scripting to scale and threshold anisotorpy values for later use in scaling lenght of ECM fibers
-    # for visualization purposes.
-
-    # micro = plane_anisotropy
-    # micro_scaled = micro
-    #
-    # def curve(x):
-    #     #return (V_max * x) / (K_M + x)
-    #     return 0.5 if x > 0.5 else x
-
-    # for i in range(len(micro)):
-    #     for j in range(len(micro[i])):
-    #         #micro_scaled[i][j] = 10 *  math.log10(micro[i][j] + 1) / math.log10(2)
-    #         micro_scaled[i][j] = curve(micro[i][j])
-
     ##### Process data for plotting - weight fibers by anisotropy, mask out 0 anisotropy ECM units, get cell radii and types
 
     # Anisotropy strictly runs between 0 and 1. Element by element mulitplication produces weighted lengths between 0 - 1
@@ -145,15 +130,9 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
             ax.add_artist(circ)
 
     # add quiver layer with scaled arrows ###
-    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
-                  width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
+    q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,headlength=0, headaxislength=0,
+                  width=0.0015)  
 
-    # add unscaled arrows ###
-    # plt.quiver(xx[mask], yy[mask], ECM_x[mask], ECM_y[mask],
-    # pivot='mid', angles='xy', headwidth=3)
-
-    # ax.axis('scaled') #used to be 'equal' https://stackoverflow.com/questions/45057647/difference-between-axisequal-and-axisscaled-in-matplotlib
-    # This changes teh axis from -750,750 to ~-710,730. It looks better with scaled compared to axix, but either way it changes the plot limits
 
     # Labels and title
     ax.set_xlabel('x [micron]')

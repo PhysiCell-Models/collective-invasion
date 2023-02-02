@@ -97,21 +97,6 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
     # levels_ecm = np.linspace(1e-14, 1.0, num_levels)
     levels_ecm = np.linspace(0.90, 0.93, num_levels) # for the march environment - need to especially highlight small changes in anistoropy. 
 
-    # Old function and scripting to scale and threshold anisotorpy values for later use in scaling lenght of ECM fibers
-    # for visualization purposes.
-
-    # micro = plane_anisotropy
-    # micro_scaled = micro
-    #
-    # def curve(x):
-    #     #return (V_max * x) / (K_M + x)
-    #     return 0.5 if x > 0.5 else x
-
-    # for i in range(len(micro)):
-    #     for j in range(len(micro[i])):
-    #         #micro_scaled[i][j] = 10 *  math.log10(micro[i][j] + 1) / math.log10(2)
-    #         micro_scaled[i][j] = curve(micro[i][j])
-
     ##### Process data for plotting - weight fibers by anisotropy, mask out 0 anisotropy ECM units, get cell radii and types
 
     # Anisotropy strictly runs between 0 and 1. Element by element mulitplication produces weighted lengths between 0 - 1
@@ -158,16 +143,9 @@ def create_plot(snapshot, folder, output_folder='.', output_plot=True, show_plot
             #                radius=plot_df.loc[j, 'radius'], alpha=0.7, edgecolor='black')
             ax.add_artist(circ)
 
-    # add quiver layer with scaled arrows ###
-    # q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
-    #               width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
-
     # add ECM orientation vectors unscaled by anistorpy ###
     plt.quiver(xx, yy, ECM_x, ECM_y,
     pivot='middle', angles='xy', scale_units='inches', scale=4.75, headwidth=0,headlength=0, headaxislength=0, alpha = 0.3)  ### was at 3.0 before changing the mat size from 12 to 8 to match my otherr images AND get the font for the ticks large
-
-    # ax.axis('scaled') #used to be 'equal' https://stackoverflow.com/questions/45057647/difference-between-axisequal-and-axisscaled-in-matplotlib
-    # This changes teh axis from -750,750 to ~-710,730. It looks better with scaled compared to axix, but either way it changes the plot limits
 
     # Labels and title (will need removed for journal - they will be added manually)
     
@@ -203,19 +181,4 @@ if __name__ == '__main__':
     snapshot = sys.argv[1]
     output_plot = bool(distutils.util.strtobool(sys.argv[2]))
     show_plot = bool(distutils.util.strtobool(sys.argv[3]))
-
-            # elif (len(sys.argv) == 4):
-        # usage_str = "Usage: %s <start tracking index> <step interval for tracking> <# of samples to include>" % (
-        # sys.argv[0])
-        # # print(usage_str)
-        # starting_index = int(sys.argv[1])
-        # sample_step_interval = int(sys.argv[2])
-        # number_of_samples = int(sys.argv[3])
-
-        # # print("e.g.,")
-        # # eg_str = "%s 0 1 10 indicates start at 0, go up by ones, and stop when you 10 samples" % (sys.argv[0])
-        # # print(eg_str)
-
-        # Sample call with meaningful variables:
-        # create_plot('output00000275', output_folder='21_03_leader_follower_model_3_test/',output_plot=False, show_plot=False)
     create_plot(snapshot, '.', '', output_plot=True, show_plot=False)

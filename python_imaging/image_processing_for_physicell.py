@@ -32,7 +32,7 @@ except ImportError:
     from pyMCDS import *
 
 # Features for PhysiImage module
-# Plots cells, tracks (as vectors???), and at least one microenvironment feature (ECM or otherwise)
+# Plots cells, cell positional history, and at least one microenvironment feature (ECM or otherwise)
 # Allows for fine grain control of rate of plotting of tracks - start, end and interval
 # Allows for fine grain control of outputs - quality, for insets, for videos
 # has scale bar (ideally)
@@ -40,8 +40,8 @@ except ImportError:
 # preserves cell colors (only in SVGs!!!!!!!!) and also allows for that to be overridden if needed
 # Gets mat size and time/slide number from images
 # Allows you to specify a title and add time/slide number to it
-# plots color bar that isn't stupidly large (can I get something that returns a figure and then lets me change it in a script????) Ormaybe I can just write a bunch of different ones or use flags. Something to make it easier than it currently is - which it is currently assine.
-# Be able to specify an output directory (might want to check that it is exsists (or not - does Python give an error?))
+# plots color bar 
+# Be able to specify an output directory (might want to check that it is exsists)
 # Add in module catch that says - ECM functionality will fail - load pyMCDS_ECM to use with ECM, otherwise your are fine
 
 class PhysiCellPlotter():
@@ -305,16 +305,12 @@ class PhysiCellPlotter():
                            pivot='middle', angles='xy', scale_units='inches', scale=12.0, units='width', width=0.0025, headwidth=0,headlength=0, headaxislength=0, alpha = 0.3)
         else:
             if quiver_options["scale_quiver"] is True:
-                # sfact = 0.45   # rwh 0.6
                 scaling_values = scaling_values
                 ECM_x = np.multiply(x_orientation, scaling_values)
                 ECM_y = np.multiply(y_orientation, scaling_values)
             else:
                 ECM_x = x_orientation
                 ECM_y = y_orientation
-
-            # q = ax.quiver(xx_ecm[mask], yy_ecm[mask], scaled_ECM_x[mask], scaled_ECM_y[mask], pivot='middle', angles='xy', scale_units='inches', scale=2.0, headwidth=0,
-            #               width=0.0015)  ## What is the deal with the line segment lengths shifting as the plots progress when I don't ue teh scaling??
 
             # mask out zero vectors
             mask = scaling_values > 0.0001
@@ -349,7 +345,7 @@ class PhysiCellPlotter():
 
         return xx_ecm, yy_ecm, anisotropy_at_z_equals_zero, density_at_z_equals_zero, x_orientation_at_z_equals_zero, y_orientation_at_z_equals_zero
 
-    def plot_figure(self, title_str: str, plot_x_extend: float, plot_y_extend: float, file_name: str, output_directory: str='', options: dict=None): ###### This should probably have to have options??????? Why though???
+    def plot_figure(self, title_str: str, plot_x_extend: float, plot_y_extend: float, file_name: str, output_directory: str='', options: dict=None): 
         if options is None:
             options= {"output_plot": True,
                       "show_plot": True,
@@ -359,12 +355,10 @@ class PhysiCellPlotter():
         show_plot = options['show_plot']
         produce_for_panel = options['produce_for_panel']
         output_folder = ''
-        # print(output_folder.type)
-        # print(file_name.type)
-        # fig.figure(figsize=(7, 7))
 
         self.ax.set_aspect("equal")
         # endpoint = starting_index + sample_step_interval*number_of_samples
+
         #### Build plot frame, titles, and save data
         self.ax.set_ylim(-plot_y_extend/2, plot_y_extend/2)
         self.ax.set_xlim(-plot_x_extend/2, plot_x_extend/2)
@@ -954,16 +948,6 @@ class PhysiCellPlotter():
         print(options)
         plot_cell_tracks_from_svg (starting_index, sample_step_interval, number_of_samples, file_name, options)
         # or a dictionary - and then I just modify the dictionary for the options or even have several of them
-    
-    
-        # 0
-        # 1
-        # 417
-        # True
-        # True
-        # True
-    
-    # test_of_args_and_kwargs(0, 0, 0, output_plot='False')
     
     def plot_cell_tracks_from_svg(starting_index: int, sample_step_interval: int, number_of_samples: int, file_name: str=None, options=None ):
         """

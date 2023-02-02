@@ -1,6 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
-sys.path.append(r'/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/python_imaging')
+sys.path.append(r'../python_imaging')
 
 from image_processing_for_physicell import *
 
@@ -31,34 +31,11 @@ movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
                             'INCLUDE_FULL_HISTORY': False
                             }
 
-#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... I wonder if there
-#### is a better/more robust way to do it (kwargs???, lots of "trapping"??) but this will be handled later ...
+#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting .
 
 mf = PhysiCellPlotter()
-# m2 = PhysiCellPlotter()
-# m3 = PhysiCellPlotter()
 
-# image_list_for_figure2a = []
-
-# image_list_for_figure2a = [90, 500, 1200]
-
-# file_name = 'march_' + str(90)
-
-# for number in image_list_for_figure2a:
-#     mf.generic_plotter(starting_index=number, number_of_samples=1, options=options_for_figure2a, file_name='march_' + str(number))
 mf.produce_movie(save_name='1parameter_set_21_20_20_ECM_with_chemotaxsis_revised_05_leaders_increased_realignment_2', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
-#  starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
-
-# mf.produce_movie(save_name='parameter_set_21_20_20_ECM_with_chemotaxsis_revised_2_05_leaders', trail_length=15, movie_options=movie_options_for_figure_4, \
-    # image_options=options_for_figure4_movie, start_file_index = 0, sample_step_interval = 1, end_file_index =1200)
-# mf.produce_movie(save_name='1parameter_set_21_20_20_ECM_with_chemotaxsis_revised_05_leaders_increased_realignment_2', trail_length=1, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
-
-# mf.generic_plotter(starting_index=90, number_of_samples=1, options=options_for_figure2a)
-# m2.generic_plotter(starting_index=500, number_of_samples=1, options=options_for_figure2a)
-# m3.generic_plotter(starting_index=1200, number_of_samples=1, options=options_for_figure2a)
-
-# mf.generic_plotter (number_of_samples=10, options=options_for_figure2a)
-# mf.create_separate_colorbar(contour_options=options_for_figure2a['contour_options'])
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #
