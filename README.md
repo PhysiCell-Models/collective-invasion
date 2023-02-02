@@ -27,7 +27,7 @@ The models and computational experiments were conceived of and developed by John
 
 ## Installing PhysiCell
 
-PhysiCell has a small number of dependencies. Before trying to run the code, you should ensure that your computer can run PhysiCell. Read the PhysiCell [Quick Start Guide](https://github.com/MathCancer/PhysiCell/blob/master/Quickstart.pdf) to begin working with PhysiCell and ensure that your system has the proper dependencies installed or follow the [Mac install](https://www.youtube.com/watch?v=Sq9nfKS5U0E&list=PL1fyIV-yPAYzzOVxfGsL90a5KTTh8gSW2&index=2) or [Windows install](https://www.youtube.com/watch?v=hIP4JUrViRA) videos. Note that the videos include more than is required to run the ECM and collective invasion models. Following the install videos through around the half way point of each video is sufficient. SBML and the PhysiCell Model Builder are not required. Python, Matplotlib and other basic Python packages are required to produce visualizations behind the SVGs produced by core PhysiCell. 
+PhysiCell has a small number of dependencies. Before trying to run the code, you should ensure that your computer can run PhysiCell. Read the PhysiCell [Quick Start Guide](https://github.com/MathCancer/PhysiCell/blob/master/documentation/Quickstart.md) to begin working with PhysiCell and ensure that your system has the proper dependencies installed or follow the [Mac install](https://www.youtube.com/watch?v=Sq9nfKS5U0E&list=PL1fyIV-yPAYzzOVxfGsL90a5KTTh8gSW2&index=2) or [Windows install](https://www.youtube.com/watch?v=hIP4JUrViRA) videos. Note that the videos include more than is required to run the ECM and collective invasion models. Following the install videos through around the half way point of each video is sufficient. SBML and the PhysiCell Model Builder are not required. Python, Matplotlib and other basic Python packages are required to produce visualizations behind the SVGs produced by core PhysiCell. 
 
 Additional install support (and otherwise) can be found be generating an issue at [SourceForge](https://sourceforge.net/projects/physicell/) or on the [PhysiCell Slack workspace](https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA). 
 
@@ -37,7 +37,7 @@ Note that we recommend downloading the model [release](https://github.com/MathCa
 
 This model runs similarly to most other PhysiCell projects, however, there are some differences that are noted below.  
 
-After navigating to the root directory, run `make`.  This will compile the PhysiCell code and create an executable named `AMIGOS-invasion`.  If you have issues compiling or running the code, begin by consulting the PhysiCell [Quick Start Guide](https://github.com/MathCancer/PhysiCell/blob/master/Quickstart.pdf) and other documentation.
+After navigating to the root directory, run `make`.  This will compile the PhysiCell code and create an executable named `AMIGOS-invasion`.  If you have issues compiling or running the code, begin by consulting the PhysiCell [Quick Start Guide](https://github.com/MathCancer/PhysiCell/blob/master/documentation/Quickstart.md) and other documentation.
 
 Please submit issues specific to the collective invasion and ECM models as an [issue](https://github.com/PhysiCell-Models/collective-invasion/issues) on this repo.
 
@@ -59,13 +59,17 @@ You can follow these suggestions to familiarize yourself with the model.
 
 Note that code does not need recompiled in between parameter changes; the executable will parse the changes to the xml. 
 
-## Outputs
+## ECM Specific Outputs
 
 In addition to the standard PhysiCell outputs, our model outputs an ECM specific MATLAB file at each save time.  The file is saved to the `output` folder with the form `outputxxxxxxxx_ECM.mat` where `xxxxxxxx` is the _i_ th simulation output.  The MATLAB file contains one array named `ECM_Data` with each column representing a voxel (indexed using voxel id) and rows representing the x, y, and z voxel coordinates, ECM anisotropy, ECM density, and fiber orientation x, y, and z components.  
 
-This data can be visualized using the scripts in [python_imaging](python_imaging/). We provide general image production through a general template script [image_processing_script.py](python_imaging/image_processing_script.py) which accesses the *PhysiCellPlotter* class in the module *Image processing for PhysiCell* in [image_processing_for_physicell.py](python_imaging/image_processing_for_physicell.py). For image production settings optimzied for the default parameter settings, see [figure_4_stills_script.py](python_imaging/figure_4_stills_script.py) and [figure_4_movie_script.py](python_imaging/figure_4_movie_script.py). This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing oxygen (in red) and a quiver plots showing cell movement history.
+This data can be visualized using the scripts in [python_imaging](python_imaging/). We provide general image production through a general template script [image_processing_script.py](python_imaging/image_processing_script.py) which accesses the *PhysiCellPlotter* class in the module *Image processing for PhysiCell* in [image_processing_for_physicell.py](python_imaging/image_processing_for_physicell.py). For image production settings optimzied for the default parameter settings, see [partial_history_multilevel_contour_still.py](python_imaging/partial_history_multilevel_contour_still.py) and [partial_history_multilevel_contour_movie.py](python_imaging/partial_history_multilevel_contour_movie.py). This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing oxygen (in red) and a quiver plots showing cell movement history.
 
-### Some key makefile rules
+## Running PhysiCell simulations across a team
+
+PhysiCell can be run in a distributed fashion across a team using DAPT: Distributed Automated Parameter Testing [5]. See the coder [here](https://github.com/BenSDuggan/DAPT) including a [detailed PhysiCell example](https://github.com/PhysiCell-Tools/DAPT-example).
+
+## Some key makefile rules
 
 ```
 make                    : compiles the ECM Modeling code
@@ -82,15 +86,14 @@ See makefile for additional rules.
 
 [1] Ghaffarizadeh, A, Heiland, R, Friedman, SH, Mumenthaler, SM, and Macklin, P. PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
 
-[2] Metzcar, J, Duggan, BS, Fischer, B, Murphy, M, Macklin, P. A novel model of multicellular communication through extracellular matrix microstructure. bioRxiv 2022.11.21.514608; doi: https://doi.org/10.1101/2022.11.21.514608
+[2] Metzcar, J, Duggan, BS, Fischer, B, Murphy, M, Macklin, P. A novel model of multicellular communication through extracellular matrix microstructure. bioRxiv 2022.11.21.514608; doi: [https://doi.org/10.1101/2022.11.21.514608](https://doi.org/10.1101/2022.11.21.514608)
 
-[3] Cheung KJ, Gabrielson E, Werb Z, Ewald AJ. Collective invasion in breast cancer requires a conserved basal epithelial program. Cell 2013; 155(7):1639-51.
+[3] Cheung KJ, Gabrielson E, Werb Z, Ewald AJ. Collective invasion in breast cancer requires a conserved basal epithelial program. Cell 2013; 155(7):1639-51. [10.1016/j.cell.2013.11.029](10.1016/j.cell.2013.11.029)
 
-[4] Nguyen-Ngoc KV\*, Cheung KJ*, Brenot A, Shamir ER, Gray RS, Hines WC, Yaswen P, Werb Z, Ewald AJ. The ECM microenvironment regulates collective migration and local dissemination in normal and malignant mammary epithelium. Proceedings of the National Academy of Science 2012; 10.1073/pnas.1212834109 *Co-First Authors. PMCID: PMC3465416
+[4] Nguyen-Ngoc KV\*, Cheung KJ*, Brenot A, Shamir ER, Gray RS, Hines WC, Yaswen P, Werb Z, Ewald AJ. The ECM microenvironment regulates collective migration and local dissemination in normal and malignant mammary epithelium. Proceedings of the National Academy of Science 2012; [10.1073/pnas.1212834109](10.1073/pnas.1212834109) *Co-First Authors. PMCID: PMC3465416
+
+[5] Duggan, BS, Metzcar, J, and Macklin, P (2021). DAPT: A package enabling distributed automated parameter testing. Gigabyte 2021, 1–10. [10.46471/gigabyte.22](10.46471/gigabyte.22).
+
 
 **Latest PhysiCell info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
-
-## Release summary:
-
-* ECM model initial paper draft - September 2021
  
