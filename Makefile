@@ -45,7 +45,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o Extracellular_matrix.o
+PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -134,7 +134,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-Extracellular_matrix.o: ./custom_modules/extracellular_matrix.cpp 
+extracellular_matrix.o: ./custom_modules/extracellular_matrix.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/extracellular_matrix.cpp
 
 AMIGOS-invasion_uncoupled.o: ./custom_modules/AMIGOS-invasion_uncoupled.cpp 
