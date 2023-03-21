@@ -998,10 +998,8 @@ void setup_tissue( void )
 		if(parameters.strings("cell_setup") == "single")
 		{
 			Cell* pC;
-			pC = create_cell();
-			pC->assign_position(0.0, 0.0, 0.0);
-			// std::cin.get();
-
+			pC = create_cell(leader_cell);
+			pC->assign_position(0.0, 0.0, 0.0)
 		}
 
 		else if(parameters.strings("cell_setup") == "random")
@@ -2248,7 +2246,7 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		normalize(&norm_cell_motility);
 
 		ddotf = dot_product(ECM_orientation, norm_cell_motility);
-		
+
 		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
 		
 		std::vector<double> f_minus_d;
@@ -2258,6 +2256,10 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 
 		for(int i = 0; i < 3; i++)
 		{
+			if (ddotf<0.0)
+			{
+				ECM_orientation = -1.0 * ECM_orientation;
+			}
 			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
 			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
 		}
