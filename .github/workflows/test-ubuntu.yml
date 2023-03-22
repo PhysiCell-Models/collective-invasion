@@ -1,0 +1,20 @@
+name: Test Ubuntu
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build model
+      run: |
+        make
+        
+    - name: Run model
+      run: |
+        ./AMIGOS-invasion

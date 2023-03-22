@@ -999,7 +999,7 @@ void setup_tissue( void )
 		{
 			Cell* pC;
 			pC = create_cell(leader_cell);
-			pC->assign_position(0.0, 0.0, 0.0)
+			pC->assign_position(0.0, 0.0, 0.0);
 		}
 
 		else if(parameters.strings("cell_setup") == "random")
