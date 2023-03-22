@@ -16,7 +16,7 @@ jobs:
     
     - name: Build model
       run: |
-        make
+        make PHYSICELL_CPP=g++-11
         
     - name: Run model
       run: |
