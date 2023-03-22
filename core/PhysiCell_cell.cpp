@@ -211,8 +211,7 @@ void Cell::update_motility_vector( double dt_ )
 			cos_phi = 0.0;
 		}
 		
-		std::vector<double> randvec; 
-		randvec.resize(3,sin_phi); 
+		std::vector<double> randvec(3,sin_phi); 
 		
 		randvec[0] *= cos( temp_angle ); // cos(theta)*sin(phi)
 		randvec[1] *= sin( temp_angle ); // sin(theta)*sin(phi)
