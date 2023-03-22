@@ -1,4 +1,4 @@
-name: Test Ubuntu
+name: Test MacOSX
 run-name: ${{ github.actor }} 
 on:
   push:
@@ -6,10 +6,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Install dependencies
+    run : brew install gcc@11
     
     - name: Build model
       run: |
