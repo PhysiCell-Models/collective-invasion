@@ -1,6 +1,7 @@
 name: Test Windows
 run-name: ${{ github.actor }} 
 on:
+  push:
   pull_request:
   workflow_dispatch:
 
