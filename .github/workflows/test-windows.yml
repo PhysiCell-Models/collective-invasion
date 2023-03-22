@@ -1,16 +1,19 @@
 name: Test Windows
 run-name: ${{ github.actor }} 
 on:
-  push:
   pull_request:
 
 jobs:
   build:
     runs-on: windows-latest
 
+    defaults:
+      run:
+        shell: msys2 {0}
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - uses: msys2/setup-msys2@v2
       with:
         update: true

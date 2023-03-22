@@ -1,7 +1,6 @@
 name: Test MacOSX
 run-name: ${{ github.actor }} 
 on:
-  push:
   pull_request:
 
 jobs:
