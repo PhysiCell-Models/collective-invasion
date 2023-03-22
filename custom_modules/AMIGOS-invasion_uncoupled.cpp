@@ -2240,9 +2240,9 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		double r_realignment = r_0 * (1-anisotropy);
 
 		double ddotf;
-		std::vector<double> norm_cell_motility;
-		norm_cell_motility.resize(3,0.0);
-		norm_cell_motility = phenotype.motility.motility_vector;
+		std::vector<double> norm_cell_motility = phenotype.motility.motility_vector;
+		// norm_cell_motility.resize(3,0.0);
+		// norm_cell_motility = phenotype.motility.motility_vector;
 		normalize(&norm_cell_motility);
 
 		ddotf = dot_product(ECM_orientation, norm_cell_motility);
@@ -2351,9 +2351,9 @@ void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , d
     double r_realignment = r_0 * (1-anisotropy);
 
 	double ddotf;
-	std::vector<double> norm_cell_velocity;
-	norm_cell_velocity.resize(3,0.0);
-	norm_cell_velocity = pCell->velocity;
+	std::vector<double> norm_cell_velocity = pCell->velocity;
+	// norm_cell_velocity.resize(3,0.0);
+	// norm_cell_velocity = pCell->velocity;
 	normalize(&norm_cell_velocity);
 
 	ddotf = dot_product(ECM_orientation, norm_cell_velocity);
