@@ -2,6 +2,7 @@ name: Test Windows
 run-name: ${{ github.actor }} 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
