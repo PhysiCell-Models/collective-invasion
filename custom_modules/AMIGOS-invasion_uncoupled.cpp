@@ -675,8 +675,7 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
     
 	// Temperarily eliminating leader/follower signal	
-    
-	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
+	// default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
     
 	initialize_microenvironment(); 
