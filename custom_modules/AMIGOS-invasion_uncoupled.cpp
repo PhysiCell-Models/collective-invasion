@@ -675,8 +675,7 @@ void setup_microenvironment( void )
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
     
 	// Temperarily eliminating leader/follower signal	
-    
-	default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
+	// default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
     
 	initialize_microenvironment(); 
@@ -998,10 +997,8 @@ void setup_tissue( void )
 		if(parameters.strings("cell_setup") == "single")
 		{
 			Cell* pC;
-			pC = create_cell();
+			pC = create_cell(leader_cell);
 			pC->assign_position(0.0, 0.0, 0.0);
-			// std::cin.get();
-
 		}
 
 		else if(parameters.strings("cell_setup") == "random")
@@ -2242,13 +2239,13 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		double r_realignment = r_0 * (1-anisotropy);
 
 		double ddotf;
-		std::vector<double> norm_cell_motility;
-		norm_cell_motility.resize(3,0.0);
-		norm_cell_motility = phenotype.motility.motility_vector;
+		std::vector<double> norm_cell_motility = phenotype.motility.motility_vector;
+		// norm_cell_motility.resize(3,0.0);
+		// norm_cell_motility = phenotype.motility.motility_vector;
 		normalize(&norm_cell_motility);
 
 		ddotf = dot_product(ECM_orientation, norm_cell_motility);
-		
+
 		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
 		
 		std::vector<double> f_minus_d;
@@ -2258,6 +2255,10 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 
 		for(int i = 0; i < 3; i++)
 		{
+			if (ddotf<0.0)
+			{
+				ECM_orientation = -1.0 * ECM_orientation;
+			}
 			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
 			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
 		}
@@ -2349,9 +2350,9 @@ void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , d
     double r_realignment = r_0 * (1-anisotropy);
 
 	double ddotf;
-	std::vector<double> norm_cell_velocity;
-	norm_cell_velocity.resize(3,0.0);
-	norm_cell_velocity = pCell->velocity;
+	std::vector<double> norm_cell_velocity = pCell->velocity;
+	// norm_cell_velocity.resize(3,0.0);
+	// norm_cell_velocity = pCell->velocity;
 	normalize(&norm_cell_velocity);
 
 	ddotf = dot_product(ECM_orientation, norm_cell_velocity);

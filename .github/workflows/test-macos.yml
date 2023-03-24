@@ -1,0 +1,24 @@
+name: Test MacOSX
+run-name: ${{ github.actor }} 
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run : brew install gcc@11
+    
+    - name: Build model
+      run: |
+        make PHYSICELL_CPP=g++-11
+        
+    - name: Run model
+      run: |
+        ./AMIGOS-invasion
