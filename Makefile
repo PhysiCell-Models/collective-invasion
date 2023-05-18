@@ -59,15 +59,20 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o
 
+PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o
+
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
-
+INVASIVE_SPHEROID_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECT_2)
 #compile the project 
 	
 all: main-ecm.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main-ecm.cpp 
+
+invasive_spheroid: main_invasive_spheroid.cpp $(INVASIVE_SPHEROID_OBJECTS)
+	$(COMPILE_COMMAND) -o invasive_spheroid $(INVASIVE_SPHEROID_OBJECTS) main_invasive_spheroid.cpp 
 
 # PhysiCell core components	
 
@@ -151,6 +156,10 @@ extracellular_matrix.o: ./custom_modules/extracellular_matrix.cpp
 
 AMIGOS-invasion_uncoupled.o: ./custom_modules/AMIGOS-invasion_uncoupled.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion_uncoupled.cpp
+
+invasive_spheroid.o: ./custom_modules/invasive_spheroid.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/invasive_spheroid.cpp
+
 
 # cleanup
 
