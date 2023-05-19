@@ -23,7 +23,7 @@
 	</parallel> 
 	
 	<save>
-		<folder>output</folder>  
+		<folder>invasive_spheroid_output</folder>  
 
 		<full_data>
 			<interval units="min">600</interval>
@@ -46,9 +46,9 @@
 		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
 
 		<div_background type="divider" description="---Lesion initialization parameters---"/>
-		<cell_setup description="single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march" type="string">lesion</cell_setup>
+		<cell_setup description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, or cells at left boundary/march" type="string">invasive_spheroid</cell_setup>
 		<tumor_radius description="Initial cell lesion radius (lesion only)" type="double" units="microns">175</tumor_radius>
-		<initial_fibroblast_fraction description="Average percentage of fibroblasts initialized (lesion only)" type="double" units="dimensionless">0.05</initial_fibroblast_fraction>
+		<initial_fibroblast_fraction description="Average percentage of fibroblasts initialized (lesion only)" type="double" units="dimensionless">0.00</initial_fibroblast_fraction>
 
 		<div_background type="divider" description="---Cell properties---"/>
 		
@@ -60,13 +60,15 @@
 		<div_background type="divider" description="-Fibroblast type parameters-"/>
 		<fibroblast_adhesion description="Strength of fibroblasts\' cell-cell adhesion" type="double" units="micron/minute">5.0</fibroblast_adhesion>
 		<fibroblast_repulsion description="Strength of fibroblasts\' cell-cell repulsion" type="double" units="micron/minute">25.0</fibroblast_repulsion>
-		<oxygen_migration_bias_for_fibroblasts description="fibroblast chemotaxis bias" type="double" units="dimensionless">0.95</oxygen_migration_bias_for_fibroblasts>
+		<inflam_sig_migration_bias_for_fibroblasts description="fibroblast chemotaxis bias" type="double" units="dimensionless">0.85</inflam_sig_migration_bias_for_fibroblasts>
 		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.004</anisotropy_increase_rate>
 		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">4.0</fiber_realignment_rate>
 		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
+		<default_ECM_production_rate description="Cell ECM production rate" type="double" units="dimenionless">0.001</default_ECM_production_rate>
+		<number_of_fibroblasts description="Number of fibroblasts to initialize" type="int">11</number_of_fibroblasts>
 
 		<div_background type="divider" description="-cancer cell type parameters-"/>
-   		<cancer_cell_adhesion description="Strength of cancer cells\' cell-cell adhesion" type="double" units="micron/minute">5.0</cancer_cell_adhesion>
+   		<cancer_cell_adhesion description="Strength of cancer cells\' cell-cell adhesion" type="double" units="micron/minute">10.0</cancer_cell_adhesion>
     	<cancer_cell_repulsion description="Strength of cancer cells\' cell-cell repulsion" type="double" units="micron/minute">25.0</cancer_cell_repulsion>
 		<default_chemotaxis_bias description="cancer chemotaxis bias" hidden="true" type="double" units="dimensionless">0.05</default_chemotaxis_bias>
 		<default_ECM_sensitivity description="cancer ECM orientation sensitivity" type="double" units="dimensionless">1.0</default_ECM_sensitivity>    	
@@ -103,10 +105,6 @@
 		<visual_guideline_pattern hidden="true" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles" type="string">none</visual_guideline_pattern>
 		
 		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>
-		
-		cancer cell chemotaxis with variable cancer cell speed
-		
-		
 		
 	</user_parameters>
 	

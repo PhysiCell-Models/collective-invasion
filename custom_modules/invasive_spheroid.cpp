@@ -157,12 +157,14 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
 	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
-	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 38 );
+	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 10 );
 	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
+	cell_defaults.custom_data.add_variable( "ECM_production_rate", "1/min", parameters.doubles( "default_ECM_production_rate") );
 	cell_defaults.custom_data.add_variable( "Base hysteresis bias", "dimensionless", parameters.doubles( "default_hysteresis_bias") );
 	cell_defaults.custom_data.add_variable( "previous anisotropy", "dimensionless", 0 );
 	cell_defaults.custom_data.add_variable( "Anisotropy increase rate", "1/min", parameters.doubles( "anisotropy_increase_rate") );
 	cell_defaults.custom_data.add_variable( "Fiber realignment rate", "1/min", parameters.doubles( "fiber_realignment_rate") );
+	
 
 	// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
 
@@ -280,7 +282,7 @@ void create_cell_types( void )
 	cancer_cell.name = "cancer cell"; 
 	cancer_cell.type = 2;
     
-    cancer_cell.functions.update_phenotype = NULL;// cancer_cell_phenotype_model;
+    cancer_cell.functions.update_phenotype = cancer_cell_phenotype_model;
 
 	cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cancer_cell_adhesion");
 	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
@@ -342,7 +344,8 @@ void create_cell_types( void )
 
 	// Temperarily eliminating fibroblast/cancer cell signal
 
-   	// cancer_cell.phenotype.secretion.secretion_rates[2] = 50; // cancer cell signal
+   	cancer_cell.phenotype.secretion.secretion_rates[1] = 50; // cancer cell signal
+	cancer_cell.phenotype.secretion.saturation_densities[1] = 1; // cancer cell signal
     
 	// Temperarily eliminating fibroblast/cancer cell signal
 	return; 
@@ -370,7 +373,7 @@ void setup_microenvironment( void )
     
 	// 50 micron length scale 
     // microenvironment.add_density( "fibroblast signal", "dimensionless", 1e5 , 1 );
-    // microenvironment.add_density( "cancer cell signal", "dimensionless", 1e5 , 1 );
+    microenvironment.add_density( "inflammatory_signal", "dimensionless", 1e5 , 1 );
 
 	// Temperarily eliminating fibroblast/cancer cell signal	
 	
@@ -378,44 +381,42 @@ void setup_microenvironment( void )
 	
 	default_microenvironment_options.outer_Dirichlet_conditions = true;
 
-	std::vector<double> bc_vector;
-	bc_vector = { 38.0};
+	std::vector<double> bc_vector; 
+	bc_vector = { 38.0, 0.0};
 	// bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , fibroblast signal, cancer cell signal
 
-	// Old for coupled uE.
+	// if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
+	// {
 
-	if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
-	{
+	// 	bc_vector = { 38.0 }; // 5% o2 , fibroblast signal, cancer cell signal
+	// 	default_microenvironment_options.X_range[0] = -500.0;
+	// 	default_microenvironment_options.X_range[1] = 500.0;
+	// 	default_microenvironment_options.Y_range[0] = -500.0;
+	// 	default_microenvironment_options.Y_range[1] = 500.0;
 
-		bc_vector = { 38.0 }; // 5% o2 , fibroblast signal, cancer cell signal
-		default_microenvironment_options.X_range[0] = -500.0;
-		default_microenvironment_options.X_range[1] = 500.0;
-		default_microenvironment_options.Y_range[0] = -500.0;
-		default_microenvironment_options.Y_range[1] = 500.0;
+	// }
 
-	}
+	// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+	// {
+	// 	bc_vector = { 38.0}; // 5% o2 , fibroblast signal, cancer cell signal
+	// 	default_microenvironment_options.X_range[0] = -500.0;
+	// 	default_microenvironment_options.X_range[1] = 500.0;
+	// 	default_microenvironment_options.Y_range[0] = -500.0;
+	// 	default_microenvironment_options.Y_range[1] = 500.0;
+	// }
 
-	else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
-	{
-		bc_vector = { 38.0}; // 5% o2 , fibroblast signal, cancer cell signal
-		default_microenvironment_options.X_range[0] = -500.0;
-		default_microenvironment_options.X_range[1] = 500.0;
-		default_microenvironment_options.Y_range[0] = -500.0;
-		default_microenvironment_options.Y_range[1] = 500.0;
-	}
+	// else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
+	// {
+	// 	bc_vector = { 38.0 };  // 5% o2 , fibroblast signal, cancer cell signal
+	// }
 
-	else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
-	{
-		bc_vector = { 38.0 };  // 5% o2 , fibroblast signal, cancer cell signal
-	}
-
-	else
-	{
-		std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
-		std::cout<<"Halting!"<<std::endl;
-		abort();
-		return;
-	}
+	// else
+	// {
+	// 	std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+	// 	std::cout<<"Halting!"<<std::endl;
+	// 	abort();
+	// 	return;
+	// }
 	
 	
 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
@@ -567,6 +568,41 @@ void setup_extracellular_matrix( void )
 	
 	for( int n = 0; n < ecm.ecm_mesh.voxels.size() ; n++ )
 	{
+		
+		// ############################# Density and anisotropy ####################################
+		if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
+		{
+
+			ecm.ecm_voxels[n].density = 0.5;
+			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+
+		}
+
+		else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+		{
+			
+			ecm.ecm_voxels[n].density = 0.5;
+			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+			
+		}
+
+		else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
+		{
+			ecm.ecm_voxels[n].density = parameters.doubles("initial_ECM_density");
+			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
+			
+		}
+
+		else
+		{
+			std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+			std::cout<<"Halting!"<<std::endl;
+			abort();
+			return;
+		}
+		
+		// ############################# Alignment ####################################
+		// ############## CAN ALSO BE USED TO MAKE MORE COMPLEX PATTERNS in density and anisotropy ##############
 		// For random 2-D initalization 
 		if(parameters.strings( "ECM_orientation_setup") == "random")
 		{
@@ -580,7 +616,7 @@ void setup_extracellular_matrix( void )
 		else if(parameters.strings( "ECM_orientation_setup") == "hard_line")
 		{
 			// std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
-			if(ecm.ecm_mesh.voxels[n].center[0] < 0)
+			if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("tumor_radius") && ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("tumor_radius") - 60)
 			{
 				ecm.ecm_voxels[n].ecm_fiber_alignment = {1.0, 0.0, 0.0};
 				ecm.ecm_voxels[n].density = 1.0;
@@ -653,36 +689,7 @@ void setup_extracellular_matrix( void )
 			return;
 		}
 
-		if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
-		{
 
-			ecm.ecm_voxels[n].density = 0.5;
-			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
-
-		}
-
-		else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
-		{
-			
-			ecm.ecm_voxels[n].density = 0.5;
-			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
-			
-		}
-
-		else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
-		{
-			ecm.ecm_voxels[n].density = parameters.doubles("initial_ECM_density");
-			ecm.ecm_voxels[n].anisotropy = parameters.doubles("initial_anisotropy");
-			
-		}
-
-		else
-		{
-			std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
-			std::cout<<"Halting!"<<std::endl;
-			abort();
-			return;
-		}
 		
 	}
 
@@ -900,7 +907,134 @@ void setup_tissue( void )
 
 		}
 
+
+		/************************************Spheroid with fibroblasts***************************************/		
+
+		else if(parameters.strings("cell_setup") == "invasive_spheroid")
+		{
+			// place a cluster of tumor cells at the center and fibroblasts below it
 		
+			//Get tumor radius from XML parameters
+
+			double tumor_radius; 
+
+			if( parameters.ints("unit_test_setup") == 1)
+			{
+				tumor_radius = 150;
+
+			}
+
+			else
+			{
+				tumor_radius = parameters.doubles("tumor_radius");
+			}
+
+			// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
+
+			double cell_radius = cell_defaults.phenotype.geometry.radius;
+			double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
+			double sqrt_adhesion_to_repulsion_ratio;
+			
+			if(parameters.doubles("cancer_cell_repulsion") == 0)
+			{
+				sqrt_adhesion_to_repulsion_ratio = 0.632455; // value for adhesion = 10 and repulsion = 25.0 - "parameter set 21"
+			}
+
+			else
+			{
+				sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("cancer_cell_adhesion")/parameters.doubles("cancer_cell_repulsion"));
+			} 
+
+			double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
+			cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
+			
+			Cell* pCell = NULL; 
+			
+			double x = 0.0;
+			double x_outer = tumor_radius; 
+			// double center_offset = 0.0;
+			double y = 0.0;
+
+			double fibroblast_fraction;
+			
+			if( parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 0)
+			{
+				fibroblast_fraction = 0.0;
+				cell_spacing = 1.90 * cell_radius;
+			}
+
+			else
+			{
+				fibroblast_fraction = parameters.doubles("initial_fibroblast_fraction"); // 0.2;
+			}
+
+			int n = 0; 
+			while( y < tumor_radius )
+			{
+				x = 0.0; 
+				if( n % 2 == 1 )
+				{ x = 0.5*cell_spacing; }
+				x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+				
+				while( x < x_outer )
+				{
+					if( UniformRandom() < fibroblast_fraction )
+					{ pCell = create_cell(fibroblast); }
+					else
+					{ pCell = create_cell(cancer_cell);}
+						
+					pCell->assign_position( x , y , 0.0 );
+					
+					if( fabs( y ) > 0.01 )
+					{
+						if( UniformRandom() < fibroblast_fraction )
+						{ pCell = create_cell(fibroblast); }
+						else
+						{ pCell = create_cell(cancer_cell); }
+						pCell->assign_position( x , -y , 0.0 );
+					}
+					
+					if( fabs( x ) > 0.01 )
+					{ 
+						if( UniformRandom() < fibroblast_fraction )
+						{ pCell = create_cell(fibroblast); }
+						else
+						{ pCell = create_cell(cancer_cell); }
+						pCell->assign_position( -x , y , 0.0 );
+						
+						if( fabs( y ) > 0.01 )
+						{
+							if( UniformRandom() < fibroblast_fraction )
+							{ pCell = create_cell(fibroblast); }
+							else
+							{ pCell = create_cell(cancer_cell); }
+							
+							pCell->assign_position( -x , -y , 0.0 );
+						}
+					}
+					x += cell_spacing; 
+					
+				}
+				
+				y += cell_spacing * sqrt(3.0)/2.0; 
+				n++; 
+			}
+
+			std::cout<<"Cell's placed in 2-lesion at center of domain"<<std::endl;
+
+			/***********************************Add in the fibroblasts**************************************/
+
+			int number_of_fibroblasts = parameters.ints("number_of_fibroblasts");
+			n =-500.0;
+			for(int i=0; i<number_of_fibroblasts; i++)
+			{
+				pCell = create_cell(fibroblast);
+				pCell->assign_position( n , -600.0, 0.0 );
+				std::cout<<"Fibroblast placed at "<<pCell->position<<std::endl;
+				n += 100.0;
+			}
+
+		}		
 
 		/******************************************3D Spheroid initialization***************************************/
 
@@ -1692,27 +1826,30 @@ void reset_cell_position( void ) // for cell mark/ECM change test
 
 void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 {
-	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
+	/*********************************************Chemotaxsis update***************************************************/
+	
+	// sample uE
+	static int inflam_sig_index = microenvironment.find_density_index( "inflammatory_signal" ); 
+	
+	phenotype.motility.is_motile = true; 
+	phenotype.motility.migration_bias = parameters.doubles("inflam_sig_migration_bias_for_fibroblasts"); //0.95;
+	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(inflam_sig_index);
+
+	normalize( &( phenotype.motility.migration_bias_direction ) );
+
+	/*********************************************Begin speed update***************************************************/
+
+	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
+
 	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
 	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
 	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
 	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
 	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
 	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
-	
-	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
-	std::vector<double> cell_position = pCell->position;
-	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
-	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
-	// std::cout<<"ECM density = "<<ECM_density<<std::endl;
-	
-	phenotype.motility.is_motile = true; 
-	phenotype.motility.migration_bias = parameters.doubles("oxygen_migration_bias_for_fibroblasts"); //0.95;
-	phenotype.motility.migration_bias_direction = pCell->nearest_gradient(o2_index);
-
-	normalize( &( phenotype.motility.migration_bias_direction ) );
-
-		/*********************************************Begin speed update***************************************************/
 	
 	// New speed update (06.18.19) - piece wise continous
 	
@@ -2003,13 +2140,15 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 	// std::cout<<nearest_ecm_voxel_index<<std::endl;
 	// std::cin.get();
 	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
+	static int Cell_ECM_production_rate_index = pCell->custom_data.find_variable_index( "ECM_production_rate");
 	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy increase rate");
 	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber realignment rate");
     
     // Cell-ECM density interaction
 
     double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density;
-    double r = 1.0;
+    double r = pCell->custom_data[Cell_ECM_production_rate_index];
+	// std::cout<<"ECM_production_rate: "<<r<<std::endl;
     
     ecm.ecm_voxels[nearest_ecm_voxel_index].density = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
     // END Cell-ECM density interaction
