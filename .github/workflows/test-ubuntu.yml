@@ -18,4 +18,4 @@ jobs:
         
     - name: Run model
       run: |
-        ./AMIGOS-invasion
+        ./AMIGOS-invasion config/leader_follower_model.xml
