@@ -84,8 +84,8 @@ void diffusion_decay_solver__constant_coefficients_explicit_uniform_mesh( Microe
 		std::cout	<< std::endl << "Using solver: " << __FUNCTION__ << std::endl 
 					<< "     (constant diffusion coefficient with explicit stepping, implicit decay, uniform mesh) ... " << std::endl << std::endl;  
 
-		if( M.mesh.uniform_mesh == false )
-		{ std::cout << "Error. This code is only supported for uniform meshes." << std::endl; }
+		if( M.mesh.regular_mesh == false )
+		{ std::cout << "Error. This code is only supported for regular meshes." << std::endl; }
 
 		precomputations_and_constants_done = true; 
 	}
@@ -95,9 +95,9 @@ void diffusion_decay_solver__constant_coefficients_explicit_uniform_mesh( Microe
 
 void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, double dt )
 {
-	if( M.mesh.uniform_mesh == false || M.mesh.Cartesian_mesh == false )
+	if( M.mesh.regular_mesh == false || M.mesh.Cartesian_mesh == false )
 	{
-		std::cout << "Error: This algorithm is written for uniform Cartesian meshes. Try: other solvers!" << std::endl << std::endl; 
+		std::cout << "Error: This algorithm is written for regular Cartesian meshes. Try: other solvers!" << std::endl << std::endl; 
 	return; 
 	}
 
@@ -301,9 +301,9 @@ void diffusion_decay_solver__constant_coefficients_LOD_3D( Microenvironment& M, 
 
 void diffusion_decay_solver__constant_coefficients_LOD_2D( Microenvironment& M, double dt )
 {
-	if( M.mesh.uniform_mesh == false )
+	if( M.mesh.regular_mesh == false )
 	{
-		std::cout << "Error: This algorithm is written for uniform Cartesian meshes. Try: something else." << std::endl << std::endl; 
+		std::cout << "Error: This algorithm is written for regular Cartesian meshes. Try: something else." << std::endl << std::endl; 
 		return; 
 	}
 	
@@ -520,5 +520,110 @@ void diffusion_decay_explicit_uniform_rates( Microenvironment& M, double dt )
 
 	return; 
 }
+
+void diffusion_decay_solver__constant_coefficients_LOD_1D( Microenvironment& M, double dt )
+{
+	if( M.mesh.regular_mesh == false )
+	{
+		std::cout << "Error: This algorithm is written for regular Cartesian meshes. Try: something else." << std::endl << std::endl; 
+		return; 
+	}
+	
+	// constants for the linear solver (Thomas algorithm) 
+	
+	if( !M.diffusion_solver_setup_done )
+	{
+		std::cout << std::endl << "Using method " << __FUNCTION__ << " (2D LOD with Thomas Algorithm) ... " << std::endl << std::endl;  
+		
+		M.thomas_denomx.resize( M.mesh.x_coordinates.size() , M.zero );
+		M.thomas_cx.resize( M.mesh.x_coordinates.size() , M.zero );
+
+		// define constants and pre-computed quantities 
+
+		M.thomas_i_jump = 1; 
+		M.thomas_j_jump = M.mesh.x_coordinates.size(); 
+
+		M.thomas_constant1 =  M.diffusion_coefficients; //   dt*D/dx^2 
+		M.thomas_constant1a = M.zero; // -dt*D/dx^2; 
+		M.thomas_constant2 =  M.decay_rates; // (1/2)*dt*lambda 
+		M.thomas_constant3 = M.one; // 1 + 2*constant1 + constant2; 
+		M.thomas_constant3a = M.one; // 1 + constant1 + constant2; 
+		
+		M.thomas_constant1 *= dt; 
+		M.thomas_constant1 /= M.mesh.dx; 
+		M.thomas_constant1 /= M.mesh.dx; 
+
+		M.thomas_constant1a = M.thomas_constant1; 
+		M.thomas_constant1a *= -1.0; 
+
+		M.thomas_constant2 *= dt; 
+		M.thomas_constant2 *= 1; // no splitting via LOD
+
+		M.thomas_constant3 += M.thomas_constant1; 
+		M.thomas_constant3 += M.thomas_constant1; 
+		M.thomas_constant3 += M.thomas_constant2; 
+
+		M.thomas_constant3a += M.thomas_constant1; 
+		M.thomas_constant3a += M.thomas_constant2; 
+		
+		// Thomas solver coefficients 
+
+		M.thomas_cx.assign( M.mesh.x_coordinates.size() , M.thomas_constant1a ); 
+		M.thomas_denomx.assign( M.mesh.x_coordinates.size()  , M.thomas_constant3 ); 
+		M.thomas_denomx[0] = M.thomas_constant3a; 
+		M.thomas_denomx[ M.mesh.x_coordinates.size()-1 ] = M.thomas_constant3a; 
+		if( M.mesh.x_coordinates.size() == 1 )
+		{ M.thomas_denomx[0] = M.one; M.thomas_denomx[0] += M.thomas_constant2; } 
+
+		M.thomas_cx[0] /= M.thomas_denomx[0]; 
+		for( unsigned int i=1 ; i <= M.mesh.x_coordinates.size()-1 ; i++ )
+		{ 
+			axpy( &M.thomas_denomx[i] , M.thomas_constant1 , M.thomas_cx[i-1] ); 
+			M.thomas_cx[i] /= M.thomas_denomx[i]; // the value at  size-1 is not actually used  
+		}
+
+		M.diffusion_solver_setup_done = true; 
+	}
+
+	// set the pointer
+	
+	M.apply_dirichlet_conditions();
+
+	// x-diffusion 
+	#pragma omp parallel for 
+	for( unsigned int j=0; j < M.mesh.y_coordinates.size() ; j++ )
+	{
+		// Thomas solver, x-direction
+
+		// remaining part of forward elimination, using pre-computed quantities 
+		unsigned int n = M.voxel_index(0,j,0);
+		(*M.p_density_vectors)[n] /= M.thomas_denomx[0]; 
+
+		n += M.thomas_i_jump; 
+		for( unsigned int i=1; i < M.mesh.x_coordinates.size() ; i++ )
+		{
+			axpy( &(*M.p_density_vectors)[n] , M.thomas_constant1 , (*M.p_density_vectors)[n-M.thomas_i_jump] ); 
+			(*M.p_density_vectors)[n] /= M.thomas_denomx[i]; 
+			n += M.thomas_i_jump; 
+		}
+
+		// back substitution 
+		n = M.voxel_index( M.mesh.x_coordinates.size()-2 ,j,0); 
+
+		for( int i = M.mesh.x_coordinates.size()-2 ; i >= 0 ; i-- )
+		{
+			naxpy( &(*M.p_density_vectors)[n] , M.thomas_cx[i] , (*M.p_density_vectors)[n+M.thomas_i_jump] ); 
+			n -= M.thomas_i_jump; 
+		}
+	}
+
+	M.apply_dirichlet_conditions();
+	
+	// reset gradient vectors 
+//	M.reset_all_gradient_vectors(); 
+	
+	return; 
+}
+
 
 };

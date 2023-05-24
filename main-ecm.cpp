@@ -86,6 +86,61 @@ using namespace PhysiCell;
 
 // void ecm_update(void); // I think this from an old implentation. Noted and commented out 09.01.20
 
+// #define v1_4_cell_types
+#undef v1_4_cell_types
+
+void dump_leader_cell_info()
+{
+    std::cout << "---- t= " << PhysiCell_globals.current_time  << std::endl;
+    std::cout << "ID type adh rep     motility_vec     mig_bias      mig_bias_dir    \n";
+    for( int i=0; i < all_cells->size() ; i++ )
+    {
+#ifdef v1_4_cell_types
+        if ( (*all_cells)[i]->type == 1)
+#else
+        if ( (*all_cells)[i]->type == 0)   // if NOT doing v1_4_cell_types
+#endif
+        {
+        std::cout << (*all_cells)[i]->ID << " : " << (*all_cells)[i]->type << " : " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_adhesion_strength  << ", " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_repulsion_strength  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.motility_vector[0]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[1]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[2]  << "), " <<
+            (*all_cells)[i]->phenotype.motility.migration_bias  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.migration_bias_direction[0]  << ", "
+            << (*all_cells)[i]->phenotype.motility.migration_bias_direction[1]  << ") " <<std::endl;
+        std::cout<<"rmad= "<< (*all_cells)[i]->phenotype.mechanics.relative_maximum_adhesion_distance <<std::endl; 
+
+        std::cout<<"speed="<< (*all_cells)[i]->phenotype.motility.migration_speed << std::endl;
+        std::cout<<"pos=("<< (*all_cells)[i]->position[0] <<", "<< (*all_cells)[i]->position[1] <<")\n";
+        std::cout<<"vel=("<< (*all_cells)[i]->velocity[0] <<", "<< (*all_cells)[i]->velocity[1] <<")\n";
+        }
+    }
+}
+void dump_cell_info()
+{
+    std::cout << "---- t= " << PhysiCell_globals.current_time  << std::endl;
+    std::cout << "ID type adh rep     motility_vec     mig_bias      mig_bias_dir    \n";
+    for( int i=0; i < all_cells->size() ; i++ )
+    {
+        std::cout << (*all_cells)[i]->ID << " : " << (*all_cells)[i]->type << " : " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_adhesion_strength  << ", " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_repulsion_strength  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.motility_vector[0]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[1]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[2]  << "), " <<
+            (*all_cells)[i]->phenotype.motility.migration_bias  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.migration_bias_direction[0]  << ", "
+            << (*all_cells)[i]->phenotype.motility.migration_bias_direction[1]  << ") " <<std::endl;
+        std::cout<<"rmad= "<< (*all_cells)[i]->phenotype.mechanics.relative_maximum_adhesion_distance <<std::endl; 
+
+        std::cout<<"speed="<< (*all_cells)[i]->phenotype.motility.migration_speed << std::endl;
+        std::cout<<"pos=("<< (*all_cells)[i]->position[0] <<", "<< (*all_cells)[i]->position[1] <<")\n";
+        std::cout<<"vel=("<< (*all_cells)[i]->velocity[0] <<", "<< (*all_cells)[i]->velocity[1] <<")\n";
+    }
+}
+
 
 int main( int argc, char* argv[] )
 {
@@ -104,9 +159,10 @@ int main( int argc, char* argv[] )
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
-	// SeedRandom(0);
-	if( parameters.ints("unit_test_setup") == 1) 
-	{SeedRandom(0);}
+	SeedRandom(0);  //rwh do here, just once
+	// if( parameters.ints("unit_test_setup") == 1) 
+	// {SeedRandom(0);}
+
 	
 	// time setup 
 	std::string time_units = "min"; 
@@ -230,11 +286,14 @@ int main( int argc, char* argv[] )
 					
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
+
+                    // dump_cell_info();  //rwh
+                    // dump_leader_cell_info();  //rwh
 				}
 			}
 
 			// Uncomment to run march test
- 			if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt && parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)	
+ 			if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt && parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 1)	
 			{
 				if (enable_cell_resets == true )
 				{

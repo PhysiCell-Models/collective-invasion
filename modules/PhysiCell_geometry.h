@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -65,63 +65,88 @@
 ###############################################################################
 */
 
-#include "./PhysiCell_SVG.h"
+#ifndef __PhysiCell_geometry_h__
+#define __PhysiCell_geometry_h__
 
-bool Write_SVG_start( std::ostream& os, double width, double height )
+#include <string>
+#include <vector>
+#include <sstream>
+
+#include "../core/PhysiCell.h"
+#include "./PhysiCell_settings.h"
+
+
+namespace PhysiCell
 {
- os << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" << std::endl 
-    << "<!-- Created with PhysiCell (http://PhysiCell.MathCancer.org/) -->" << std::endl; 
-
- os << "<svg " << std::endl
-    << " xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " << std::endl
-    << " xmlns:cc=\"http://creativecommons.org/ns#\" " << std::endl
-    << " xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " << std::endl
-    << " xmlns:svg=\"http://www.w3.org/2000/svg\" " << std::endl
-    << " xmlns=\"http://www.w3.org/2000/svg\" " << std::endl
-    << " version=\"1.1\" " << std::endl
-    << " width=\"" << width << "\" " << std::endl
-    << " height=\"" << height << "\" " << std::endl
-    << " id=\"svg2\">" << std::endl;
+// loaders 
 	
-	return true; 
-}
-
-bool Write_SVG_end( std::ostream& os )
-{
- os << "</svg>" << std::endl;
- return true; 
-}
-
-bool Write_SVG_text( std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font)
-{
- os << "  <text x=\"" << position_x << "\" y=\""  << position_y << "\"" << std::endl
-    << "   font-family=\"" << font << "\" font-size=\"" << font_size << "\" fill=\"" << color << "\" >" << std::endl
-    << "   " << str << std::endl << "  </text>" << std::endl; 
-  return true; 
-}
-
-bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
-                       std::string stroke_color , std::string fill_color )
-{
- os << "  <circle cx=\"" << center_x << "\" cy=\"" << center_y << "\" r=\"" << radius << "\" stroke-width=\"" << stroke_size 
-    << "\" stroke=\"" << stroke_color << "\" fill=\"" << fill_color << "\"/>" << std::endl; 
- return true; 
-}
+void load_cells_csv_v1( std::string filename ); // done 
 
 
-bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, double width, double height, 
-                     double stroke_size, std::string stroke_color , std::string fill_color )
-{
- os << "  <rect x=\"" << UL_corner_x << "\" y=\"" << UL_corner_y << "\" width=\"" << width << "\" height=\"" 
-    << height << "\" stroke-width=\"" << stroke_size 
-    << "\" stroke=\"" << stroke_color << "\" fill=\"" << fill_color << "\"/>" << std::endl; 
- return true; 
-}
+std::vector<std::string> split_csv_labels( std::string labels_line ); // done 
+Cell* process_csv_v2_line( std::string line , std::vector<std::string> labels ); // done 
+void load_cells_csv_v2( std::string filename ); // done 
 
-bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-                    std::string stroke_color )
-{
- os << "  <line x1=\"" << start_x << "\" y1=\"" << start_y << "\" x2=\"" << end_x << "\" y2=\"" << end_y << "\" "
-    << "stroke=\"" << stroke_color << "\" stroke-width=\"" << thickness << "\"/>" << std::endl; 
- return true; 
-}
+
+void load_cells_csv( std::string filename ); 
+
+
+
+void load_cells_mat( std::string filename ); 
+void load_cells_physicell( std::string filename ); 
+
+bool load_cells_from_pugixml( pugi::xml_node root ); 
+bool load_cells_from_pugixml( void ); // load cells based on default config XML root 
+
+//	
+// 2D functions 
+//
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_circle( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_circle( std::vector<double> center , double radius , int cell_type , double compression );
+void fill_circle( std::vector<double> center , double radius , int cell_type ); 
+
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD , double compression ); 
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, Cell_Definition* pCD ); 
+
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type , double compression );
+void fill_annulus( std::vector<double> center , double outer_radius , double inner_radius, int cell_type ); 
+
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_rectangle( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_rectangle( std::vector<double> bounds , int cell_type , double compression );  
+void fill_rectangle( std::vector<double> bounds , int cell_type ); 
+
+
+//
+// 3D functions
+//
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , Cell_Definition* pCD ); 
+
+void fill_sphere( std::vector<double> center , double radius , int cell_type , double compression ); 
+void fill_sphere( std::vector<double> center , double radius , int cell_type ); 
+
+// bounds = { xmin, ymin, zmin, xmax, ymax, zmax } 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD , double compression ); 
+void fill_box( std::vector<double> bounds , Cell_Definition* pCD ); 
+
+void fill_box( std::vector<double> bounds , int cell_type , double compression ); 
+void fill_box( std::vector<double> bounds , int cell_type ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , Cell_Definition* pCD ); 
+
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type , double compression ); 
+void draw_line( std::vector<double> start , std::vector<double> end , int cell_type ); 
+
+
+
+};
+
+#endif

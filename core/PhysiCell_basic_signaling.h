@@ -1,4 +1,4 @@
-/*
+	/*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -64,64 +64,68 @@
 #                                                                             #
 ###############################################################################
 */
+ 
+#include <vector>
+#include <string>
 
-#include "./PhysiCell_SVG.h"
+#ifndef __PhysiCell_basic_signaling__
+#define __PhysiCell_basic_signaling__
 
-bool Write_SVG_start( std::ostream& os, double width, double height )
-{
- os << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" << std::endl 
-    << "<!-- Created with PhysiCell (http://PhysiCell.MathCancer.org/) -->" << std::endl; 
+#include "./PhysiCell_constants.h" 
+#include "./PhysiCell_phenotype.h" 
+#include "./PhysiCell_cell.h" 
 
- os << "<svg " << std::endl
-    << " xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " << std::endl
-    << " xmlns:cc=\"http://creativecommons.org/ns#\" " << std::endl
-    << " xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " << std::endl
-    << " xmlns:svg=\"http://www.w3.org/2000/svg\" " << std::endl
-    << " xmlns=\"http://www.w3.org/2000/svg\" " << std::endl
-    << " version=\"1.1\" " << std::endl
-    << " width=\"" << width << "\" " << std::endl
-    << " height=\"" << height << "\" " << std::endl
-    << " id=\"svg2\">" << std::endl;
+namespace PhysiCell{
 	
-	return true; 
-}
+// std::vector<std::string> 
 
-bool Write_SVG_end( std::ostream& os )
+double Hill_response_function( double s, double half_max , double hill_power ); // done
+// increases from 0 (at s_min) to 1 (at s_max)
+double linear_response_function( double s, double s_min , double s_max ); // done 
+// decreases from 1 (at s_min) to 0 (at s_max)
+double decreasing_linear_response_function( double s, double s_min , double s_max ); // done 
+
+
+double multivariate_Hill_response_function( std::vector<double> signals, std::vector<double> half_maxes , std::vector<double> hill_powers ); 
+double multivariate_linear_response_function( std::vector<double> signals, std::vector<double> min_thresholds , std::vector<double> max_thresholds ); 
+
+std::vector<double> linear_response_to_Hill_parameters( double s0, double s1 ); 
+std::vector<double> Hill_response_to_linear_parameters( double half_max , double Hill_power ); 
+
+
+double interpolate_behavior( double base_value , double max_changed_value, double response ); 
+
+// signal increases/decreases parameter
+// options: hill power
+// options: half max
+
+class Integrated_Signal
 {
- os << "</svg>" << std::endl;
- return true; 
-}
+ private:
+ public: 
+	double base_activity; 
+	double max_activity; 
+	
+	std::vector<double> promoters; 
+	std::vector<double> promoter_weights; 
+	double promoters_Hill;
+	double promoters_half_max; 
+	
+	std::vector<double> inhibitors; 
+	std::vector<double> inhibitor_weights; 
+	double inhibitors_Hill;
+	double inhibitors_half_max; 
+	
+	Integrated_Signal();
+	void reset( void ); 
+	
+	void add_signal( char signal_type , double signal , double weight ); 
+	void add_signal( char signal_type , double signal );
 
-bool Write_SVG_text( std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font)
-{
- os << "  <text x=\"" << position_x << "\" y=\""  << position_y << "\"" << std::endl
-    << "   font-family=\"" << font << "\" font-size=\"" << font_size << "\" fill=\"" << color << "\" >" << std::endl
-    << "   " << str << std::endl << "  </text>" << std::endl; 
-  return true; 
-}
-
-bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
-                       std::string stroke_color , std::string fill_color )
-{
- os << "  <circle cx=\"" << center_x << "\" cy=\"" << center_y << "\" r=\"" << radius << "\" stroke-width=\"" << stroke_size 
-    << "\" stroke=\"" << stroke_color << "\" fill=\"" << fill_color << "\"/>" << std::endl; 
- return true; 
-}
+	double compute_signal( void );
+};
 
 
-bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, double width, double height, 
-                     double stroke_size, std::string stroke_color , std::string fill_color )
-{
- os << "  <rect x=\"" << UL_corner_x << "\" y=\"" << UL_corner_y << "\" width=\"" << width << "\" height=\"" 
-    << height << "\" stroke-width=\"" << stroke_size 
-    << "\" stroke=\"" << stroke_color << "\" fill=\"" << fill_color << "\"/>" << std::endl; 
- return true; 
-}
+}; 
 
-bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-                    std::string stroke_color )
-{
- os << "  <line x1=\"" << start_x << "\" y1=\"" << start_y << "\" x2=\"" << end_x << "\" y2=\"" << end_y << "\" "
-    << "stroke=\"" << stroke_color << "\" stroke-width=\"" << thickness << "\"/>" << std::endl; 
- return true; 
-}
+#endif 

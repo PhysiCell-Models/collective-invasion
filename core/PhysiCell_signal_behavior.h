@@ -1,4 +1,4 @@
-/*
+	/*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
 # number, such as below:                                                      #
@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2023, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -64,64 +64,117 @@
 #                                                                             #
 ###############################################################################
 */
+ 
+#include <vector>
+#include <string>
 
-#include "./PhysiCell_SVG.h"
+#ifndef __PhysiCell_signal_response__
+#define __PhysiCell_signal_response__
 
-bool Write_SVG_start( std::ostream& os, double width, double height )
-{
- os << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" << std::endl 
-    << "<!-- Created with PhysiCell (http://PhysiCell.MathCancer.org/) -->" << std::endl; 
+#include "./PhysiCell_constants.h" 
+#include "./PhysiCell_phenotype.h" 
+#include "./PhysiCell_cell.h" 
 
- os << "<svg " << std::endl
-    << " xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " << std::endl
-    << " xmlns:cc=\"http://creativecommons.org/ns#\" " << std::endl
-    << " xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" " << std::endl
-    << " xmlns:svg=\"http://www.w3.org/2000/svg\" " << std::endl
-    << " xmlns=\"http://www.w3.org/2000/svg\" " << std::endl
-    << " version=\"1.1\" " << std::endl
-    << " width=\"" << width << "\" " << std::endl
-    << " height=\"" << height << "\" " << std::endl
-    << " id=\"svg2\">" << std::endl;
-	
-	return true; 
-}
+namespace PhysiCell{
 
-bool Write_SVG_end( std::ostream& os )
-{
- os << "</svg>" << std::endl;
- return true; 
-}
+// scales for the signals 
+extern std::vector<double> signal_scales; 
+// easy access to get or set scales 
+double& signal_scale( std::string signal_name ); // done 
+double& signal_scale( int signal_index ); // done 
 
-bool Write_SVG_text( std::ostream& os, const char* str , double position_x, double position_y, double font_size , const char* color , const char* font)
-{
- os << "  <text x=\"" << position_x << "\" y=\""  << position_y << "\"" << std::endl
-    << "   font-family=\"" << font << "\" font-size=\"" << font_size << "\" fill=\"" << color << "\" >" << std::endl
-    << "   " << str << std::endl << "  </text>" << std::endl; 
-  return true; 
-}
+// create the signal and behavior dictionaries 
+void setup_signal_behavior_dictionaries( void ); // done 
 
-bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
-                       std::string stroke_color , std::string fill_color )
-{
- os << "  <circle cx=\"" << center_x << "\" cy=\"" << center_y << "\" r=\"" << radius << "\" stroke-width=\"" << stroke_size 
-    << "\" stroke=\"" << stroke_color << "\" fill=\"" << fill_color << "\"/>" << std::endl; 
- return true; 
-}
+// display dictionaries 
+void display_signal_dictionary( void ); // done 
+void display_behavior_dictionary( void ); // done 
+
+void display_signal_dictionary( std::ostream& os ); // done 
+void display_behavior_dictionary( std::ostream& os ); // done 
+
+void display_signal_dictionary_with_synonyms( void ); // done 
+void display_behavior_dictionary_with_synonyms( void ); // done 
+
+/* signal functions */ 
+
+// find index for named signal (returns -1 if not found)
+int find_signal_index( std::string signal_name ); // done 
+
+// coming soon: 
+std::vector<int> find_signal_indices( std::vector<std::string> signal_names ); // done 
+
+// get the name of a signal index 
+std::string signal_name( int i ); // done 
+
+// create a full signal vector 
+std::vector<double> get_signals( Cell* pCell ); // done 
+
+// create a signal vector of only the cell contacts 
+std::vector<double> get_cell_contact_signals( Cell* pCell ); // done 
+
+// create a subset of the signal vector with the supplied indicies 
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<int> indices ); // done 
+std::vector<double> get_selected_signals( Cell* pCell , std::vector<std::string> names );  // done 
+
+// grab a single signal by its index or name 
+double get_single_signal( Cell* pCell, int index ); // done 
+double get_single_signal( Cell* pCell, std::string name ); // done 
+
+/* behavior functions */ 
+
+// find index for named behavior / response / parameter (returns -1 if not found)
+int find_parameter_index( std::string response_name ); // done
+int find_behavior_index( std::string response_name ); // done 
+
+std::vector<int> find_behavior_indices( std::vector<std::string> behavior_names ); // done 
+
+// get the name of a behavior index 
+std::string behavior_name( int i ); // done 
+
+// make a properly sized behavior vector 
+std::vector<double> create_empty_behavior_vector(); // done 
+
+// write a full behavior vector (phenotype parameters) to the cell 
+void set_behaviors( Cell* pCell , std::vector<double> parameters ); // done 
+
+// write a selected set of behavior parameters to the cell 
+void set_selected_behaviors( Cell* pCell , std::vector<int> indices , std::vector<double> parameters ); // done 
+void set_selected_behaviors( Cell* pCell , std::vector<std::string> names , std::vector<double> parameters ); // done 
+
+// write a single behavior parameter 
+void set_single_behavior( Cell* pCell, int index , double parameter ); // done  
+void set_single_behavior( Cell* pCell, std::string name , double parameter ); // done 
+
+/* get current behaviors */ 
+
+// get all current behavior
+std::vector<double> get_behaviors( Cell* pCell ); // done 
+
+// get selected current behavior
+std::vector<double> get_behaviors( Cell* pCell , std::vector<int> indices ); // doen 
+std::vector<double> get_behaviors( Cell* pCell , std::vector<std::string> names ); // done 
+
+// get single current behavior 
+double get_single_behavior( Cell* pCell , int index ); // done 
+double get_single_behavior( Cell* pCell , std::string name ); // done 
+
+/* get base behaviors (from cell definition) */ 
+
+// get all base behaviors (from cell's definition) 
+std::vector<double> get_base_behaviors( Cell* pCell );  // done 
+
+// get selected base behaviors (from cell's definition)
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<int> indices ); // done 
+std::vector<double> get_base_behaviors( Cell* pCell , std::vector<std::string> names ); // done 
+
+// get single base behavior (from cell's definition)
+double get_single_base_behavior( Cell* pCell , int index ); // done 
+double get_single_base_behavior( Cell* pCell , std::string name ); // done 
+
+double get_single_base_behavior( Cell_Definition* pCD , std::string name ); 
 
 
-bool Write_SVG_rect( std::ostream& os , double UL_corner_x, double UL_corner_y, double width, double height, 
-                     double stroke_size, std::string stroke_color , std::string fill_color )
-{
- os << "  <rect x=\"" << UL_corner_x << "\" y=\"" << UL_corner_y << "\" width=\"" << width << "\" height=\"" 
-    << height << "\" stroke-width=\"" << stroke_size 
-    << "\" stroke=\"" << stroke_color << "\" fill=\"" << fill_color << "\"/>" << std::endl; 
- return true; 
-}
+}; 
 
-bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-                    std::string stroke_color )
-{
- os << "  <line x1=\"" << start_x << "\" y1=\"" << start_y << "\" x2=\"" << end_x << "\" y2=\"" << end_y << "\" "
-    << "stroke=\"" << stroke_color << "\" stroke-width=\"" << thickness << "\"/>" << std::endl; 
- return true; 
-}
+#endif 

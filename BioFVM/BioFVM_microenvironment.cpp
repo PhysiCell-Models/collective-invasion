@@ -151,14 +151,25 @@ Microenvironment::Microenvironment()
 	one_third = one; 
 	one_third /= 3.0;
 
-/*	
-	dirichlet_indices.clear();
-	dirichlet_value_vectors.clear();
-	
-	dirichlet_node_map.assign( mesh.voxels.size() , -1 ); 
-*/
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	dirichlet_activation_vector.assign( 1 , true ); 
+	
+	dirichlet_activation_vectors.assign( 1 , dirichlet_activation_vector ); 
+	
+	default_microenvironment_options.Dirichlet_all.assign( 1 , true ); 
+	default_microenvironment_options.Dirichlet_xmin.assign( 1 , false ); 
+	default_microenvironment_options.Dirichlet_xmax.assign( 1 , false ); 
+	default_microenvironment_options.Dirichlet_ymin.assign( 1 , false ); 
+	default_microenvironment_options.Dirichlet_ymax.assign( 1 , false ); 
+	default_microenvironment_options.Dirichlet_zmin.assign( 1 , false ); 
+	default_microenvironment_options.Dirichlet_zmax.assign( 1 , false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.assign( 1 , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.assign( 1 , 1.0 ); 
 	
 	if(default_microenvironment==NULL)
 	{ default_microenvironment=this; }
@@ -189,30 +200,18 @@ void Microenvironment::add_dirichlet_node( int voxel_index, std::vector<double>&
 
 void Microenvironment::update_dirichlet_node( int voxel_index , std::vector<double>& new_value )
 {
-/*
-	if( mesh.voxels[voxel_index].is_Dirichlet == false )
-	{ 
-		std::cout << "BioFVM Warning: No Dirichlet condition previously specified at voxel " << voxel_index << "! Creating a new one now ... " << std::endl; 
-		add_dirichlet_node( voxel_index , new_value ); 
-		return; 
-	}
-	
-	int n = 0; 
-	while( dirichlet_indices[n] != voxel_index && n < dirichlet_indices.size() )
-	{ n++; }
-		
-	if( n == dirichlet_indices.size() )
-	{ 
-		std::cout << "BioFVM Warning: No Dirichlet condition previously specified at voxel " << voxel_index << "! Creating a new one now ... " << std::endl; 
-		add_dirichlet_node( voxel_index , new_value ); 
-		return; 
-	}
-
-	dirichlet_value_vectors[n] = new_value; 
-	*/
-	
 	mesh.voxels[voxel_index].is_Dirichlet = true; 
 	dirichlet_value_vectors[voxel_index] = new_value; 
+	
+	return; 
+}
+
+void Microenvironment::update_dirichlet_node( int voxel_index , int substrate_index , double new_value )
+{
+	mesh.voxels[voxel_index].is_Dirichlet = true; 
+	dirichlet_value_vectors[voxel_index][substrate_index] = new_value; 
+	
+	dirichlet_activation_vectors[voxel_index][substrate_index] = true; 
 	
 	return; 
 }
@@ -220,31 +219,6 @@ void Microenvironment::update_dirichlet_node( int voxel_index , std::vector<doub
 void Microenvironment::remove_dirichlet_node( int voxel_index )
 {
 	mesh.voxels[voxel_index].is_Dirichlet = false; 
-	
-/*	
-	if( mesh.voxels[voxel_index].is_Dirichlet == false )
-	{ 
-		std::cout << "BioFVM Warning: No Dirichlet condition previously specified at voxel " << voxel_index << "! Nothing to remove!" << std::endl; 
-		return; 
-	}	
-	
-	int n = 0; 
-	mesh.voxels[voxel_index].is_Dirichlet=false;
-	while( dirichlet_indices[n] != voxel_index && n < dirichlet_indices.size() )
-	{  n++; }
-	
-	if( n == dirichlet_indices.size() )
-	{ 
-		std::cout << "BioFVM Warning: No Dirichlet condition previously specified at voxel " << voxel_index << "! Nothing to remove!" << std::endl; 
-		return; 
-	}
-	
-	// swap with the final node and then remove it 	
-	dirichlet_indices[n] = dirichlet_indices[ dirichlet_indices.size()-1 ]; 
-	dirichlet_value_vectors[n] = dirichlet_value_vectors[ dirichlet_value_vectors.size()-1 ]; 
-	dirichlet_indices.pop_back();
-	dirichlet_value_vectors.pop_back();
-*/
 	
 	return; 
 }
@@ -257,8 +231,35 @@ bool& Microenvironment::is_dirichlet_node( int voxel_index )
 void Microenvironment::set_substrate_dirichlet_activation( int substrate_index , bool new_value )
 {
 	dirichlet_activation_vector[substrate_index] = new_value; 
+	
+	for( int n = 0 ; n < mesh.voxels.size() ; n++ )
+	{ dirichlet_activation_vectors[n][substrate_index] = new_value; }
+	
 	return; 
 }
+
+void Microenvironment::set_substrate_dirichlet_activation( int index, std::vector<bool>& new_value )
+{
+	dirichlet_activation_vectors[index] = new_value; 
+	return; 
+}
+
+
+bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index )
+{
+	return dirichlet_activation_vector[substrate_index]; 
+}
+
+// new functions for finer-grained control of Dirichlet conditions -- 1.7.0
+
+void Microenvironment::set_substrate_dirichlet_activation( int substrate_index , int index, bool new_value )
+{
+	dirichlet_activation_vectors[index][substrate_index] = new_value; 
+	return; 
+}
+
+bool Microenvironment::get_substrate_dirichlet_activation( int substrate_index, int index )
+{ return dirichlet_activation_vectors[index][substrate_index]; }
 
 void Microenvironment::apply_dirichlet_conditions( void )
 {
@@ -268,7 +269,7 @@ void Microenvironment::apply_dirichlet_conditions( void )
 	{ density_vector( dirichlet_indices[i] ) = dirichlet_value_vectors[i]; }
 	*/
 
-	#pragma omp parallel for 
+	// #pragma omp parallel for 
 	for( unsigned int i=0 ; i < mesh.voxels.size() ;i++ )
 	{
 		/*
@@ -279,7 +280,8 @@ void Microenvironment::apply_dirichlet_conditions( void )
 		{
 			for( unsigned int j=0; j < dirichlet_value_vectors[i].size(); j++ )
 			{
-				if( dirichlet_activation_vector[j] == true )
+				// if( dirichlet_activation_vector[j] == true )
+				if( dirichlet_activation_vectors[i][j] == true )
 				{
 					density_vector(i)[j] = dirichlet_value_vectors[i][j]; 
 				}
@@ -316,6 +318,8 @@ void Microenvironment::resize_voxels( int new_number_of_voxes )
 	gradient_vector_computed.resize( mesh.voxels.size() , false ); 	
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
+
+	dirichlet_activation_vectors.assign( mesh.voxels.size() , dirichlet_activation_vector ); 
 	
 	return; 
 }
@@ -340,7 +344,9 @@ void Microenvironment::resize_space( int x_nodes, int y_nodes, int z_nodes )
 	gradient_vector_computed.resize( mesh.voxels.size() , false ); 	
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-
+	
+	dirichlet_activation_vectors.assign( mesh.voxels.size() , dirichlet_activation_vector ); 
+	
 	return;  
 }
 
@@ -364,6 +370,8 @@ void Microenvironment::resize_space( double x_start, double x_end, double y_star
 
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	
+	dirichlet_activation_vectors.assign( mesh.voxels.size() , dirichlet_activation_vector ); 	
+	
 	return;  
 }
 
@@ -386,6 +394,8 @@ void Microenvironment::resize_space( double x_start, double x_end, double y_star
 	gradient_vector_computed.resize( mesh.voxels.size() , false ); 	
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
+
+	dirichlet_activation_vectors.assign( mesh.voxels.size() , dirichlet_activation_vector ); 
 	
 	return;  
 }
@@ -428,9 +438,29 @@ void Microenvironment::resize_densities( int new_size )
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
 	dirichlet_activation_vector.assign( new_size, true ); 
 
+	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
+
 	default_microenvironment_options.Dirichlet_condition_vector.assign( new_size , 1.0 );  
 	default_microenvironment_options.Dirichlet_activation_vector.assign( new_size, true ); 
 	
+	default_microenvironment_options.initial_condition_vector.assign( new_size , 1.0 ); 
+	
+	default_microenvironment_options.Dirichlet_all.assign( new_size , true ); 
+//	default_microenvironment_options.Dirichlet_interior.assign( new_size, true );
+	default_microenvironment_options.Dirichlet_xmin.assign( new_size , false ); 
+	default_microenvironment_options.Dirichlet_xmax.assign( new_size , false ); 
+	default_microenvironment_options.Dirichlet_ymin.assign( new_size , false ); 
+	default_microenvironment_options.Dirichlet_ymax.assign( new_size , false ); 
+	default_microenvironment_options.Dirichlet_zmin.assign( new_size , false ); 
+	default_microenvironment_options.Dirichlet_zmax.assign( new_size , false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.assign( new_size , 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.assign( new_size , 1.0 ); 
+
 	return; 
 }
 
@@ -477,11 +507,30 @@ void Microenvironment::add_density( void )
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.assign( number_of_densities(), true ); 
+	dirichlet_activation_vector.push_back( true ); 
+	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 	
 	// Fixes in PhysiCell preview November 2017
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
+	
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
+
+	default_microenvironment_options.Dirichlet_all.push_back( true ); 
+//	default_microenvironment_options.Dirichlet_interior.push_back( true );
+	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
+	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
+	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 
 	
 	return; 
 }
@@ -528,12 +577,31 @@ void Microenvironment::add_density( std::string name , std::string units )
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.assign( number_of_densities(), true ); 
+	dirichlet_activation_vector.push_back( true ); 
+	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 	
 	// fix in PhysiCell preview November 2017 
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); //  = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 
+	default_microenvironment_options.Dirichlet_all.push_back( true ); 
+//	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
+	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
+	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 	
+
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
+	
 	return; 
 }
 
@@ -579,12 +647,31 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	one_third /= 3.0; 
 	
 	dirichlet_value_vectors.assign( mesh.voxels.size(), one ); 
-	dirichlet_activation_vector.assign( number_of_densities(), true ); 
+	dirichlet_activation_vector.push_back( true ); 
+	dirichlet_activation_vectors.assign( mesh.voxels.size(), dirichlet_activation_vector ); 
 	
 	// fix in PhysiCell preview November 2017 
 	default_microenvironment_options.Dirichlet_condition_vector.push_back( 1.0 ); // = one; 
 	default_microenvironment_options.Dirichlet_activation_vector.push_back( true ); // assign( number_of_densities(), true ); 
 	
+	default_microenvironment_options.initial_condition_vector.push_back( 1.0 ); 
+	
+	default_microenvironment_options.Dirichlet_all.push_back( true ); 
+//	default_microenvironment_options.Dirichlet_interior.push_back( true ); 
+	default_microenvironment_options.Dirichlet_xmin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_xmax.push_back( false ); 
+	default_microenvironment_options.Dirichlet_ymin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_ymax.push_back( false ); 
+	default_microenvironment_options.Dirichlet_zmin.push_back( false ); 
+	default_microenvironment_options.Dirichlet_zmax.push_back( false ); 
+	
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 	
+
 	return; 
 }
 
@@ -701,13 +788,23 @@ void Microenvironment::display_information( std::ostream& os )
 		os << "   " << density_names[i] << ":" << std::endl
 		<< "     units: " << density_units[i] << std::endl 
 		<< "     diffusion coefficient: " << diffusion_coefficients[i]  
-		<< " " << spatial_units << "^2 / " << time_units << std::endl
+			<< " " << spatial_units << "^2 / " << time_units << std::endl
 		<< "     decay rate: " << decay_rates[i] 
-		<< " " << time_units << "^-1" << std::endl 
-		<< "     diffusion length scale: " << sqrt( diffusion_coefficients[i] / ( 1e-12 + decay_rates[i] ) ) << " " 
-		<< spatial_units << std::endl << std::endl; 
+			<< " " << time_units << "^-1" << std::endl 
+		<< "     diffusion length scale: " << sqrt( diffusion_coefficients[i] / ( 1e-12 + decay_rates[i] ) ) 
+			<< " " << spatial_units << std::endl 
+		<< "     initial condition: " << default_microenvironment_options.initial_condition_vector[i] 
+			<< " " << density_units[i] << std::endl 
+		<< "     boundary condition: " << default_microenvironment_options.Dirichlet_condition_vector[i] 
+			<< " " << density_units[i] << " (enabled: "; 
+		if( dirichlet_activation_vector[i] == true )
+		{ os << "true"; }
+		else
+		{ os << "false"; }
+		os << ")" << std::endl; 
 	}
 	os << std::endl; 
+	
 	return; 
 }
 	
@@ -847,6 +944,7 @@ std::vector<gradient>& Microenvironment::gradient_vector(int n )
 		compute_gradient_vector( n );
 	}
 	
+	
 	return gradient_vectors[n];
 }
 	
@@ -863,7 +961,6 @@ std::vector<gradient>& Microenvironment::nearest_gradient_vector( std::vector<do
 
 void Microenvironment::compute_all_gradient_vectors( void )
 {
-	// 
 	static double two_dx = mesh.dx; 
 	static double two_dy = mesh.dy; 
 	static double two_dz = mesh.dz; 
@@ -881,6 +978,29 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	{
 		for( unsigned int j=0; j < mesh.y_coordinates.size() ; j++ )
 		{
+			// endcaps 
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int i = 0; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][0] = (*p_density_vectors)[n+thomas_i_jump][q]; 
+				gradient_vectors[n][q][0] -= (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][0] /= mesh.dx; 
+				
+				gradient_vector_computed[n] = true; 
+			}
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int i = mesh.x_coordinates.size()-1; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][0] = (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][0] -= (*p_density_vectors)[n-thomas_i_jump][q]; 
+				gradient_vectors[n][q][0] /= mesh.dx; 
+				
+				gradient_vector_computed[n] = true; 
+			}
 			
 			for( unsigned int i=1; i < mesh.x_coordinates.size()-1 ; i++ )
 			{
@@ -904,6 +1024,29 @@ void Microenvironment::compute_all_gradient_vectors( void )
 	{
 		for( unsigned int i=0; i < mesh.x_coordinates.size() ; i++ )
 		{
+			// endcaps 
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int j = 0; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][1] = (*p_density_vectors)[n+thomas_j_jump][q]; 
+				gradient_vectors[n][q][1] -= (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][1] /= mesh.dy; 
+				
+				gradient_vector_computed[n] = true; 
+			}
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int j = mesh.y_coordinates.size()-1; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][1] = (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][1] -= (*p_density_vectors)[n-thomas_j_jump][q]; 
+				gradient_vectors[n][q][1] /= mesh.dy; 
+				
+				gradient_vector_computed[n] = true; 
+			}		
 			
 			for( unsigned int j=1; j < mesh.y_coordinates.size()-1 ; j++ )
 			{
@@ -920,12 +1063,39 @@ void Microenvironment::compute_all_gradient_vectors( void )
 			
 		}
 	}
+	
+	// don't bother computing z component if there is no z-directoin 
+	if( mesh.z_coordinates.size() == 1 )
+	{ return; }
 
 	#pragma omp parallel for 
 	for( unsigned int j=0; j < mesh.y_coordinates.size() ; j++ )
 	{
 		for( unsigned int i=0; i < mesh.x_coordinates.size() ; i++ )
 		{
+			// endcaps 
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int k = 0; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][2] = (*p_density_vectors)[n+thomas_k_jump][q]; 
+				gradient_vectors[n][q][2] -= (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][2] /= mesh.dz; 
+				
+				gradient_vector_computed[n] = true; 
+			}
+			for( unsigned int q=0; q < number_of_densities() ; q++ )
+			{
+				int k = mesh.z_coordinates.size()-1; 
+				int n = voxel_index(i,j,k);
+				// x-derivative of qth substrate at voxel n
+				gradient_vectors[n][q][2] = (*p_density_vectors)[n][q]; 
+				gradient_vectors[n][q][2] -= (*p_density_vectors)[n-thomas_k_jump][q]; 
+				gradient_vectors[n][q][2] /= mesh.dz; 
+				
+				gradient_vector_computed[n] = true; 
+			}			
 			
 			for( unsigned int k=1; k < mesh.z_coordinates.size()-1 ; k++ )
 			{
@@ -976,6 +1146,10 @@ void Microenvironment::compute_gradient_vector( int n )
 		}
 	}
 	
+	// don't bother computing y and z component if there is no y-direction. (1D)
+	if( mesh.y_coordinates.size() == 1 )
+	{ return; }	
+	
 	// d/dy 
 	if( indices[1] > 0 && indices[1] < mesh.y_coordinates.size()-1 )
 	{
@@ -987,6 +1161,10 @@ void Microenvironment::compute_gradient_vector( int n )
 			gradient_vector_computed[n] = true; 
 		}
 	}
+	
+	// don't bother computing z component if there is no z-direction (2D) 
+	if( mesh.z_coordinates.size() == 1 )
+	{ return; }
 	
 	// d/dz 
 	if( indices[2] > 0 && indices[2] < mesh.z_coordinates.size()-1 )
@@ -1043,6 +1221,8 @@ Microenvironment_Options::Microenvironment_Options()
 	Dirichlet_condition_vector.assign( pMicroenvironment->number_of_densities() , 1.0 ); 
 	Dirichlet_activation_vector.assign( pMicroenvironment->number_of_densities() , true ); 
 	
+	initial_condition_vector.resize(0); //  = Dirichlet_condition_vector; 
+	
 	// set a far-field value for oxygen (assumed to be in the first field)
 	Dirichlet_condition_vector[0] = 38.0; 
 	
@@ -1059,6 +1239,24 @@ Microenvironment_Options::Microenvironment_Options()
 	
 	calculate_gradients = false; 
 	
+	track_internalized_substrates_in_each_agent = false; 
+
+	Dirichlet_all.push_back( true ); 
+//	Dirichlet_interior.push_back( true ); 
+	Dirichlet_xmin.push_back( false ); 
+	Dirichlet_xmax.push_back( false ); 
+	Dirichlet_ymin.push_back( false ); 
+	Dirichlet_ymax.push_back( false ); 
+	Dirichlet_zmin.push_back( false ); 
+	Dirichlet_zmax.push_back( false ); 
+
+	default_microenvironment_options.Dirichlet_xmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_xmax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_ymax_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmin_values.push_back( 1.0 ); 
+	default_microenvironment_options.Dirichlet_zmax_values.push_back( 1.0 ); 
+	
 	return; 
 }
 
@@ -1066,13 +1264,6 @@ Microenvironment_Options default_microenvironment_options;
 
 void initialize_microenvironment( void )
 {
-	/*
-	if( default_microenvironment_options.use_oxygen_as_first_field == false )
-	{
-		std::cout << "wha???" << std::endl; 
-	}
-	*/
-	
 	// create and name a microenvironment; 
 	microenvironment.name = default_microenvironment_options.name;
 	// register the diffusion solver 
@@ -1109,10 +1300,193 @@ void initialize_microenvironment( void )
 	microenvironment.time_units = default_microenvironment_options.time_units;
 	microenvironment.mesh.units = default_microenvironment_options.spatial_units;
 
-	// set the initial densities to the values set in the Dirichlet_condition_vector
-	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
-	{ microenvironment.density_vector(n) = default_microenvironment_options.Dirichlet_condition_vector; }
+	// set the initial densities to the values set in the initial_condition_vector
 	
+	// if the initial condition vector has not been set, use the Dirichlet condition vector 
+	if( default_microenvironment_options.initial_condition_vector.size() != 
+		microenvironment.number_of_densities() )
+	{
+		std::cout << "BioFVM Warning: Initial conditions not set. " << std::endl 
+				  << "                Using Dirichlet condition vector to set initial substrate values!" << std::endl 
+				  << "                In the future, set default_microenvironment_options.initial_condition_vector." 
+				  << std::endl << std::endl;  
+		default_microenvironment_options.initial_condition_vector = default_microenvironment_options.Dirichlet_condition_vector; 
+	}
+
+	// set the initial condition 
+	for( unsigned int n=0; n < microenvironment.number_of_voxels() ; n++ )
+	{ microenvironment.density_vector(n) = default_microenvironment_options.initial_condition_vector; }
+
+	// now, figure out which sides have BCs (for at least one substrate): 
+
+	bool xmin = false; 
+	bool xmax = false; 
+	bool ymin = false; 
+	bool ymax = false; 
+	bool zmin = false; 
+	bool zmax = false; 
+	
+	if( default_microenvironment_options.outer_Dirichlet_conditions == true )
+	{
+		for( int n=0 ; n < microenvironment.number_of_densities() ; n++ )
+		{
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_xmin[n] )
+				{ xmin = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_xmax[n] )
+				{ xmax = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_ymin[n] )
+				{ ymin = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_ymax[n] )
+				{ ymax = true; }
+				
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_zmin[n] )
+				{ zmin = true; }
+			
+			if( default_microenvironment_options.Dirichlet_all[n] || 
+				default_microenvironment_options.Dirichlet_zmax[n] )
+				{ zmax = true; }
+		}
+		
+		// add the Dirichlet nodes in the right places 
+		
+	}
+	std::cout << "which boundaries?" << std::endl; 
+	std::cout << xmin << " " << xmax << " " << ymin << " " << ymax << " " << zmin << " " << zmax << std::endl; 
+
+	// add the Dirichlet nodes in the right places 
+	// now, go in and set the values 
+	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
+	{
+		// set xmin if xmin = true or all = true 
+		if( xmin == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int I = 0; 
+				// set Dirichlet conditions along the xmin outer edges 
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					// set the value 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmin_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
+					default_microenvironment_options.Dirichlet_xmin ); 
+					
+				}
+			}
+		}			
+		
+		// set xmax if xmax = true or all = true 
+		if( xmax == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int I = microenvironment.mesh.x_coordinates.size()-1;; 
+				// set Dirichlet conditions along the xmax outer edges 
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					// set the values 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(I,j,k) , default_microenvironment_options.Dirichlet_xmax_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(I,j,k) , 
+					default_microenvironment_options.Dirichlet_xmax ); 
+				}
+			}
+		}			
+		
+		// set ymin if ymin = true or all = true 
+		if( ymin == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int J = 0; // microenvironment.mesh.x_coordinates.size()-1;; 
+				// set Dirichlet conditions along the ymin outer edges 
+				for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+				{
+					// set the values 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymin_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
+					default_microenvironment_options.Dirichlet_ymin ); 
+				}
+			}
+		}	
+		
+		// set ymzx if ymax = true or all = true; 
+		if( ymax == true )
+		{
+			for( unsigned int k=0 ; k < microenvironment.mesh.z_coordinates.size() ; k++ )
+			{
+				int J = microenvironment.mesh.y_coordinates.size()-1;; 
+				// set Dirichlet conditions along the ymin outer edges 
+				for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+				{
+					// set the value 
+					microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,J,k) , default_microenvironment_options.Dirichlet_ymax_values );
+					
+					// set the activation 
+					microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,J,k) , 
+					default_microenvironment_options.Dirichlet_ymax ); 
+				}
+			}
+		}	
+		
+		// if not 2D:
+		if( default_microenvironment_options.simulate_2D == false )
+		{
+			// set zmin if zmin = true or all = true 
+			if( zmin == true )
+			{
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					int K = 0; // microenvironment.mesh.z_coordinates.size()-1;; 
+					// set Dirichlet conditions along the ymin outer edges 
+					for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+					{
+						// set the value 
+						microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmin_values );
+					
+						// set the activation 
+						microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
+						default_microenvironment_options.Dirichlet_zmin ); 
+					}
+				}
+			}				
+			
+			// set zmax if zmax = true or all = true 
+			if( zmax == true )
+			{
+				for( unsigned int j=0 ; j < microenvironment.mesh.y_coordinates.size() ; j++ )
+				{
+					int K = microenvironment.mesh.z_coordinates.size()-1;; 
+					// set Dirichlet conditions along the ymin outer edges 
+					for( unsigned int i=0 ; i < microenvironment.mesh.x_coordinates.size() ; i++ )
+					{
+						// set the value 
+						microenvironment.add_dirichlet_node( microenvironment.voxel_index(i,j,K) , default_microenvironment_options.Dirichlet_zmax_values );
+						
+						// set the activation 
+						microenvironment.set_substrate_dirichlet_activation( microenvironment.voxel_index(i,j,K) , 
+						default_microenvironment_options.Dirichlet_zmax ); 						
+					}
+				}
+			}				
+		}
+		
+	}
+	
+/*
 	if( default_microenvironment_options.outer_Dirichlet_conditions == true ) 
 	{
 		
@@ -1146,6 +1520,13 @@ void initialize_microenvironment( void )
 			}	
 		}
 		
+	}
+*/
+	
+	// set the Dirichlet condition activation vector to match the microenvironment options 
+	for( int i=0 ; i < default_microenvironment_options.Dirichlet_activation_vector.size(); i++ )
+	{
+		microenvironment.set_substrate_dirichlet_activation( i , default_microenvironment_options.Dirichlet_activation_vector[i] ); 
 	}
 	
 	microenvironment.display_information( std::cout );

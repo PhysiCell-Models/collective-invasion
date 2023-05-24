@@ -80,6 +80,9 @@
 #include "./PhysiCell_pugixml.h"
 #include "../BioFVM/BioFVM.h"
 
+#include "../core/PhysiCell_constants.h" 
+#include "../core/PhysiCell_utilities.h"
+
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -108,9 +111,25 @@ class PhysiCell_Settings
 	double full_save_interval = 60;  
 	bool enable_full_saves = true; 
 	bool enable_legacy_saves = false; 
+
+	bool disable_automated_spring_adhesions = false; 
 	
 	double SVG_save_interval = 60; 
 	bool enable_SVG_saves = true; 
+
+	bool enable_substrate_plot = false;
+	std::string substrate_to_monitor = "oxygen"; 
+	bool limits_substrate_plot = false;
+	double min_concentration = -1.0;
+	double max_concentration = -1.0;
+
+	double intracellular_save_interval = 60; 
+	bool enable_intracellular_saves = false; 
+
+	// cell rules option
+	bool rules_enabled = false; 
+	std::string rules_protocol = "Cell Behavior Hypothesis Grammar (CBHG)"; 
+	std::string rules_protocol_version = "1.0"; 
 	
 	PhysiCell_Settings();
 	
@@ -124,8 +143,10 @@ class PhysiCell_Globals
 	double current_time = 0.0; 
 	double next_full_save_time = 0.0; 
 	double next_SVG_save_time = 0.0; 
+	double next_intracellular_save_time = 0.0; 
 	int full_output_index = 0; 
 	int SVG_output_index = 0; 
+	int intracellular_output_index = 0; 
 };
 
 template <class T> 
@@ -202,6 +223,9 @@ extern PhysiCell_Globals PhysiCell_globals;
 extern PhysiCell_Settings PhysiCell_settings; 
 
 extern User_Parameters parameters; 
+
+bool setup_microenvironment_from_XML( pugi::xml_node root_node );
+bool setup_microenvironment_from_XML( void );
 
 }
 
