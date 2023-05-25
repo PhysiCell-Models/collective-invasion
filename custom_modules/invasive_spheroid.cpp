@@ -64,185 +64,357 @@
 #include "./invasive_spheroid.h"
 #include "./extracellular_matrix.h"
 #include <chrono>  // for high_resolution_clock - https://www.pluralsight.com/blog/software-development/how-to-measure-execution-time-intervals-in-c--
-Cell_Definition fibroblast; 
-Cell_Definition cancer_cell; 
+// Cell_Definition fibroblast; 
+// Cell_Definition cancer_cell; 
 ECM ecm;
 unsigned long long int counter=0; // counter for calculating average for the ad hoc timing I am doing ... 
 int time_total = 0;
 
+// void create_cell_types( void )
+// {
+// 	// // use the same random seed so that future experiments have the 
+// 	// // same initial histogram of oncoprotein, even if threading means 
+// 	// // that future division and other events are still not identical 
+// 	// // for all runs 
+// 	// SeedRandom(0); 
+	
+// 	// housekeeping 
+	
+// 	initialize_default_cell_definition();
+// 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	
+// 	// turn the default cycle model to live, 
+// 	// so it's easier to turn off proliferation
+
+// 	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
+	
+// 	// Make sure we're ready for 2D
+	
+// 	cell_defaults.functions.set_orientation = up_orientation; 
+// 	cell_defaults.phenotype.geometry.polarity = 1.0; 
+// 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
+	
+// 	// use default proliferation and death 
+	
+// 	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
+// 	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
+	
+// 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
+// 	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+
+// 	// For strict ECM invasion testing, why have on death and birth at all??
+
+// 	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
+//     cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0;
+// 	cell_defaults.phenotype.death.rates[necrosis_index] = 0.0;
+
+// 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
+// 	cell_defaults.parameters.o2_reference = 38.0;
+	
+	
+// 	// set default uptake and secretion 
+// 	// oxygen 
+// 	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
+// 	cell_defaults.phenotype.secretion.uptake_rates[0] = parameters.doubles("oxygen_uptake"); 
+// 	std::cout<<cell_defaults.phenotype.secretion.uptake_rates[0]<<std::endl;
+// 	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
+
+// 	// Fields for fibroblast-cancer diffusing signal based communication. Commented out 03.11.19
+
+// 	/*
+
+// 	cell_defaults.phenotype.secretion.secretion_rates[1] = 0;
+// 	cell_defaults.phenotype.secretion.uptake_rates[1] = 0;
+// 	cell_defaults.phenotype.secretion.saturation_densities[1] = 1;
+
+// 	cell_defaults.phenotype.secretion.secretion_rates[2] = 0;
+// 	cell_defaults.phenotype.secretion.uptake_rates[2] = 0;
+	
+// 		cell_defaults.phenotype.secretion.saturation_densities[2] = 1;
+
+// 	*/	
+
+// 	// For phenotype switching if using
+	
+// 	// cell_defaults.functions.update_phenotype = switching_phenotype_model;
+	
+// 	cell_defaults.name = "cancer cell"; 
+// 	cell_defaults.type = 0; 
+	
+// 	// set default motility parameters (even for when off)
+	
+// 	cell_defaults.phenotype.motility.is_motile = true;
+// 	// consider what "best" persistence time would be, given the voxel dimensions. 
+// 	cell_defaults.phenotype.motility.persistence_time = parameters.doubles("default_persistence_time"); //10.0; // Voxels are 20 um in all dimensions. Given a top speed of 0.5 um/min, cells will likely be in one voxel for 10 minutes or more. So update of 10 isn't bad. Should consider "best" number later. 
+// 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
+// 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
+// 	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
+
+// 	// add custom data 
+// 	cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", parameters.doubles( "rho_L") );  // Minimum ECM density required for cell motility
+// 	cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", parameters.doubles( "rho_H") );  // Maximum ECM density allowing cell motility
+// 	cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", parameters.doubles( "rho_I") );  // Ideal ECM density cell motility
+// 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
+// 	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
+// 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
+// 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 10 );
+// 	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
+// 	cell_defaults.custom_data.add_variable( "ECM_production_rate", "1/min", parameters.doubles( "default_ECM_production_rate") );
+// 	cell_defaults.custom_data.add_variable( "Base hysteresis bias", "dimensionless", parameters.doubles( "default_hysteresis_bias") );
+// 	cell_defaults.custom_data.add_variable( "previous anisotropy", "dimensionless", 0 );
+// 	cell_defaults.custom_data.add_variable( "Anisotropy increase rate", "1/min", parameters.doubles( "anisotropy_increase_rate") );
+// 	cell_defaults.custom_data.add_variable( "Fiber realignment rate", "1/min", parameters.doubles( "fiber_realignment_rate") );
+	
+
+// 	// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
+
+// 	if( parameters.ints("unit_test_setup") == 1)
+// 	{
+// 		cell_defaults.phenotype.motility.persistence_time = 10.0; 
+// 		cell_defaults.phenotype.motility.migration_speed = 1.0;
+// 		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
+// 		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
+// 		cell_defaults.phenotype.secretion.uptake_rates[0] = 0.0;
+// 		cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
+// 		cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
+// 		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
+// 		cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
+// 		cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
+
+// 		std::cout<< "running unit test setup cancer cell"<<std::endl;
+
+// 	}
+
+// 	else if ( parameters.ints("unit_test_setup") == 0)
+// 	{
+// 		std::cout<<"not in unit test mode"<<std::endl;
+// 	}
+
+// 	else
+// 	{
+// 		std::cout<<"WARNING!!!!! Cell parameters not set correctly - unit test set up must either be true or false!!!!"<<std::endl;
+// 	}
+	
+	
+// 	// fibroblast cells 
+	
+// 	fibroblast = cell_defaults;
+// 	fibroblast.name = "fibroblast cell"; 
+// 	fibroblast.type = 1; 
+
+// 	// Temperarily eliminating fibroblast/cancer cell signal
+
+// 	// Obviously missing - add later
+    
+// 	// 10% proliferation 
+//     // fibroblast.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
+
+// 	/*******************************************For "march" simulation****************************************/
+
+// 	fibroblast.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
+//     fibroblast.phenotype.death.rates[apoptosis_index] = 0.0;
+// 	fibroblast.phenotype.death.rates[necrosis_index] = 0.0;
+	
+    
+// 	// Temperarily eliminating fibroblast/cancer cell signal	
+	
+// 	// Obviously missing - add later
+
+// 	// turn on motility 
+// 	fibroblast.phenotype.motility.is_motile = parameters.bools("fibroblast_motility_mode"); 
+	
+//     fibroblast.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("fibroblast_adhesion");
+// 	// std::cout<<fibroblast.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
+    
+// 	fibroblast.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("fibroblast_repulsion");
+//     // std::cout<<fibroblast.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
+
+// 	// Temperarily eliminating fibroblast/cancer cell signal	
+
+// 	//    fibroblast.phenotype.secretion.secretion_rates[1] = 50; // fibroblast signal
+
+//     // modify ECM
+    
+// 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
+//     	fibroblast.functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only fibroblasts can modify ECM (phenotype -> ECM)
+
+// 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
+// 	{
+// 		fibroblast.functions.custom_cell_rule = ecm_update_from_cell_velocity_vector; // Only fibroblasts can modify ECM (phenotype -> ECM)
+// 	}
+	
+// 	else
+// 	{
+// 		std::cout<<"no reorientation model specified!!@!!!!!! Halting!!!!!!"<<std::endl;
+// 		abort();
+// 		return;
+// 	}
+	
+
+// 	// set functions
+	
+// 	fibroblast.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set fibroblast fraction to 1.0.
+	
+//     fibroblast.functions.update_phenotype = NULL; // fibroblast_phenotype_model;
+
+// 	if( parameters.ints("unit_test_setup") == 1)
+// 	{
+// 		fibroblast.phenotype.motility.persistence_time = 10.0;
+// 		fibroblast.phenotype.motility.migration_speed = 0.50;
+// 		fibroblast.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
+// 		fibroblast.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
+// 		fibroblast.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
+// 		fibroblast.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
+// 		fibroblast.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
+// 		fibroblast.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
+// 		fibroblast.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
+// 		if (parameters.ints("march_unit_test_setup") == 1){
+// 		fibroblast.functions.update_migration_bias = rightward_deterministic_cell_march;
+// 		}
+
+// 		// std::cout<< "running unit test setup fibroblast"<<std::endl;
+
+// 	}
+	
+// 	// cancer cells
+
+// 	cancer_cell = cell_defaults;
+// 	cancer_cell.name = "cancer cell"; 
+// 	cancer_cell.type = 2;
+    
+//     cancer_cell.functions.update_phenotype = cancer_cell_phenotype_model;
+
+// 	cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cancer_cell_adhesion");
+// 	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
+// 	cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("cancer_cell_repulsion");
+//    	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
+// 	cancer_cell.phenotype.motility.is_motile = parameters.bools("cancer_cell_motility_mode");
+	
+// 	// Selecting cell-ECM interaction wrt to hyteriss
+	
+// 	if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell chemotaxis/no cancer cell hysteresis" || parameters.ints("unit_test_setup") == 1)
+// 	{
+// 		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
+// 		std::cout<<"I selected cancer cell chemotaxsis" << std::endl;
+// 	}
+
+// 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell hysteresis/no cancer cell chemotaxis")
+// 	{
+// 		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
+// 		// cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+// 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
+// 		std::cout<<"I selected cancer cell hysteresis" << std::endl;
+// 	}
+
+// 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell chemotaxis with variable cancer cell speed")
+// 	{
+// 		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+// 		// cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+// 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
+// 		std::cout<<"I selected cancer cell chemotaxis with variable cancer cell speed" << std::endl;
+// 	}
+
+// 	else
+// 	{
+// 		std::cout<<"WARNING: NO CELL-ECM MODEL SPECIFIED. FIX THIS!!!"<<std::endl;
+// 		std::cout<<"Halting program!!!"<<std::endl;
+// 		abort();
+// 		return;
+// 	}
+
+// 	// Why do these lines not overwrite the cell defaults?
+
+// 	if( parameters.ints("unit_test_setup") == 1)
+// 	{
+// 		cancer_cell.phenotype.motility.persistence_time = 10.0;
+// 		cancer_cell.phenotype.motility.migration_speed = 1.0;
+// 		cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
+// 		cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
+// 		cancer_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
+// 		cancer_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
+// 		cancer_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
+// 		cancer_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
+// 		cancer_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
+
+// 		std::cout<< "running unit test setup cancer cell"<<std::endl;
+
+// 	}
+    
+// 	std::cout<<"cancer cell cell migration speed "<<cancer_cell.phenotype.motility.migration_speed <<std::endl;
+
+// 	// Temperarily eliminating fibroblast/cancer cell signal
+
+//    	cancer_cell.phenotype.secretion.secretion_rates[1] = 50; // cancer cell signal
+// 	cancer_cell.phenotype.secretion.saturation_densities[1] = 1; // cancer cell signal
+    
+// 	// Temperarily eliminating fibroblast/cancer cell signal
+// 	return; 
+// }	
+
 void create_cell_types( void )
 {
-	// // use the same random seed so that future experiments have the 
-	// // same initial histogram of oncoprotein, even if threading means 
-	// // that future division and other events are still not identical 
-	// // for all runs 
-	// SeedRandom(0); 
+	// set the random seed 
+	// SeedRandom( parameters.ints("random_seed") );  
+	// SeedRandom(0);  
 	
-	// housekeeping 
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	initialize_default_cell_definition(); 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.contact_function = NULL; 
 	
-	// Make sure we're ready for 2D
-	
-	cell_defaults.functions.set_orientation = up_orientation; 
-	cell_defaults.phenotype.geometry.polarity = 1.0; 
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
-	// use default proliferation and death 
-	
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 
-	// For strict ECM invasion testing, why have on death and birth at all??
-
-	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
-    cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0;
-	cell_defaults.phenotype.death.rates[necrosis_index] = 0.0;
-
-	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
-	cell_defaults.parameters.o2_reference = 38.0;
+    cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
 	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
 	
-	// set default uptake and secretion 
-	// oxygen 
-	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[0] = parameters.doubles("oxygen_uptake"); 
-	std::cout<<cell_defaults.phenotype.secretion.uptake_rates[0]<<std::endl;
-	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
-
-	// Fields for fibroblast-cancer diffusing signal based communication. Commented out 03.11.19
+	initialize_cell_definitions_from_pugixml(); 
 
 	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
 
-	cell_defaults.phenotype.secretion.secretion_rates[1] = 0;
-	cell_defaults.phenotype.secretion.uptake_rates[1] = 0;
-	cell_defaults.phenotype.secretion.saturation_densities[1] = 1;
-
-	cell_defaults.phenotype.secretion.secretion_rates[2] = 0;
-	cell_defaults.phenotype.secretion.uptake_rates[2] = 0;
-	
-		cell_defaults.phenotype.secretion.saturation_densities[2] = 1;
-
+	/*
+	   This intializes cell signal and response dictionaries 
 	*/
 
-	// For phenotype switching if using
-	
-	// cell_defaults.functions.update_phenotype = switching_phenotype_model;
-	
-	cell_defaults.name = "cancer cell"; 
-	cell_defaults.type = 0; 
-	
-	// set default motility parameters (even for when off)
-	
-	cell_defaults.phenotype.motility.is_motile = true;
-	// consider what "best" persistence time would be, given the voxel dimensions. 
-	cell_defaults.phenotype.motility.persistence_time = parameters.doubles("default_persistence_time"); //10.0; // Voxels are 20 um in all dimensions. Given a top speed of 0.5 um/min, cells will likely be in one voxel for 10 minutes or more. So update of 10 isn't bad. Should consider "best" number later. 
-	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
-	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
+	setup_signal_behavior_dictionaries(); 	
 
-	// add custom data 
-	cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", parameters.doubles( "rho_L") );  // Minimum ECM density required for cell motility
-	cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", parameters.doubles( "rho_H") );  // Maximum ECM density allowing cell motility
-	cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", parameters.doubles( "rho_I") );  // Ideal ECM density cell motility
-	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
-	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
-	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
-	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 10 );
-	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
-	cell_defaults.custom_data.add_variable( "ECM_production_rate", "1/min", parameters.doubles( "default_ECM_production_rate") );
-	cell_defaults.custom_data.add_variable( "Base hysteresis bias", "dimensionless", parameters.doubles( "default_hysteresis_bias") );
-	cell_defaults.custom_data.add_variable( "previous anisotropy", "dimensionless", 0 );
-	cell_defaults.custom_data.add_variable( "Anisotropy increase rate", "1/min", parameters.doubles( "anisotropy_increase_rate") );
-	cell_defaults.custom_data.add_variable( "Fiber realignment rate", "1/min", parameters.doubles( "fiber_realignment_rate") );
-	
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
 
-	// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
+    Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
+	Cell_Definition* cancer_cell = find_cell_definition("cancer cell");	
 
-	if( parameters.ints("unit_test_setup") == 1)
-	{
-		cell_defaults.phenotype.motility.persistence_time = 10.0; 
-		cell_defaults.phenotype.motility.migration_speed = 1.0;
-		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
-		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
-		cell_defaults.phenotype.secretion.uptake_rates[0] = 0.0;
-		cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
-		cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
-		cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
-		cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
-
-		std::cout<< "running unit test setup cancer cell"<<std::endl;
-
-	}
-
-	else if ( parameters.ints("unit_test_setup") == 0)
-	{
-		std::cout<<"not in unit test mode"<<std::endl;
-	}
-
-	else
-	{
-		std::cout<<"WARNING!!!!! Cell parameters not set correctly - unit test set up must either be true or false!!!!"<<std::endl;
-	}
-	
-	
-	// fibroblast cells 
-	
-	fibroblast = cell_defaults;
-	fibroblast.name = "fibroblast cell"; 
-	fibroblast.type = 1; 
-
-	// Temperarily eliminating fibroblast/cancer cell signal
-
-	// Obviously missing - add later
-    
-	// 10% proliferation 
-    // fibroblast.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
-
-	/*******************************************For "march" simulation****************************************/
-
-	fibroblast.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
-    fibroblast.phenotype.death.rates[apoptosis_index] = 0.0;
-	fibroblast.phenotype.death.rates[necrosis_index] = 0.0;
-	
-    
-	// Temperarily eliminating fibroblast/cancer cell signal	
-	
-	// Obviously missing - add later
-
-	// turn on motility 
-	fibroblast.phenotype.motility.is_motile = parameters.bools("fibroblast_motility_mode"); 
-	
-    fibroblast.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("fibroblast_adhesion");
-	// std::cout<<fibroblast.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
-    
-	fibroblast.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("fibroblast_repulsion");
-    // std::cout<<fibroblast.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
-
-	// Temperarily eliminating fibroblast/cancer cell signal	
-
-	//    fibroblast.phenotype.secretion.secretion_rates[1] = 50; // fibroblast signal
-
-    // modify ECM
-    
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
-    	fibroblast.functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only fibroblasts can modify ECM (phenotype -> ECM)
-
+    {
+    	fibroblast->functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only leaders can modify ECM (phenotype -> ECM)
+    }
 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
 	{
-		fibroblast.functions.custom_cell_rule = ecm_update_from_cell_velocity_vector; // Only fibroblasts can modify ECM (phenotype -> ECM)
+		fibroblast->functions.custom_cell_rule = ecm_update_from_cell_velocity_vector; // Only leaders can modify ECM (phenotype -> ECM)
 	}
-	
 	else
 	{
 		std::cout<<"no reorientation model specified!!@!!!!!! Halting!!!!!!"<<std::endl;
@@ -250,70 +422,36 @@ void create_cell_types( void )
 		return;
 	}
 	
-
-	// set functions
+	fibroblast->functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
-	fibroblast.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set fibroblast fraction to 1.0.
-	
-    fibroblast.functions.update_phenotype = NULL; // fibroblast_phenotype_model;
+    fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
-	if( parameters.ints("unit_test_setup") == 1)
+    //--------- now follower:
+
+    cancer_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
+
+// <cell_motility_ECM_interaction_model_selector type="string" units="" description="follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis<
+
+    // rwh: doing this one:
+    if ( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
-		fibroblast.phenotype.motility.persistence_time = 10.0;
-		fibroblast.phenotype.motility.migration_speed = 0.50;
-		fibroblast.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
-		fibroblast.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
-		fibroblast.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
-		fibroblast.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-		fibroblast.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
-		fibroblast.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
-		fibroblast.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
-		if (parameters.ints("march_unit_test_setup") == 1){
-		fibroblast.functions.update_migration_bias = rightward_deterministic_cell_march;
-		}
-
-		// std::cout<< "running unit test setup fibroblast"<<std::endl;
-
+		cancer_cell->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
+		std::cout<<"I selected follower chemotaxsis" << std::endl;   // <------ rwh
 	}
-	
-	// cancer cells
-
-	cancer_cell = cell_defaults;
-	cancer_cell.name = "cancer cell"; 
-	cancer_cell.type = 2;
-    
-    cancer_cell.functions.update_phenotype = cancer_cell_phenotype_model;
-
-	cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cancer_cell_adhesion");
-	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
-	cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("cancer_cell_repulsion");
-   	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
-	cancer_cell.phenotype.motility.is_motile = parameters.bools("cancer_cell_motility_mode");
-	
-	// Selecting cell-ECM interaction wrt to hyteriss
-	
-	if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell chemotaxis/no cancer cell hysteresis" || parameters.ints("unit_test_setup") == 1)
+	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")
 	{
-		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
-		std::cout<<"I selected cancer cell chemotaxsis" << std::endl;
-	}
-
-	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell hysteresis/no cancer cell chemotaxis")
-	{
-		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
-		// cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+		cancer_cell->functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
+		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
-		std::cout<<"I selected cancer cell hysteresis" << std::endl;
+		std::cout<<"I selected follower hysteresis" << std::endl;
 	}
-
-	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell chemotaxis with variable cancer cell speed")
+	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis with variable follower speed")
 	{
-		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
-		// cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+		cancer_cell->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
+		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
-		std::cout<<"I selected cancer cell chemotaxis with variable cancer cell speed" << std::endl;
+		std::cout<<"I selected follower chemotaxis with variable follower speed" << std::endl;
 	}
-
 	else
 	{
 		std::cout<<"WARNING: NO CELL-ECM MODEL SPECIFIED. FIX THIS!!!"<<std::endl;
@@ -322,229 +460,224 @@ void create_cell_types( void )
 		return;
 	}
 
-	// Why do these lines not overwrite the cell defaults?
 
-	if( parameters.ints("unit_test_setup") == 1)
-	{
-		cancer_cell.phenotype.motility.persistence_time = 10.0;
-		cancer_cell.phenotype.motility.migration_speed = 1.0;
-		cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
-		cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
-		cancer_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
-		cancer_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-		cancer_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
-		cancer_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
-		cancer_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
-
-		std::cout<< "running unit test setup cancer cell"<<std::endl;
-
-	}
-    
-	std::cout<<"cancer cell cell migration speed "<<cancer_cell.phenotype.motility.migration_speed <<std::endl;
-
-	// Temperarily eliminating fibroblast/cancer cell signal
-
-   	cancer_cell.phenotype.secretion.secretion_rates[1] = 50; // cancer cell signal
-	cancer_cell.phenotype.secretion.saturation_densities[1] = 1; // cancer cell signal
-    
-	// Temperarily eliminating fibroblast/cancer cell signal
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	display_cell_definitions( std::cout ); 
+	
 	return; 
-}	
+}
 
 void setup_microenvironment( void )
 {
-
-	if(parameters.ints("unit_test_setup")==1)
-	{
-		default_microenvironment_options.calculate_gradients = false; 
-	}
+	// set domain parameters 
 	
-	else
-	{
-		default_microenvironment_options.calculate_gradients = true; 
-	}
-
-	// let BioFVM use oxygen as the default 
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
 	
-	default_microenvironment_options.use_oxygen_as_first_field = true; 
+	// initialize BioFVM 
 	
-
-	// Temperarily eliminating fibroblast/cancer cell signal (except here)
-    
-	// 50 micron length scale 
-    // microenvironment.add_density( "fibroblast signal", "dimensionless", 1e5 , 1 );
-    microenvironment.add_density( "inflammatory_signal", "dimensionless", 1e5 , 1 );
-
-	// Temperarily eliminating fibroblast/cancer cell signal	
-	
-	// set Dirichlet conditions 
-	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-
-	std::vector<double> bc_vector; 
-	bc_vector = { 38.0, 0.0};
-	// bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , fibroblast signal, cancer cell signal
-
-	// if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
-	// {
-
-	// 	bc_vector = { 38.0 }; // 5% o2 , fibroblast signal, cancer cell signal
-	// 	default_microenvironment_options.X_range[0] = -500.0;
-	// 	default_microenvironment_options.X_range[1] = 500.0;
-	// 	default_microenvironment_options.Y_range[0] = -500.0;
-	// 	default_microenvironment_options.Y_range[1] = 500.0;
-
-	// }
-
-	// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
-	// {
-	// 	bc_vector = { 38.0}; // 5% o2 , fibroblast signal, cancer cell signal
-	// 	default_microenvironment_options.X_range[0] = -500.0;
-	// 	default_microenvironment_options.X_range[1] = 500.0;
-	// 	default_microenvironment_options.Y_range[0] = -500.0;
-	// 	default_microenvironment_options.Y_range[1] = 500.0;
-	// }
-
-	// else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
-	// {
-	// 	bc_vector = { 38.0 };  // 5% o2 , fibroblast signal, cancer cell signal
-	// }
-
-	// else
-	// {
-	// 	std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
-	// 	std::cout<<"Halting!"<<std::endl;
-	// 	abort();
-	// 	return;
-	// }
-	
-	
-	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-    
-	// Temperarily eliminating fibroblast/cancer cell signal	
-	// default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
-	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
-    
-	initialize_microenvironment(); 
-
-	// ecm.ecm_mesh.resize(default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
-	// 	default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1],default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], \
-	// 	parameters.doubles("ECM_dx"), parameters.doubles("ECM_dy"),parameters.doubles("ECM_dz"));
-	// ecm.resize_ecm_units_from_ecm_mesh();
-
-
-	// ecm.ecm_mesh.display_information(std::cout );
-
-	// std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
-	// std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
-	// std::cout<<" hit Enter to continue:"<<std::flush;
-	// std::cin.get();
-
-	microenvironment.decay_rates[0] = parameters.doubles("chemotactic_substrate_decay_rate");
-
-	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
-
-	// Catching if chemical field gradient not specified for unit testing - if chemical_field_setup_specified_bool is true, there is a string match in the chemical field setup, else, the field is not specified. Program halts in this condition if unit testing IS specified and displays message requesting user specify the chemical field set up.
-
-	bool chemical_field_setup_specified_bool = (parameters.strings("chemical_field_setup")== "starburst" ||  parameters.strings("chemical_field_setup")== "vertical up" || parameters.strings("chemical_field_setup") == "horizontal right" || parameters.strings("chemical_field_setup") == "angle" || parameters.strings("chemical_field_setup") == "none");
-
-	// std::cout<<"Chemical field specified? "<<chemical_field_setup_specified_bool<<std::endl;
-
-	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "starburst")
-	{
-
-		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-		{
-			std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-			microenvironment.gradient_vector(i)[0] = { position[0],position[1],0}; 
-			normalize(&microenvironment.gradient_vector(i)[0]);
-			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-		}
-	}
-
-	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "vertical up")
-	{
-
-		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-		{
-			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-			microenvironment.gradient_vector(i)[0] = { 0,1,0}; 
-			normalize(&microenvironment.gradient_vector(i)[0]);
-			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-		}
-	}
-
-	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "horizontal right")
-	{
-
-		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-		{
-			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-			microenvironment.gradient_vector(i)[0] = { 1,0,0}; 
-			normalize(&microenvironment.gradient_vector(i)[0]);
-			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-		}
-	}
-
-	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "angle")
-	{
-		
-
-		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-		{
-			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-			microenvironment.gradient_vector(i)[0] = { cos ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180) , sin ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180),0}; 
-			normalize(&microenvironment.gradient_vector(i)[0]);
-			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-		}
-	}
-
-	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "none")
-	{
-
-		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-		{
-			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-			microenvironment.gradient_vector(i)[0] = { 0,0,0}; 
-		}
-
-	}
-
-	else if( parameters.ints("unit_test_setup") == 1 && chemical_field_setup_specified_bool == 0)
-	{
-		std::cout<<"WARNING: NO CHEMICAL FIELD ORIENTATION SPECIFIED for unit testing. FIX THIS!!!"<<std::endl;
-		std::cout<<"Halting program!!!"<<std::endl;
-		abort();
-		return;
-	}
-
-
-	// run to get a decent starting conditoin (refers to code no longer present but will be added back for fibroblast-cancer cell signaling models)
-	
-	// now, let's set the fibroblast signal to 1, so we don't hvae early swiching 
-	/*
-	for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-	{
-		microenvironment.density_vector(i)[1] = 1.0; 
-	}
-	*/
-
-	// set up ECM density and anisotropy profile as needed
-	// int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-	// int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
-
-	/*for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
-	{
-		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
-		if( fabs( position[0] ) > 200 || fabs( position[1] ) > 200 )
-		{
-			microenvironment(n)[ECM_density_index] = 0.0; 
-			microenvironment(n)[ECM_anisotropy_index] = 1.0; 
-		}
-	}*/
+	initialize_microenvironment(); 	
 	
 	return; 
-}	
+}
+
+// void setup_microenvironment( void )
+// {
+
+// 	if(parameters.ints("unit_test_setup")==1)
+// 	{
+// 		default_microenvironment_options.calculate_gradients = false; 
+// 	}
+	
+// 	else
+// 	{
+// 		default_microenvironment_options.calculate_gradients = true; 
+// 	}
+
+// 	// let BioFVM use oxygen as the default 
+	
+// 	default_microenvironment_options.use_oxygen_as_first_field = true; 
+	
+
+// 	// Temperarily eliminating fibroblast/cancer cell signal (except here)
+    
+// 	// 50 micron length scale 
+//     // microenvironment.add_density( "fibroblast signal", "dimensionless", 1e5 , 1 );
+//     microenvironment.add_density( "inflammatory_signal", "dimensionless", 1e5 , 1 );
+
+// 	// Temperarily eliminating fibroblast/cancer cell signal	
+	
+// 	// set Dirichlet conditions 
+	
+// 	default_microenvironment_options.outer_Dirichlet_conditions = true;
+
+// 	std::vector<double> bc_vector; 
+// 	bc_vector = { 38.0, 0.0};
+// 	// bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , fibroblast signal, cancer cell signal
+
+// 	// if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
+// 	// {
+
+// 	// 	bc_vector = { 38.0 }; // 5% o2 , fibroblast signal, cancer cell signal
+// 	// 	default_microenvironment_options.X_range[0] = -500.0;
+// 	// 	default_microenvironment_options.X_range[1] = 500.0;
+// 	// 	default_microenvironment_options.Y_range[0] = -500.0;
+// 	// 	default_microenvironment_options.Y_range[1] = 500.0;
+
+// 	// }
+
+// 	// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
+// 	// {
+// 	// 	bc_vector = { 38.0}; // 5% o2 , fibroblast signal, cancer cell signal
+// 	// 	default_microenvironment_options.X_range[0] = -500.0;
+// 	// 	default_microenvironment_options.X_range[1] = 500.0;
+// 	// 	default_microenvironment_options.Y_range[0] = -500.0;
+// 	// 	default_microenvironment_options.Y_range[1] = 500.0;
+// 	// }
+
+// 	// else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
+// 	// {
+// 	// 	bc_vector = { 38.0 };  // 5% o2 , fibroblast signal, cancer cell signal
+// 	// }
+
+// 	// else
+// 	// {
+// 	// 	std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
+// 	// 	std::cout<<"Halting!"<<std::endl;
+// 	// 	abort();
+// 	// 	return;
+// 	// }
+	
+	
+// 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
+    
+// 	// Temperarily eliminating fibroblast/cancer cell signal	
+// 	// default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
+// 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
+    
+// 	initialize_microenvironment(); 
+
+// 	// ecm.ecm_mesh.resize(default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
+// 	// 	default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1],default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], \
+// 	// 	parameters.doubles("ECM_dx"), parameters.doubles("ECM_dy"),parameters.doubles("ECM_dz"));
+// 	// ecm.resize_ecm_units_from_ecm_mesh();
+
+
+// 	// ecm.ecm_mesh.display_information(std::cout );
+
+// 	// std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
+// 	// std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
+// 	// std::cout<<" hit Enter to continue:"<<std::flush;
+// 	// std::cin.get();
+
+// 	microenvironment.decay_rates[0] = parameters.doubles("chemotactic_substrate_decay_rate");
+
+// 	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
+
+// 	// Catching if chemical field gradient not specified for unit testing - if chemical_field_setup_specified_bool is true, there is a string match in the chemical field setup, else, the field is not specified. Program halts in this condition if unit testing IS specified and displays message requesting user specify the chemical field set up.
+
+// 	bool chemical_field_setup_specified_bool = (parameters.strings("chemical_field_setup")== "starburst" ||  parameters.strings("chemical_field_setup")== "vertical up" || parameters.strings("chemical_field_setup") == "horizontal right" || parameters.strings("chemical_field_setup") == "angle" || parameters.strings("chemical_field_setup") == "none");
+
+// 	// std::cout<<"Chemical field specified? "<<chemical_field_setup_specified_bool<<std::endl;
+
+// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "starburst")
+// 	{
+
+// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+// 		{
+// 			std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+// 			microenvironment.gradient_vector(i)[0] = { position[0],position[1],0}; 
+// 			normalize(&microenvironment.gradient_vector(i)[0]);
+// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+// 		}
+// 	}
+
+// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "vertical up")
+// 	{
+
+// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+// 		{
+// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+// 			microenvironment.gradient_vector(i)[0] = { 0,1,0}; 
+// 			normalize(&microenvironment.gradient_vector(i)[0]);
+// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+// 		}
+// 	}
+
+// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "horizontal right")
+// 	{
+
+// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+// 		{
+// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+// 			microenvironment.gradient_vector(i)[0] = { 1,0,0}; 
+// 			normalize(&microenvironment.gradient_vector(i)[0]);
+// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+// 		}
+// 	}
+
+// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "angle")
+// 	{
+		
+
+// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+// 		{
+// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+// 			microenvironment.gradient_vector(i)[0] = { cos ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180) , sin ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180),0}; 
+// 			normalize(&microenvironment.gradient_vector(i)[0]);
+// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
+// 		}
+// 	}
+
+// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "none")
+// 	{
+
+// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+// 		{
+// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
+// 			microenvironment.gradient_vector(i)[0] = { 0,0,0}; 
+// 		}
+
+// 	}
+
+// 	else if( parameters.ints("unit_test_setup") == 1 && chemical_field_setup_specified_bool == 0)
+// 	{
+// 		std::cout<<"WARNING: NO CHEMICAL FIELD ORIENTATION SPECIFIED for unit testing. FIX THIS!!!"<<std::endl;
+// 		std::cout<<"Halting program!!!"<<std::endl;
+// 		abort();
+// 		return;
+// 	}
+
+
+// 	// run to get a decent starting conditoin (refers to code no longer present but will be added back for fibroblast-cancer cell signaling models)
+	
+// 	// now, let's set the fibroblast signal to 1, so we don't hvae early swiching 
+// 	/*
+// 	for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
+// 	{
+// 		microenvironment.density_vector(i)[1] = 1.0; 
+// 	}
+// 	*/
+
+// 	// set up ECM density and anisotropy profile as needed
+// 	// int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+// 	// int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+
+// 	/*for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
+// 	{
+// 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
+// 		if( fabs( position[0] ) > 200 || fabs( position[1] ) > 200 )
+// 		{
+// 			microenvironment(n)[ECM_density_index] = 0.0; 
+// 			microenvironment(n)[ECM_anisotropy_index] = 1.0; 
+// 		}
+// 	}*/
+	
+// 	return; 
+// }	
 
 void setup_extracellular_matrix( void )
 {
@@ -556,11 +689,6 @@ void setup_extracellular_matrix( void )
 	ecm.resize_ecm_units_from_ecm_mesh();
 
 	ecm.ecm_mesh.display_information(std::cout );
-
-	if(parameters.bools("unit_test_setup") == 1)
-	{
-
-	}
 
 	// set up ECM alignment 
 
@@ -760,6 +888,8 @@ void setup_tissue( void )
 {	
 	// Setting seed so cells always start with same initial configuration
 	SeedRandom(0);
+	static Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
+	static Cell_Definition* cancer_cell = find_cell_definition("cancer cell");	
 
 	if (parameters.ints("march_unit_test_setup") == 0)
 	{
@@ -767,7 +897,7 @@ void setup_tissue( void )
 		if(parameters.strings("cell_setup") == "single")
 		{
 			Cell* pC;
-			pC = create_cell(fibroblast);
+			pC = create_cell(*fibroblast);
 			pC->assign_position(0.0, 0.0, 0.0);
 		}
 
@@ -862,35 +992,35 @@ void setup_tissue( void )
 				while( x < x_outer )
 				{
 					if( UniformRandom() < fibroblast_fraction )
-					{ pCell = create_cell(fibroblast); }
+					{ pCell = create_cell(*fibroblast); }
 					else
-					{ pCell = create_cell(cancer_cell);}
+					{ pCell = create_cell(*cancer_cell);}
 						
 					pCell->assign_position( x , y , 0.0 );
 					
 					if( fabs( y ) > 0.01 )
 					{
 						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(fibroblast); }
+						{ pCell = create_cell(*fibroblast); }
 						else
-						{ pCell = create_cell(cancer_cell); }
+						{ pCell = create_cell(*cancer_cell); }
 						pCell->assign_position( x , -y , 0.0 );
 					}
 					
 					if( fabs( x ) > 0.01 )
 					{ 
 						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(fibroblast); }
+						{ pCell = create_cell(*fibroblast); }
 						else
-						{ pCell = create_cell(cancer_cell); }
+						{ pCell = create_cell(*cancer_cell); }
 						pCell->assign_position( -x , y , 0.0 );
 						
 						if( fabs( y ) > 0.01 )
 						{
 							if( UniformRandom() < fibroblast_fraction )
-							{ pCell = create_cell(fibroblast); }
+							{ pCell = create_cell(*fibroblast); }
 							else
-							{ pCell = create_cell(cancer_cell); }
+							{ pCell = create_cell(*cancer_cell); }
 							
 							pCell->assign_position( -x , -y , 0.0 );
 						}
@@ -979,35 +1109,35 @@ void setup_tissue( void )
 				while( x < x_outer )
 				{
 					if( UniformRandom() < fibroblast_fraction )
-					{ pCell = create_cell(fibroblast); }
+					{ pCell = create_cell(*fibroblast); }
 					else
-					{ pCell = create_cell(cancer_cell);}
+					{ pCell = create_cell(*cancer_cell);}
 						
 					pCell->assign_position( x , y , 0.0 );
 					
 					if( fabs( y ) > 0.01 )
 					{
 						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(fibroblast); }
+						{ pCell = create_cell(*fibroblast); }
 						else
-						{ pCell = create_cell(cancer_cell); }
+						{ pCell = create_cell(*cancer_cell); }
 						pCell->assign_position( x , -y , 0.0 );
 					}
 					
 					if( fabs( x ) > 0.01 )
 					{ 
 						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(fibroblast); }
+						{ pCell = create_cell(*fibroblast); }
 						else
-						{ pCell = create_cell(cancer_cell); }
+						{ pCell = create_cell(*cancer_cell); }
 						pCell->assign_position( -x , y , 0.0 );
 						
 						if( fabs( y ) > 0.01 )
 						{
 							if( UniformRandom() < fibroblast_fraction )
-							{ pCell = create_cell(fibroblast); }
+							{ pCell = create_cell(*fibroblast); }
 							else
-							{ pCell = create_cell(cancer_cell); }
+							{ pCell = create_cell(*cancer_cell); }
 							
 							pCell->assign_position( -x , -y , 0.0 );
 						}
@@ -1028,7 +1158,7 @@ void setup_tissue( void )
 			n =-500.0;
 			for(int i=0; i<number_of_fibroblasts; i++)
 			{
-				pCell = create_cell(fibroblast);
+				pCell = create_cell(*fibroblast);
 				pCell->assign_position( n , -600.0, 0.0 );
 				std::cout<<"Fibroblast placed at "<<pCell->position<<std::endl;
 				n += 100.0;
@@ -1048,7 +1178,7 @@ void setup_tissue( void )
 			for (int a = 0; a<42; a++)
 			{
 				Cell* pCell = NULL;
-				pCell = create_cell(cancer_cell); 
+				pCell = create_cell(*cancer_cell); 
 				pCell->assign_position( 300 * cos(theta2) , 300 * sin(theta2) , 0.0 );
 				theta2 += 0.14959952;
 			}
@@ -1064,7 +1194,7 @@ void setup_tissue( void )
 			int n = default_microenvironment_options.X_range[0] + 10.0; 
 			while( n <= default_microenvironment_options.X_range[1] )
 			{
-				pCell = create_cell(cancer_cell); 
+				pCell = create_cell(*cancer_cell); 
 
 				// To prevent droping cells in areas of high ECM curvature. 
 				while(abs(n) < 70)
@@ -1085,10 +1215,10 @@ void setup_tissue( void )
 			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
 			{
 				if (parameters.ints("march_unit_test_setup") == 1)
-				{pCell = create_cell(fibroblast);}
+				{pCell = create_cell(*fibroblast);}
 
 				else 
-				{pCell = create_cell(cancer_cell);}
+				{pCell = create_cell(*cancer_cell);}
 				pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
 				n = n + 10.0;
 			}
@@ -1110,7 +1240,7 @@ void setup_tissue( void )
 		int n = default_microenvironment_options.X_range[0] + 10.0; 
 		while( n <= default_microenvironment_options.X_range[1] - 10.0 )
 		{
-			pCell = create_cell(fibroblast); 
+			pCell = create_cell(*fibroblast); 
 			pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
 			n = n + 10.0;
 		}
@@ -1175,13 +1305,21 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
 	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
-	
-	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
-	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
-	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
-	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
-	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
-	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
+
+	    // rwh: use underscores now that they are in the .xml as tags
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max_speed" ); 
+	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis_bias");
+	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM_sensitivity");
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min_ECM_motility_density");
+    if (min_ECM_mot_den_index < 0) 
+    {
+        std::cout << "        static int min_ECM_mot_den_index = " <<min_ECM_mot_den_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max_ECM_motility_density");
+    if (max_ECM_mot_den_index < 0) std::exit(-1);
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal_ECM_motility_density");
+    if (ideal_ECM_mot_den_index  < 0) std::exit(-1);
 	
 	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
 	std::vector<double> cell_position = pCell->position;
@@ -2139,11 +2277,13 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 	// std::cout<<nearest_ecm_voxel_index<<std::endl;
 	// std::cin.get();
-	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target ECM density");
-	static int Cell_ECM_production_rate_index = pCell->custom_data.find_variable_index( "ECM_production_rate");
-	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy increase rate");
-	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber realignment rate");
     
+	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target_ECM_density");
+	static int Cell_ECM_production_rate_index = pCell->custom_data.find_variable_index( "ECM_production_rate");
+	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy_increase_rate");
+	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber_realignment_rate");
+    
+
     // Cell-ECM density interaction
 
     double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density;
