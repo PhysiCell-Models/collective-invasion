@@ -29,11 +29,11 @@
     <save>
         <folder>invasive_spheroid_output</folder>
         <full_data>
-            <interval units="min">600</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">600</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
         </SVG>
         <legacy_data>
@@ -206,13 +206,14 @@
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
                 <chemotaxis_bias conserved="false" units="dimensionless" description="">0.05</chemotaxis_bias>
-                <ECM_sensitivity conserved="false" units="dimensionless" description="">1.0</ECM_sensitivity>
+                <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.5</ECM_production_rate>
             </custom_data>
         </cell_definition>
         <cell_definition name="cancer cell" ID="1">
@@ -347,6 +348,7 @@
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
             </custom_data>
         </cell_definition>
     </cell_definitions>
@@ -374,7 +376,7 @@
         <fiber_realignment_rate type="double" units="1/min" description="Fiber rate of realignment">4.0</fiber_realignment_rate>
         <default_ECM_density_target type="double" units="dimenionless" description="Cell ECM density target">0.5</default_ECM_density_target>
         <default_ECM_production_rate type="double" units="dimenionless" description="Cell ECM production rate">0.001</default_ECM_production_rate>
-        <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">11</number_of_fibroblasts>
+        <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">1</number_of_fibroblasts>
         <cancer_cell_adhesion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell adhesion">10.0</cancer_cell_adhesion>
         <cancer_cell_repulsion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell repulsion">25.0</cancer_cell_repulsion>
         <default_chemotaxis_bias type="double" units="dimensionless" description="Follower chemotaxis bias">0.05</default_chemotaxis_bias>

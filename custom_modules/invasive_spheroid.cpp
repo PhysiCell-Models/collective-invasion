@@ -2277,12 +2277,16 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 	// std::cout<<nearest_ecm_voxel_index<<std::endl;
 	// std::cin.get();
-    
+
 	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target_ECM_density");
 	static int Cell_ECM_production_rate_index = pCell->custom_data.find_variable_index( "ECM_production_rate");
+	if (Cell_ECM_production_rate_index < 0) 
+    {
+        std::cout << "        static int Cell_ECM_production_rate_index = " <<Cell_ECM_production_rate_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
 	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy_increase_rate");
 	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber_realignment_rate");
-    
 
     // Cell-ECM density interaction
 
@@ -2292,7 +2296,7 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
     
     ecm.ecm_voxels[nearest_ecm_voxel_index].density = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
     // END Cell-ECM density interaction
-
+	
 	// Cell-ECM Fiber realingment - continous then discrete
 
 	if( parameters.ints("discrete_ECM_remodeling") == 1)
@@ -2301,28 +2305,30 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
 		// int n = pCell->get_current_voxel_index();
 		std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
+		
 
 		double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
 		double migration_speed = pCell->phenotype.motility.migration_speed;
 		double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
 		// std::cout<<r_0<<std::endl;
+		
 		double r_realignment = r_0 * (1-anisotropy);
-
 		double ddotf;
 		std::vector<double> norm_cell_motility = phenotype.motility.motility_vector;
+		
 		// norm_cell_motility.resize(3,0.0);
 		// norm_cell_motility = phenotype.motility.motility_vector;
 		normalize(&norm_cell_motility);
-
-		ddotf = dot_product(ECM_orientation, norm_cell_motility);
-
-		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
 		
+		ddotf = dot_product(ECM_orientation, norm_cell_motility);
+		std::cout<<"Hear this!!!"<<std::endl;
+		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
+		std::cout<<"Hear this!!!"<<std::endl;
 		std::vector<double> f_minus_d;
 		f_minus_d.resize(3,0.0);
-
+		std::cout<<"Hear this!!!"<<std::endl;
 		// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
-
+		std::cout<<"hear this!!!"<<std::endl;
 		for(int i = 0; i < 3; i++)
 		{
 			if (ddotf<0.0)
@@ -2333,7 +2339,7 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
 		}
 		
-		
+		std::cout<<"hear this!!!"<<std::endl;
 		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
 
 		// End Cell-ECM Fiber realingment
@@ -2348,7 +2354,7 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		
 		// END Cell-ECM Anisotropy Modification
 
-
+		std::cout<<"hear this!!!"<<std::endl;
 	}
 
 	else if (parameters.ints("discrete_ECM_remodeling") == 0)
@@ -2379,7 +2385,7 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		return;
 	}
 	
-	
+	std::cout<<"hear this!!!"<<std::endl;
     
     return;
 
