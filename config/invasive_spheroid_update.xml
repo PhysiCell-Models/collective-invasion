@@ -29,11 +29,11 @@
     <save>
         <folder>invasive_spheroid_output</folder>
         <full_data>
-            <interval units="min">6</interval>
+            <interval units="min">600</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">6</interval>
+            <interval units="min">600</interval>
             <enable>true</enable>
         </SVG>
         <legacy_data>
@@ -64,9 +64,25 @@
                 <boundary_value ID="zmax" enabled="False">38</boundary_value>
             </Dirichlet_options>
         </variable>
+        <variable name="inflammatory_signal" units="dimensionless" ID="1">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">100000</diffusion_coefficient>
+                <decay_rate units="1/min">1</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="dimensionless">0.0</initial_condition>
+            <Dirichlet_boundary_condition units="dimensionless" enabled="False">0.0</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="False" />
+                <boundary_value ID="xmax" enabled="False" />
+                <boundary_value ID="ymin" enabled="False" />
+                <boundary_value ID="ymax" enabled="False" />
+                <boundary_value ID="zmin" enabled="False" />
+                <boundary_value ID="zmax" enabled="False" />
+            </Dirichlet_options>
+        </variable>
         <options>
-            <calculate_gradients>true</calculate_gradients>
-            <track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+            <calculate_gradients>false</calculate_gradients>
+            <track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
             <initial_condition type="matlab" enabled="false">
                 <filename>./config/initial.mat</filename>
             </initial_condition>
@@ -153,7 +169,7 @@
                         <use_2D>true</use_2D>
                         <chemotaxis>
                             <enabled>true</enabled>
-                            <substrate>oxygen</substrate>
+                            <substrate>inflammatory_signal</substrate>
                             <direction>1</direction>
                         </chemotaxis>
                         <advanced_chemotaxis>
@@ -161,6 +177,7 @@
                             <normalize_each_gradient>false</normalize_each_gradient>
                             <chemotactic_sensitivities>
                                 <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="inflammatory_signal">0.0</chemotactic_sensitivity>
                             </chemotactic_sensitivities>
                         </advanced_chemotaxis>
                     </options>
@@ -172,29 +189,31 @@
                         <uptake_rate units="1/min">10</uptake_rate>
                         <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
+                    <substrate name="inflammatory_signal">
+                        <secretion_rate units="1/min">0.0</secretion_rate>
+                        <secretion_target units="substrate density">0.0</secretion_target>
+                        <uptake_rate units="1/min">0.0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
                 </secretion>
                 <cell_interactions>
                     <dead_phagocytosis_rate units="1/min">0.0</dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
-                        <phagocytosis_rate name="bacteria" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="fibroblast" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="cancer cell" units="1/min">0.0</phagocytosis_rate>
                     </live_phagocytosis_rates>
                     <attack_rates>
-                        <attack_rate name="bacteria" units="1/min">0.0</attack_rate>
                         <attack_rate name="fibroblast" units="1/min">0.0</attack_rate>
                         <attack_rate name="cancer cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
                     <damage_rate units="1/min">1.0</damage_rate>
                     <fusion_rates>
-                        <fusion_rate name="bacteria" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="fibroblast" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="cancer cell" units="1/min">0.0</fusion_rate>
                     </fusion_rates>
                 </cell_interactions>
                 <cell_transformations>
                     <transformation_rates>
-                        <transformation_rate name="bacteria" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="fibroblast" units="1/min">0.0</transformation_rate>
                         <transformation_rate name="cancer cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
@@ -214,6 +233,7 @@
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.5</ECM_production_rate>
+                <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">1.0</inflam_sig_migration_bias_for_fibroblasts>
             </custom_data>
         </cell_definition>
         <cell_definition name="cancer cell" ID="1">
@@ -291,7 +311,7 @@
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
-                            <enabled>false</enabled>
+                            <enabled>true</enabled>
                             <substrate>oxygen</substrate>
                             <direction>1</direction>
                         </chemotaxis>
@@ -300,6 +320,7 @@
                             <normalize_each_gradient>false</normalize_each_gradient>
                             <chemotactic_sensitivities>
                                 <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="inflammatory_signal">0.0</chemotactic_sensitivity>
                             </chemotactic_sensitivities>
                         </advanced_chemotaxis>
                     </options>
@@ -310,6 +331,12 @@
                         <secretion_target units="substrate density">38</secretion_target>
                         <uptake_rate units="1/min">10</uptake_rate>
                         <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
+                    <substrate name="inflammatory_signal">
+                        <secretion_rate units="1/min">50.0</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0.0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0.0</net_export_rate>
                     </substrate>
                 </secretion>
                 <cell_interactions>
@@ -349,6 +376,7 @@
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
+                <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.0</inflam_sig_migration_bias_for_fibroblasts>
             </custom_data>
         </cell_definition>
     </cell_definitions>
@@ -365,7 +393,7 @@
         <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
         <cell_setup type="string" units="" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, or cells at left boundary/march">invasive_spheroid</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">175</tumor_radius>
-        <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0.00</initial_fibroblast_fraction>
+        <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0.0</initial_fibroblast_fraction>
         <oxygen_uptake type="double" units="mmHg/min" description="Default cell oxygen uptake rate">10</oxygen_uptake>
         <default_cell_speed type="double" units="microns/minute" description="Base/maximum cell speed">0.5</default_cell_speed>
         <default_persistence_time type="double" units="minutes" description="Cell directional persistence time">10.0</default_persistence_time>
@@ -376,7 +404,7 @@
         <fiber_realignment_rate type="double" units="1/min" description="Fiber rate of realignment">4.0</fiber_realignment_rate>
         <default_ECM_density_target type="double" units="dimenionless" description="Cell ECM density target">0.5</default_ECM_density_target>
         <default_ECM_production_rate type="double" units="dimenionless" description="Cell ECM production rate">0.001</default_ECM_production_rate>
-        <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">1</number_of_fibroblasts>
+        <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">11</number_of_fibroblasts>
         <cancer_cell_adhesion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell adhesion">10.0</cancer_cell_adhesion>
         <cancer_cell_repulsion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell repulsion">25.0</cancer_cell_repulsion>
         <default_chemotaxis_bias type="double" units="dimensionless" description="Follower chemotaxis bias">0.05</default_chemotaxis_bias>

@@ -1260,7 +1260,7 @@ void setup_tissue( void )
 	return; 
 }
 
-double dot_product( const std::vector<double>& v , const std::vector<double>& w )
+double dot_product_ext( const std::vector<double>& v , const std::vector<double>& w )
 {
 	double out = 0.0; 
 	for( unsigned int i=0 ; i < v.size() ; i++ )
@@ -1383,7 +1383,7 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	// std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
-	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
 
@@ -1392,8 +1392,8 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
-	double c_1 = dot_product( d_motility , d_perp ); 
-	double c_2 = dot_product( d_motility, f ); 
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
 
 	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
 	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
@@ -1605,7 +1605,7 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 	// std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
-	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
 	normalize( &d_perp ); 
 
 	// std::cout<<"D perp"<<d_perp<<std::endl;
@@ -1613,8 +1613,8 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
-	double c_1 = dot_product( d_motility , d_perp ); 
-	double c_2 = dot_product( d_motility, f ); 
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
 
 	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
 	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
@@ -1804,7 +1804,7 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 	// std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
-	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
 
@@ -1813,8 +1813,8 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
-	double c_1 = dot_product( d_motility , d_perp ); 
-	double c_2 = dot_product( d_motility, f ); 
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
 
 	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
 	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
@@ -1982,12 +1982,29 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
 
-	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
-	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
-	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
-	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
-	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
-	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
+	// static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max speed" ); 
+	// static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis bias");
+	// static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM sensitivity");
+	// static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min ECM motility density");
+	// static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max ECM motility density");
+	// static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal ECM motility density");
+
+	// rwh: use underscores now that they are in the .xml as tags
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max_speed" ); 
+    // std::cout << "        static int max_cell_speed_index = " <<max_cell_speed_index << std::endl;
+	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis_bias");
+	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM_sensitivity");
+    // std::cout << "        static int ECM_sensitivity_index = " <<ECM_sensitivity_index << std::endl;
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min_ECM_motility_density");
+    if (min_ECM_mot_den_index < 0) 
+    {
+        std::cout << "        static int min_ECM_mot_den_index = " <<min_ECM_mot_den_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max_ECM_motility_density");
+    if (max_ECM_mot_den_index < 0) std::exit(-1);
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal_ECM_motility_density");
+    if (ideal_ECM_mot_den_index  < 0) std::exit(-1);
 	
 	// New speed update (06.18.19) - piece wise continous
 	
@@ -2305,7 +2322,6 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
 		// int n = pCell->get_current_voxel_index();
 		std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
-		
 
 		double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
 		double migration_speed = pCell->phenotype.motility.migration_speed;
@@ -2320,15 +2336,11 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		// norm_cell_motility = phenotype.motility.motility_vector;
 		normalize(&norm_cell_motility);
 		
-		ddotf = dot_product(ECM_orientation, norm_cell_motility);
-		std::cout<<"Hear this!!!"<<std::endl;
+		ddotf = dot_product_ext(ECM_orientation, norm_cell_motility);
 		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
-		std::cout<<"Hear this!!!"<<std::endl;
 		std::vector<double> f_minus_d;
 		f_minus_d.resize(3,0.0);
-		std::cout<<"Hear this!!!"<<std::endl;
 		// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
-		std::cout<<"hear this!!!"<<std::endl;
 		for(int i = 0; i < 3; i++)
 		{
 			if (ddotf<0.0)
@@ -2339,7 +2351,6 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
 		}
 		
-		std::cout<<"hear this!!!"<<std::endl;
 		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
 
 		// End Cell-ECM Fiber realingment
@@ -2353,8 +2364,6 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
 		
 		// END Cell-ECM Anisotropy Modification
-
-		std::cout<<"hear this!!!"<<std::endl;
 	}
 
 	else if (parameters.ints("discrete_ECM_remodeling") == 0)
@@ -2372,7 +2381,6 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
  		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
 		
 		if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
-		{std::cout<<"ECM orientation vector norm = 0"<<std::endl;}
 
 		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
 		}
@@ -2384,8 +2392,6 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 		abort();
 		return;
 	}
-	
-	std::cout<<"hear this!!!"<<std::endl;
     
     return;
 
@@ -2431,7 +2437,7 @@ void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , d
 	// norm_cell_velocity = pCell->velocity;
 	normalize(&norm_cell_velocity);
 
-	ddotf = dot_product(ECM_orientation, norm_cell_velocity);
+	ddotf = dot_product_ext(ECM_orientation, norm_cell_velocity);
 	
 	ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
 	
