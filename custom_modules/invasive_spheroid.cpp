@@ -63,293 +63,13 @@
 
 #include "./invasive_spheroid.h"
 #include "./extracellular_matrix.h"
+#include "./cell_ECM_interactions.h"
 #include <chrono>  // for high_resolution_clock - https://www.pluralsight.com/blog/software-development/how-to-measure-execution-time-intervals-in-c--
 // Cell_Definition fibroblast; 
 // Cell_Definition cancer_cell; 
 ECM ecm;
 unsigned long long int counter=0; // counter for calculating average for the ad hoc timing I am doing ... 
 int time_total = 0;
-
-// void create_cell_types( void )
-// {
-// 	// // use the same random seed so that future experiments have the 
-// 	// // same initial histogram of oncoprotein, even if threading means 
-// 	// // that future division and other events are still not identical 
-// 	// // for all runs 
-// 	// SeedRandom(0); 
-	
-// 	// housekeeping 
-	
-// 	initialize_default_cell_definition();
-// 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
-	
-// 	// turn the default cycle model to live, 
-// 	// so it's easier to turn off proliferation
-
-// 	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
-	
-// 	// Make sure we're ready for 2D
-	
-// 	cell_defaults.functions.set_orientation = up_orientation; 
-// 	cell_defaults.phenotype.geometry.polarity = 1.0; 
-// 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-	
-// 	// use default proliferation and death 
-	
-// 	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-// 	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	
-// 	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model ); 
-// 	int necrosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::necrosis_death_model ); 
-
-// 	// For strict ECM invasion testing, why have on death and birth at all??
-
-// 	cell_defaults.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
-//     cell_defaults.phenotype.death.rates[apoptosis_index] = 0.0;
-// 	cell_defaults.phenotype.death.rates[necrosis_index] = 0.0;
-
-// 	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
-// 	cell_defaults.parameters.o2_reference = 38.0;
-	
-	
-// 	// set default uptake and secretion 
-// 	// oxygen 
-// 	cell_defaults.phenotype.secretion.secretion_rates[0] = 0; 
-// 	cell_defaults.phenotype.secretion.uptake_rates[0] = parameters.doubles("oxygen_uptake"); 
-// 	std::cout<<cell_defaults.phenotype.secretion.uptake_rates[0]<<std::endl;
-// 	cell_defaults.phenotype.secretion.saturation_densities[0] = 38; 
-
-// 	// Fields for fibroblast-cancer diffusing signal based communication. Commented out 03.11.19
-
-// 	/*
-
-// 	cell_defaults.phenotype.secretion.secretion_rates[1] = 0;
-// 	cell_defaults.phenotype.secretion.uptake_rates[1] = 0;
-// 	cell_defaults.phenotype.secretion.saturation_densities[1] = 1;
-
-// 	cell_defaults.phenotype.secretion.secretion_rates[2] = 0;
-// 	cell_defaults.phenotype.secretion.uptake_rates[2] = 0;
-	
-// 		cell_defaults.phenotype.secretion.saturation_densities[2] = 1;
-
-// 	*/	
-
-// 	// For phenotype switching if using
-	
-// 	// cell_defaults.functions.update_phenotype = switching_phenotype_model;
-	
-// 	cell_defaults.name = "cancer cell"; 
-// 	cell_defaults.type = 0; 
-	
-// 	// set default motility parameters (even for when off)
-	
-// 	cell_defaults.phenotype.motility.is_motile = true;
-// 	// consider what "best" persistence time would be, given the voxel dimensions. 
-// 	cell_defaults.phenotype.motility.persistence_time = parameters.doubles("default_persistence_time"); //10.0; // Voxels are 20 um in all dimensions. Given a top speed of 0.5 um/min, cells will likely be in one voxel for 10 minutes or more. So update of 10 isn't bad. Should consider "best" number later. 
-// 	cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");
-// 	cell_defaults.phenotype.motility.restrict_to_2D = true; 
-// 	cell_defaults.phenotype.motility.migration_bias = 1.0;// completely random - setting in update_migration_bias - might wnat to call that immediately thing
-
-// 	// add custom data 
-// 	cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", parameters.doubles( "rho_L") );  // Minimum ECM density required for cell motility
-// 	cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", parameters.doubles( "rho_H") );  // Maximum ECM density allowing cell motility
-// 	cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", parameters.doubles( "rho_I") );  // Ideal ECM density cell motility
-// 	cell_defaults.custom_data.add_variable( "max speed", "micron/min" , parameters.doubles( "default_cell_speed") ); // Maximum migration speed
-// 	cell_defaults.custom_data.add_variable( "chemotaxis bias", "dimensionless", parameters.doubles( "default_chemotaxis_bias") ); 
-// 	cell_defaults.custom_data.add_variable( "ECM sensitivity", "dimensionless", parameters.doubles("default_ECM_sensitivity") );
-// 	cell_defaults.custom_data.add_variable( "hypoxic switch value" , "mmHg", 10 );
-// 	cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", parameters.doubles( "default_ECM_density_target") ); 
-// 	cell_defaults.custom_data.add_variable( "ECM_production_rate", "1/min", parameters.doubles( "default_ECM_production_rate") );
-// 	cell_defaults.custom_data.add_variable( "Base hysteresis bias", "dimensionless", parameters.doubles( "default_hysteresis_bias") );
-// 	cell_defaults.custom_data.add_variable( "previous anisotropy", "dimensionless", 0 );
-// 	cell_defaults.custom_data.add_variable( "Anisotropy increase rate", "1/min", parameters.doubles( "anisotropy_increase_rate") );
-// 	cell_defaults.custom_data.add_variable( "Fiber realignment rate", "1/min", parameters.doubles( "fiber_realignment_rate") );
-	
-
-// 	// <unit_test_setup description="Specifies cell parameters for consistent unit tests of ECM influenced mechanics and mechanics influence on ECM - sets adhesion to 1.25, repulsion to 25, and speed to 1.0" type="bool">cells at left boundary/march</unit_test_setup>
-
-// 	if( parameters.ints("unit_test_setup") == 1)
-// 	{
-// 		cell_defaults.phenotype.motility.persistence_time = 10.0; 
-// 		cell_defaults.phenotype.motility.migration_speed = 1.0;
-// 		cell_defaults.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
-// 		cell_defaults.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
-// 		cell_defaults.phenotype.secretion.uptake_rates[0] = 0.0;
-// 		cell_defaults.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
-// 		cell_defaults.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-// 		cell_defaults.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
-// 		cell_defaults.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
-// 		cell_defaults.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
-
-// 		std::cout<< "running unit test setup cancer cell"<<std::endl;
-
-// 	}
-
-// 	else if ( parameters.ints("unit_test_setup") == 0)
-// 	{
-// 		std::cout<<"not in unit test mode"<<std::endl;
-// 	}
-
-// 	else
-// 	{
-// 		std::cout<<"WARNING!!!!! Cell parameters not set correctly - unit test set up must either be true or false!!!!"<<std::endl;
-// 	}
-	
-	
-// 	// fibroblast cells 
-	
-// 	fibroblast = cell_defaults;
-// 	fibroblast.name = "fibroblast cell"; 
-// 	fibroblast.type = 1; 
-
-// 	// Temperarily eliminating fibroblast/cancer cell signal
-
-// 	// Obviously missing - add later
-    
-// 	// 10% proliferation 
-//     // fibroblast.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.10;
-
-// 	/*******************************************For "march" simulation****************************************/
-
-// 	fibroblast.phenotype.cycle.data.transition_rate( cycle_start_index , cycle_end_index ) *= 0.0;
-//     fibroblast.phenotype.death.rates[apoptosis_index] = 0.0;
-// 	fibroblast.phenotype.death.rates[necrosis_index] = 0.0;
-	
-    
-// 	// Temperarily eliminating fibroblast/cancer cell signal	
-	
-// 	// Obviously missing - add later
-
-// 	// turn on motility 
-// 	fibroblast.phenotype.motility.is_motile = parameters.bools("fibroblast_motility_mode"); 
-	
-//     fibroblast.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("fibroblast_adhesion");
-// 	// std::cout<<fibroblast.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
-    
-// 	fibroblast.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("fibroblast_repulsion");
-//     // std::cout<<fibroblast.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
-
-// 	// Temperarily eliminating fibroblast/cancer cell signal	
-
-// 	//    fibroblast.phenotype.secretion.secretion_rates[1] = 50; // fibroblast signal
-
-//     // modify ECM
-    
-// 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
-//     	fibroblast.functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only fibroblasts can modify ECM (phenotype -> ECM)
-
-// 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
-// 	{
-// 		fibroblast.functions.custom_cell_rule = ecm_update_from_cell_velocity_vector; // Only fibroblasts can modify ECM (phenotype -> ECM)
-// 	}
-	
-// 	else
-// 	{
-// 		std::cout<<"no reorientation model specified!!@!!!!!! Halting!!!!!!"<<std::endl;
-// 		abort();
-// 		return;
-// 	}
-	
-
-// 	// set functions
-	
-// 	fibroblast.functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set fibroblast fraction to 1.0.
-	
-//     fibroblast.functions.update_phenotype = NULL; // fibroblast_phenotype_model;
-
-// 	if( parameters.ints("unit_test_setup") == 1)
-// 	{
-// 		fibroblast.phenotype.motility.persistence_time = 10.0;
-// 		fibroblast.phenotype.motility.migration_speed = 0.50;
-// 		fibroblast.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
-// 		fibroblast.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
-// 		fibroblast.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
-// 		fibroblast.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-// 		fibroblast.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
-// 		fibroblast.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
-// 		fibroblast.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
-// 		if (parameters.ints("march_unit_test_setup") == 1){
-// 		fibroblast.functions.update_migration_bias = rightward_deterministic_cell_march;
-// 		}
-
-// 		// std::cout<< "running unit test setup fibroblast"<<std::endl;
-
-// 	}
-	
-// 	// cancer cells
-
-// 	cancer_cell = cell_defaults;
-// 	cancer_cell.name = "cancer cell"; 
-// 	cancer_cell.type = 2;
-    
-//     cancer_cell.functions.update_phenotype = cancer_cell_phenotype_model;
-
-// 	cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = parameters.doubles("cancer_cell_adhesion");
-// 	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength<<std::endl;
-// 	cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength = parameters.doubles("cancer_cell_repulsion");
-//    	std::cout<<cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength<<std::endl;
-// 	cancer_cell.phenotype.motility.is_motile = parameters.bools("cancer_cell_motility_mode");
-	
-// 	// Selecting cell-ECM interaction wrt to hyteriss
-	
-// 	if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell chemotaxis/no cancer cell hysteresis" || parameters.ints("unit_test_setup") == 1)
-// 	{
-// 		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
-// 		std::cout<<"I selected cancer cell chemotaxsis" << std::endl;
-// 	}
-
-// 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell hysteresis/no cancer cell chemotaxis")
-// 	{
-// 		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_model_w_memory;
-// 		// cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
-// 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
-// 		std::cout<<"I selected cancer cell hysteresis" << std::endl;
-// 	}
-
-// 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "cancer cell chemotaxis with variable cancer cell speed")
-// 	{
-// 		cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
-// 		// cancer_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
-// 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
-// 		std::cout<<"I selected cancer cell chemotaxis with variable cancer cell speed" << std::endl;
-// 	}
-
-// 	else
-// 	{
-// 		std::cout<<"WARNING: NO CELL-ECM MODEL SPECIFIED. FIX THIS!!!"<<std::endl;
-// 		std::cout<<"Halting program!!!"<<std::endl;
-// 		abort();
-// 		return;
-// 	}
-
-// 	// Why do these lines not overwrite the cell defaults?
-
-// 	if( parameters.ints("unit_test_setup") == 1)
-// 	{
-// 		cancer_cell.phenotype.motility.persistence_time = 10.0;
-// 		cancer_cell.phenotype.motility.migration_speed = 1.0;
-// 		cancer_cell.phenotype.mechanics.cell_cell_adhesion_strength = 0.0;
-// 		cancer_cell.phenotype.mechanics.cell_cell_repulsion_strength = 0.0;
-// 		cancer_cell.custom_data.add_variable( "max speed", "micron/min" , 1.0 ); // Maximum migration speed
-// 		cancer_cell.custom_data.add_variable( "min ECM motility density", "dimensionless", 0.0 );  // Minimum ECM density required for cell motility
-// 		cancer_cell.custom_data.add_variable( "max ECM motility density", "dimensionless", 1.0 );  // Maximum ECM density allowing cell motility
-// 		cancer_cell.custom_data.add_variable( "ideal ECM motility density", "dimensionless", 0.5 );  // Ideal ECM density cell motility
-// 		cancer_cell.custom_data.add_variable( "target ECM density", "dimensionless", 0.5 ); 
-
-// 		std::cout<< "running unit test setup cancer cell"<<std::endl;
-
-// 	}
-    
-// 	std::cout<<"cancer cell cell migration speed "<<cancer_cell.phenotype.motility.migration_speed <<std::endl;
-
-// 	// Temperarily eliminating fibroblast/cancer cell signal
-
-//    	cancer_cell.phenotype.secretion.secretion_rates[1] = 50; // cancer cell signal
-// 	cancer_cell.phenotype.secretion.saturation_densities[1] = 1; // cancer cell signal
-    
-// 	// Temperarily eliminating fibroblast/cancer cell signal
-// 	return; 
-// }	
 
 void create_cell_types( void )
 {
@@ -409,7 +129,7 @@ void create_cell_types( void )
 
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
     {
-    	fibroblast->functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only leaders can modify ECM (phenotype -> ECM)
+    	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; // Only leaders can modify ECM (phenotype -> ECM)
     }
 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
 	{
@@ -422,7 +142,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	fibroblast->functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
+	fibroblast->functions.update_migration_bias = fibroblast_ECM_informed_motility_update_w_chemotaxis;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -435,7 +155,7 @@ void create_cell_types( void )
     // rwh: doing this one:
     if ( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
-		cancer_cell->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
+		cancer_cell->functions.update_migration_bias = cancer_cell_ECM_informed_motility_update_w_chemotaxis;
 		std::cout<<"I selected follower chemotaxsis" << std::endl;   // <------ rwh
 	}
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")
@@ -460,7 +180,7 @@ void create_cell_types( void )
 		return;
 	}
 
-
+	cancer_cell->functions.custom_cell_rule = ECM_remodeling_function;
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -484,200 +204,6 @@ void setup_microenvironment( void )
 	return; 
 }
 
-// void setup_microenvironment( void )
-// {
-
-// 	if(parameters.ints("unit_test_setup")==1)
-// 	{
-// 		default_microenvironment_options.calculate_gradients = false; 
-// 	}
-	
-// 	else
-// 	{
-// 		default_microenvironment_options.calculate_gradients = true; 
-// 	}
-
-// 	// let BioFVM use oxygen as the default 
-	
-// 	default_microenvironment_options.use_oxygen_as_first_field = true; 
-	
-
-// 	// Temperarily eliminating fibroblast/cancer cell signal (except here)
-    
-// 	// 50 micron length scale 
-//     // microenvironment.add_density( "fibroblast signal", "dimensionless", 1e5 , 1 );
-//     microenvironment.add_density( "inflammatory_signal", "dimensionless", 1e5 , 1 );
-
-// 	// Temperarily eliminating fibroblast/cancer cell signal	
-	
-// 	// set Dirichlet conditions 
-	
-// 	default_microenvironment_options.outer_Dirichlet_conditions = true;
-
-// 	std::vector<double> bc_vector; 
-// 	bc_vector = { 38.0, 0.0};
-// 	// bc_vector = { 38.0 , 0.0, 0.0};  // 5% o2 , fibroblast signal, cancer cell signal
-
-// 	// if(parameters.ints("unit_test_setup")==1 && parameters.ints("march_unit_test_setup") == 0)
-// 	// {
-
-// 	// 	bc_vector = { 38.0 }; // 5% o2 , fibroblast signal, cancer cell signal
-// 	// 	default_microenvironment_options.X_range[0] = -500.0;
-// 	// 	default_microenvironment_options.X_range[1] = 500.0;
-// 	// 	default_microenvironment_options.Y_range[0] = -500.0;
-// 	// 	default_microenvironment_options.Y_range[1] = 500.0;
-
-// 	// }
-
-// 	// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
-// 	// {
-// 	// 	bc_vector = { 38.0}; // 5% o2 , fibroblast signal, cancer cell signal
-// 	// 	default_microenvironment_options.X_range[0] = -500.0;
-// 	// 	default_microenvironment_options.X_range[1] = 500.0;
-// 	// 	default_microenvironment_options.Y_range[0] = -500.0;
-// 	// 	default_microenvironment_options.Y_range[1] = 500.0;
-// 	// }
-
-// 	// else if(parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 0)
-// 	// {
-// 	// 	bc_vector = { 38.0 };  // 5% o2 , fibroblast signal, cancer cell signal
-// 	// }
-
-// 	// else
-// 	// {
-// 	// 	std::cout<<"ECM density and anisotropy not set correctly!!!! FIX!!!!!!!!!"<<std::endl;
-// 	// 	std::cout<<"Halting!"<<std::endl;
-// 	// 	abort();
-// 	// 	return;
-// 	// }
-	
-	
-// 	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-    
-// 	// Temperarily eliminating fibroblast/cancer cell signal	
-// 	// default_microenvironment_options.Dirichlet_condition_vector[1] = 0; // normoxic conditions
-// 	// default_microenvironment_options.Dirichlet_condition_vector[2] = 0; // normoxic conditions
-    
-// 	initialize_microenvironment(); 
-
-// 	// ecm.ecm_mesh.resize(default_microenvironment_options.X_range[0], default_microenvironment_options.X_range[1] , 
-// 	// 	default_microenvironment_options.Y_range[0], default_microenvironment_options.Y_range[1],default_microenvironment_options.Z_range[0], default_microenvironment_options.Z_range[1], \
-// 	// 	parameters.doubles("ECM_dx"), parameters.doubles("ECM_dy"),parameters.doubles("ECM_dz"));
-// 	// ecm.resize_ecm_units_from_ecm_mesh();
-
-
-// 	// ecm.ecm_mesh.display_information(std::cout );
-
-// 	// std::cout<<ecm.ecm_mesh.nearest_voxel_index(position)<<std::endl;
-// 	// std::cout<<microenvironment.mesh.nearest_voxel_index(position)<<std::endl;
-// 	// std::cout<<" hit Enter to continue:"<<std::flush;
-// 	// std::cin.get();
-
-// 	microenvironment.decay_rates[0] = parameters.doubles("chemotactic_substrate_decay_rate");
-
-// 	// Trying to set the chemical gradient to be a starburst. Using the same code snippets as the ECM orientation. 
-
-// 	// Catching if chemical field gradient not specified for unit testing - if chemical_field_setup_specified_bool is true, there is a string match in the chemical field setup, else, the field is not specified. Program halts in this condition if unit testing IS specified and displays message requesting user specify the chemical field set up.
-
-// 	bool chemical_field_setup_specified_bool = (parameters.strings("chemical_field_setup")== "starburst" ||  parameters.strings("chemical_field_setup")== "vertical up" || parameters.strings("chemical_field_setup") == "horizontal right" || parameters.strings("chemical_field_setup") == "angle" || parameters.strings("chemical_field_setup") == "none");
-
-// 	// std::cout<<"Chemical field specified? "<<chemical_field_setup_specified_bool<<std::endl;
-
-// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "starburst")
-// 	{
-
-// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-// 		{
-// 			std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-// 			microenvironment.gradient_vector(i)[0] = { position[0],position[1],0}; 
-// 			normalize(&microenvironment.gradient_vector(i)[0]);
-// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-// 		}
-// 	}
-
-// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "vertical up")
-// 	{
-
-// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-// 		{
-// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-// 			microenvironment.gradient_vector(i)[0] = { 0,1,0}; 
-// 			normalize(&microenvironment.gradient_vector(i)[0]);
-// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-// 		}
-// 	}
-
-// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "horizontal right")
-// 	{
-
-// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-// 		{
-// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-// 			microenvironment.gradient_vector(i)[0] = { 1,0,0}; 
-// 			normalize(&microenvironment.gradient_vector(i)[0]);
-// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-// 		}
-// 	}
-
-// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "angle")
-// 	{
-		
-
-// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-// 		{
-// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-// 			microenvironment.gradient_vector(i)[0] = { cos ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180) , sin ( parameters.doubles("angle_of_chemical_field_gradient") * PhysiCell_constants::pi/180),0}; 
-// 			normalize(&microenvironment.gradient_vector(i)[0]);
-// 			// std::cout<<microenvironment.gradient_vector(i)[0][2]<<std::endl;
-// 		}
-// 	}
-
-// 	if( parameters.ints("unit_test_setup") == 1 && parameters.strings("chemical_field_setup") == "none")
-// 	{
-
-// 		for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-// 		{
-// 			// std::vector<double> position = microenvironment.mesh.voxels[i].center; 
-// 			microenvironment.gradient_vector(i)[0] = { 0,0,0}; 
-// 		}
-
-// 	}
-
-// 	else if( parameters.ints("unit_test_setup") == 1 && chemical_field_setup_specified_bool == 0)
-// 	{
-// 		std::cout<<"WARNING: NO CHEMICAL FIELD ORIENTATION SPECIFIED for unit testing. FIX THIS!!!"<<std::endl;
-// 		std::cout<<"Halting program!!!"<<std::endl;
-// 		abort();
-// 		return;
-// 	}
-
-
-// 	// run to get a decent starting conditoin (refers to code no longer present but will be added back for fibroblast-cancer cell signaling models)
-	
-// 	// now, let's set the fibroblast signal to 1, so we don't hvae early swiching 
-// 	/*
-// 	for( int i=0 ; i < microenvironment.number_of_voxels() ; i++ )
-// 	{
-// 		microenvironment.density_vector(i)[1] = 1.0; 
-// 	}
-// 	*/
-
-// 	// set up ECM density and anisotropy profile as needed
-// 	// int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
-// 	// int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
-
-// 	/*for( int n = 0; n < microenvironment.mesh.voxels.size() ; n++ )
-// 	{
-// 		std::vector<double> position = microenvironment.mesh.voxels[n].center; 
-// 		if( fabs( position[0] ) > 200 || fabs( position[1] ) > 200 )
-// 		{
-// 			microenvironment(n)[ECM_density_index] = 0.0; 
-// 			microenvironment(n)[ECM_anisotropy_index] = 1.0; 
-// 		}
-// 	}*/
-	
-// 	return; 
-// }	
 
 void setup_extracellular_matrix( void )
 {
@@ -1285,6 +811,453 @@ double sign_function (double number)
 
 /* To eliminate chemotaxis, set chemotaxis bias to zero. To eliminate ECM influence, set a to 0 (permanently) or ECM senstiivity to zero */
 
+void cancer_cell_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+	
+	if(phenotype.death.dead == true)
+	{
+		
+		phenotype.motility.is_motile = false;
+		pCell->functions.update_migration_bias = NULL;
+		pCell->functions.update_phenotype = NULL;
+		std::cout<<2<<std::endl;
+		std::cout<<"Cell is dead"<<std::endl;
+	}
+	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
+	
+	// find location of variables and base parameter values
+	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	static int o2_index = microenvironment.find_density_index( "oxygen" ); 
+
+	    // rwh: use underscores now that they are in the .xml as tags
+	
+	static int link_anisotropy_and_bias_index = pCell->custom_data.find_variable_index( "link_anisotropy_and_bias" );
+	    if (link_anisotropy_and_bias_index < 0) 
+    {
+        std::cout << "        static int link_anisotropy_and_bias_index = " <<link_anisotropy_and_bias_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max_speed" ); 
+	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis_bias");
+	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM_sensitivity");
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min_ECM_motility_density");
+    if (min_ECM_mot_den_index < 0) 
+    {
+        std::cout << "        static int min_ECM_mot_den_index = " <<min_ECM_mot_den_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max_ECM_motility_density");
+    if (max_ECM_mot_den_index < 0) std::exit(-1);
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal_ECM_motility_density");
+    if (ideal_ECM_mot_den_index  < 0) std::exit(-1);
+	
+	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+
+	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
+	double a = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy; 
+	std::vector<double> f = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment;
+	
+	
+	/****************************************Begin new migration direction update****************************************/
+
+	// Select random direction (for random portion of motility vector) and begin building updated motility direction vector
+	// (note - there is NO memeory of previous direction in this model - previous ECM-based motility used the current 
+	// velocity vector to build off, not a random one - this could produce divergent behaviors between models)
+
+	// See lab note book for more notes - MUST start with random vector. In the old method I defintiely used the previous motility vector in the method, but makes no sense here!
+
+	// get random vector - cell's "intended" or chosen random direction
+	double angle = UniformRandom() * 6.283185307179586;
+	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
+
+	// std::cout<<"D random "<<d_random<<std::endl;
+
+	// get vector for chemotaxis (sample uE)
+	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
+
+	// std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
+
+	normalize( &chemotaxis_grad ); 
+
+	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
+
+	// New bias - bias such that the agents can more closely follow the gradient IF the written signals are stronger. 
+
+	std::vector<double> d_motility;
+
+	// d_motility = {0,0,0};
+	
+	if (pCell->custom_data[link_anisotropy_and_bias_index] < 0.5) // no ints/bools in custom data - must be double - so use 0.5 instead of 0
+	{
+		d_motility = (1-a) * d_random + a * chemotaxis_grad;
+		// std::cout<<" I am coupled"<<std::endl;
+	}
+
+	else if (pCell->custom_data[link_anisotropy_and_bias_index] > 0.5) // no ints/bools in custom data - must be double - so use 0.5 instead of 1
+	{
+		// NON-ECM linked way to signal 
+		d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+		// std::cout<<" I am UNcoupled"<<std::endl;
+	}
+
+	else
+	{
+		std::cout<<"Must specify reader chemotaxis modeling mode - see XML parameter \"link_anisotropy_and_bias\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
+	}
+
+	normalize( &d_motility ); 
+
+
+	// std::cout<<"D motility "<<d_motility<<std::endl;
+
+	// to determine direction along f, find part of d_choice that is perpendicular to f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
+	
+	normalize( &d_perp ); 
+
+	// std::cout<<"D perp"<<d_perp<<std::endl;
+
+	// std::cout<<"Fiber "<<f<<std::endl;
+	
+	// find constants to span d_choice with d_perp and f
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
+
+	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+
+	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
+
+	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
+	// std::cout<<"anisotropy = "<<a<<std::endl;
+	// std::cout<<"ECM sensitivity index = "<<pCell->custom_data[ECM_sensitivity_index]<<std::endl;
+	// std::cout<<"gamma = "<< gamma <<std::endl;
+	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
+
+	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
+	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
+	{
+		// normalize( &phenotype.motility.migration_bias_direction ); // only needed if not running through the update_migration_bias code/bias not set to 1.0
+		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		pCell->phenotype.motility.migration_speed = 1.0;
+	}
+
+	else
+	{
+		pCell->phenotype.motility.migration_speed = norm( phenotype.motility.migration_bias_direction);
+		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+	
+	
+	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
+
+	// std::cout<<"migration speed(l1236) = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+	// double magnitude = norm( phenotype.motility.motility_vector);	
+
+	// std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
+
+	// if(magnitude > 0.00000001)
+	// {
+	// 	std::cout<<"Cell is moving!!!!"<<std::endl;
+	// }
+
+	/****************************************END new migration direction update****************************************/
+
+
+	// /*********************************************Begin speed update***************************************************/
+	
+	// New speed update (06.18.19) - piece wise continous
+	
+	double rho_low = pCell->custom_data[min_ECM_mot_den_index];
+	double rho_high = pCell->custom_data[max_ECM_mot_den_index];
+	double rho_ideal = pCell->custom_data[ideal_ECM_mot_den_index];
+
+	// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
+
+	if (ECM_density <= rho_low)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+
+	}
+
+	else if (rho_low < ECM_density && ECM_density <= rho_ideal)
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
+		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+
+	else if (rho_ideal < ECM_density && ECM_density < rho_high )
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+	}
+
+	// else //if (ECM_density >= rho_high)
+	// {
+	// 	pCell->phenotype.motility.migration_speed = 0.0;
+	// }
+
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	// std::cout<<"cell adhesion = "<<pCell->phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
+	// std::cout<<"cell repulsion = "<<pCell->phenotype.mechanics.cell_cell_repulsion_strength <<std::endl;
+	// std::cout<<"cell persistence time ="<<pCell->phenotype.motility.persistence_time <<std::endl;
+	// std::cout<<"cell transition rates = "<<phenotype.death.rates[apoptosis_index] <<std::endl;
+	// std::cout<<"cell death rates = "<<phenotype.death.rates[necrosis_index] <<std::endl;
+
+	// END New speed update 
+
+	return; 
+}
+
+
+void fibroblast_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+	
+	if(phenotype.death.dead == true)
+	{
+		
+		phenotype.motility.is_motile = false;
+		pCell->functions.update_migration_bias = NULL;
+		pCell->functions.update_phenotype = NULL;
+		std::cout<<2<<std::endl;
+		std::cout<<"Cell is dead"<<std::endl;
+	}
+	// Updates cell bias vector and cell speed based on the ECM density, anisotropy, and fiber direction
+	
+	// find location of variables and base parameter values
+	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+	static int inflam_sig_index = microenvironment.find_density_index( "inflammatory_signal" ); 
+
+	static int link_anisotropy_and_bias_index = pCell->custom_data.find_variable_index( "link_anisotropy_and_bias" );
+	if (link_anisotropy_and_bias_index < 0) 
+    {
+        std::cout << "        static int link_anisotropy_and_bias_index = " <<link_anisotropy_and_bias_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max_speed" ); 
+	static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis_bias");
+	static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM_sensitivity");
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min_ECM_motility_density");
+    if (min_ECM_mot_den_index < 0) 
+    {
+        std::cout << "        static int min_ECM_mot_den_index = " <<min_ECM_mot_den_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max_ECM_motility_density");
+    if (max_ECM_mot_den_index < 0) std::exit(-1);
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal_ECM_motility_density");
+    if (ideal_ECM_mot_den_index  < 0) std::exit(-1);
+	
+	// sample ECM - only changes for decoupling **should** be here as nothign gets written to the ECM...
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+
+	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
+	double a = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy; 
+	std::vector<double> f = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment;
+	
+	
+	/****************************************Begin new migration direction update****************************************/
+
+	// Select random direction (for random portion of motility vector) and begin building updated motility direction vector
+	// (note - there is NO memeory of previous direction in this model - previous ECM-based motility used the current 
+	// velocity vector to build off, not a random one - this could produce divergent behaviors between models)
+
+	// See lab note book for more notes - MUST start with random vector. In the old method I defintiely used the previous motility vector in the method, but makes no sense here!
+
+	// get random vector - cell's "intended" or chosen random direction
+	double angle = UniformRandom() * 6.283185307179586;
+	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
+
+	// std::cout<<"D random "<<d_random<<std::endl;
+
+	// get vector for chemotaxis (sample uE)
+	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(inflam_sig_index);
+
+	// std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
+
+	normalize( &chemotaxis_grad ); 
+
+	//combine cell chosen random direction and chemotaxis direction (like standard update_motlity function)
+
+	// New bias - bias such that the agents can more closely follow the gradient IF the written signals are stronger. 
+
+	std::vector<double> d_motility;
+
+	// d_motility = {0,0,0};
+	
+	if (pCell->custom_data[link_anisotropy_and_bias_index] < 0.5) // no ints/bools in custom data - must be double - so use 0.5 instead of 0
+	{
+		d_motility = (1-a) * d_random + a * chemotaxis_grad;
+		// std::cout<<" I am coupled"<<std::endl;
+	}
+
+	else if (pCell->custom_data[link_anisotropy_and_bias_index] > 0.5) // no ints/bools in custom data - must be double - so use 0.5 instead of 1
+	{
+		// NON-ECM linked way to signal 
+		d_motility = (1-pCell->custom_data[chemotaxis_bias_index])*d_random + pCell->custom_data[chemotaxis_bias_index]*chemotaxis_grad;
+		// std::cout<<" I am UNcoupled"<<std::endl;
+	}
+
+	else
+	{
+		std::cout<<"Must specify reader chemotaxis modeling mode - see XML parameter \"link_anisotropy_and_bias\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
+	}
+
+	normalize( &d_motility ); 
+
+
+	// std::cout<<"D motility "<<d_motility<<std::endl;
+
+	// to determine direction along f, find part of d_choice that is perpendicular to f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
+	
+	normalize( &d_perp ); 
+
+	// std::cout<<"D perp"<<d_perp<<std::endl;
+
+	// std::cout<<"Fiber "<<f<<std::endl;
+	
+	// find constants to span d_choice with d_perp and f
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
+
+	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
+	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
+
+	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
+
+	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
+	// std::cout<<"anisotropy = "<<a<<std::endl;
+	// std::cout<<"ECM sensitivity index = "<<pCell->custom_data[ECM_sensitivity_index]<<std::endl;
+	// std::cout<<"gamma = "<< gamma <<std::endl;
+	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
+
+	phenotype.motility.migration_bias_direction = (1.0-gamma)*c_1*d_perp + c_2*f;
+	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
+	{
+		// normalize( &phenotype.motility.migration_bias_direction ); // only needed if not running through the update_migration_bias code/bias not set to 1.0
+		// std::cout<<"migration_bias_direction after normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
+		pCell->phenotype.motility.migration_speed = 1.0;
+	}
+
+	else
+	{
+		pCell->phenotype.motility.migration_speed = norm( phenotype.motility.migration_bias_direction);
+		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+	
+	
+	phenotype.motility.migration_bias = 1.0; // MUST be set at 1.0 so that standard update_motility function doesn't add random motion. 
+
+	// std::cout<<"migration speed(l1236) = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+
+	// double magnitude = norm( phenotype.motility.motility_vector);	
+
+	// std::cout<<"Magnitutude of motility vector is "<< magnitude<<std::endl;
+
+	// if(magnitude > 0.00000001)
+	// {
+	// 	std::cout<<"Cell is moving!!!!"<<std::endl;
+	// }
+
+	/****************************************END new migration direction update****************************************/
+
+
+	// /*********************************************Begin speed update***************************************************/
+	
+	// New speed update (06.18.19) - piece wise continous
+	
+	double rho_low = pCell->custom_data[min_ECM_mot_den_index];
+	double rho_high = pCell->custom_data[max_ECM_mot_den_index];
+	double rho_ideal = pCell->custom_data[ideal_ECM_mot_den_index];
+
+	// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
+
+	if (ECM_density <= rho_low)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+
+	}
+
+	else if (rho_low < ECM_density && ECM_density <= rho_ideal)
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
+		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+
+	else if (rho_ideal < ECM_density && ECM_density < rho_high )
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+	}
+
+	// else //if (ECM_density >= rho_high)
+	// {
+	// 	pCell->phenotype.motility.migration_speed = 0.0;
+	// }
+
+	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	// std::cout<<"cell adhesion = "<<pCell->phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
+	// std::cout<<"cell repulsion = "<<pCell->phenotype.mechanics.cell_cell_repulsion_strength <<std::endl;
+	// std::cout<<"cell persistence time ="<<pCell->phenotype.motility.persistence_time <<std::endl;
+	// std::cout<<"cell transition rates = "<<phenotype.death.rates[apoptosis_index] <<std::endl;
+	// std::cout<<"cell death rates = "<<phenotype.death.rates[necrosis_index] <<std::endl;
+
+	// END New speed update 
+
+	return; 
+}
+
 void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
@@ -1463,7 +1436,7 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
 		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
 	}
@@ -1478,7 +1451,7 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
@@ -1521,6 +1494,10 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 
 void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	std::cout<<"ECM_informed_motility_update_model_w_memory() called. Exiting until it is fixed!\n";  //rwh
+    std::exit(-1);  //rwh
+
+	
 	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
 
 	if(phenotype.death.dead == true)
@@ -1684,7 +1661,7 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -1697,7 +1674,7 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
@@ -1741,7 +1718,8 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	// std::cout<<"cell speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
-
+	std::cout<<"ECM_informed_motility_update_w_chemotaxis_w_variable_speed() called. Exiting until it is fixed!\n";  //rwh
+    std::exit(-1);  //rwh
 	
 	if(phenotype.death.dead == true)
 	{
@@ -1884,7 +1862,7 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -1897,7 +1875,7 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
@@ -2029,7 +2007,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
 		// std::cout<<"rho_ideal = "<<rho_ideal<<std::endl;
 		// std::cout<<"rho_low = "<<rho_low<<std::endl;
@@ -2048,7 +2026,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt )
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
@@ -2285,6 +2263,196 @@ long fibonacci(unsigned n) // just being used for timing.
 
 // uses cell motility vector for fiber reorientation
 
+void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	
+	// this is based in ecm_update_from_cell_motility_vector from PC_ECM_extension v.1.x
+	
+	//*********************************** REMODELING ***********************************//
+	
+	// Find correct items
+	std::vector<double> cell_position = pCell->position;
+	// std::cout<<cell_position<<std::endl;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+	// std::cout<<nearest_ecm_voxel_index<<std::endl;
+	// std::cin.get();
+
+	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target_ECM_density");
+	static int Cell_ECM_production_rate_index = pCell->custom_data.find_variable_index( "ECM_production_rate");
+	if (Cell_ECM_production_rate_index < 0) 
+    {
+        std::cout << "        static int Cell_ECM_production_rate_index = " <<Cell_ECM_production_rate_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy_increase_rate");
+	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber_realignment_rate");
+
+    // Cell-ECM density interaction
+
+    double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density;
+    double r = pCell->custom_data[Cell_ECM_production_rate_index];
+	// std::cout<<"ECM_production_rate: "<<r<<std::endl;
+    
+    ecm.ecm_voxels[nearest_ecm_voxel_index].density = ECM_density + r * dt  * (pCell->custom_data[Cell_ECM_target_density_index] - ECM_density);
+    
+	// std::cout<<"ECM density = "<<ecm.ecm_voxels[nearest_ecm_voxel_index].density<<std::endl;
+	// END Cell-ECM density interaction
+	
+	// Cell-ECM Fiber realingment - continous then discrete
+
+	if( parameters.ints("discrete_ECM_remodeling") == 1)
+	{
+
+		// Get index for accessing the ECM_fiber_alignment data structure and then copy the correct value
+		// int n = pCell->get_current_voxel_index();
+		std::vector<double> ECM_orientation = ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment; 
+
+		double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
+		double migration_speed = pCell->phenotype.motility.migration_speed;
+		double r_0 = pCell->custom_data[Cell_fiber_realignment_rate_index]*migration_speed; // 1/10.0 // min-1 // NOTE!!! on 08.06.18 run - this wasn't multiplied by migration_speed!!! should be the same but worth noting!!!!
+		// std::cout<<r_0<<std::endl;
+		
+		double r_realignment = r_0 * (1-anisotropy);
+		double ddotf;
+		std::vector<double> norm_cell_motility = phenotype.motility.motility_vector;
+		
+		// norm_cell_motility.resize(3,0.0);
+		// norm_cell_motility = phenotype.motility.motility_vector;
+		normalize(&norm_cell_motility);
+		
+		ddotf = dot_product_ext(ECM_orientation, norm_cell_motility);
+		ECM_orientation = sign_function(ddotf) * ECM_orientation; // flips the orientation vector so that it is aligned correctly with the moving cell for proper reoirentation later.
+		std::vector<double> f_minus_d;
+		f_minus_d.resize(3,0.0);
+		// f_minus_d = ECM_orientation - norm_cell_motility; // Fix this later
+		for(int i = 0; i < 3; i++)
+		{
+			if (ddotf<0.0)
+			{
+				ECM_orientation = -1.0 * ECM_orientation;
+			}
+			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; // 06.05.19 - fixed 
+			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
+		}
+		
+		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); // why by reference??
+
+		// End Cell-ECM Fiber realingment
+	
+		// Cell-ECM Anisotrophy Modification
+		
+		double r_a0 = pCell->custom_data[Cell_anistoropy_rate_of_increase_index] ; // min-1
+		
+		double r_anisotropy = r_a0 * migration_speed;
+		
+		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
+		
+		// END Cell-ECM Anisotropy Modification
+	}
+
+	else if (parameters.ints("discrete_ECM_remodeling") == 0)
+	{
+		if (ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy == 1)
+		{
+			// std::cout<<"pass code"<<std::endl;
+		}
+		
+		else
+		{
+		if (norm(phenotype.motility.motility_vector) == 0)
+		{std::cout<<"Motility vector norm = 0"<<std::endl;}
+
+ 		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
+		
+		if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
+
+		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
+		}
+	}
+
+	else
+	{
+		std::cout<<"Must specify ECM remodeling mode - see XML parameter \"discrete_ECM_remodeling\" Halting!!!!!!"<<std::endl;
+		abort();
+		return;
+	}
+    
+	//****************************************** END REMODELING ******************************************************//
+
+	/*********************************************Begin speed update***************************************************/
+	
+	// New speed update (06.18.19) - piece wise continous
+
+	// rwh: use underscores now that they are in the .xml as tags
+	static int max_cell_speed_index = pCell->custom_data.find_variable_index( "max_speed" ); 
+	if (max_cell_speed_index < 0) std::exit(-1);
+    // std::cout << "        static int max_cell_speed_index = " <<max_cell_speed_index << std::endl;
+	// static int chemotaxis_bias_index = pCell->custom_data.find_variable_index( "chemotaxis_bias");
+	// static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM_sensitivity");
+    // std::cout << "        static int ECM_sensitivity_index = " <<ECM_sensitivity_index << std::endl;
+	static int min_ECM_mot_den_index = pCell->custom_data.find_variable_index( "min_ECM_motility_density");
+    if (min_ECM_mot_den_index < 0) 
+    {
+        std::cout << "        static int min_ECM_mot_den_index = " <<min_ECM_mot_den_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	static int max_ECM_mot_den_index = pCell->custom_data.find_variable_index( "max_ECM_motility_density");
+    if (max_ECM_mot_den_index < 0) std::exit(-1);
+	static int ideal_ECM_mot_den_index = pCell->custom_data.find_variable_index( "ideal_ECM_motility_density");
+    if (ideal_ECM_mot_den_index  < 0) std::exit(-1);
+	
+	double rho_low = pCell->custom_data[min_ECM_mot_den_index];
+	double rho_high = pCell->custom_data[max_ECM_mot_den_index];
+	double rho_ideal = pCell->custom_data[ideal_ECM_mot_den_index];
+	// std::cout<<"rho_low = "<<rho_low<<std::endl;
+	// std::cout<<"rho_high = "<<rho_high<<std::endl;
+	// std::cout<<"rho_ideal = "<<rho_ideal<<std::endl;
+	// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
+
+	if (ECM_density <= rho_low)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+	}
+
+	else if (rho_low < ECM_density && ECM_density <= rho_ideal)
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		// std::cout<<"l2438"<<std::endl;
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		// std::cout<<"migration speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
+		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+	}
+
+	else if (rho_ideal < ECM_density && ECM_density < rho_high )
+	{
+
+		// for base speed: y - y_1 = m (x - x_1) or y = m (x - x_1) + y_1
+		// Assuming that y_1 = 0 --> y = m (x - x_1)
+		// m = rise/run = (speed(rho_ideal) - speed(rho_l)/(rho_ideal - rho_l)). Same for rho_h
+		// Assuming that speed(rho_ideal) = 1.0 and speed(rho_l (or rho_h)) = 0.0, m = 1/(rho_ideal - rho_l)
+		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
+		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
+
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+	}
+
+	else //if (ECM_density >= rho_high)
+	{
+		pCell->phenotype.motility.migration_speed = 0.0;
+	}
+
+    return;
+}
+
 void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , double dt) 
 {
 
@@ -2402,6 +2570,8 @@ void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , d
 
 void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , double dt)
 {
+	std::cout<<"ecm_update_from_cell_velocity_vector() called. Exiting until it is fixed!\n";  //rwh
+    std::exit(-1);  //rwh
 
 	// Find correct fields
 	std::vector<double> cell_position = pCell->position;

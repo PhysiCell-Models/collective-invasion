@@ -62,7 +62,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o
 
-PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o
+PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o cell_ECM_interactions.o
 
 PhysiCell_custom_module_OBJECT_3 := fibrosis.o extracellular_matrix.o
 
@@ -177,6 +177,9 @@ PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
 
 extracellular_matrix.o: ./custom_modules/extracellular_matrix.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/extracellular_matrix.cpp
+
+cell_ECM_interactions.o: ./custom_modules/cell_ECM_interactions.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/cell_ECM_interactions.cpp
 
 AMIGOS-invasion_uncoupled.o: ./custom_modules/AMIGOS-invasion_uncoupled.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion_uncoupled.cpp
