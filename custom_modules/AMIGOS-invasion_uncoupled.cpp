@@ -1616,7 +1616,7 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
         // std::cout << "rwh #2: setting speed = " << pCell->phenotype.motility.migration_speed << std::endl;
 	}
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -1628,7 +1628,7 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
         std::cout << "rwh #3: setting speed = " << pCell->phenotype.motility.migration_speed << std::endl;
 	}
 	else //if (ECM_density >= rho_high)
@@ -1839,7 +1839,7 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -1852,7 +1852,7 @@ void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& pheno
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
@@ -2041,7 +2041,7 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -2054,7 +2054,7 @@ void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Ph
 		// y = 1/(x_2 - x_1) * (x - x_1) --> speed_base = 1/(rho_ideal - rho_l) * (rho - rho_l)
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
-		pCell->phenotype.motility.migration_speed *= pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
+		pCell->phenotype.motility.migration_speed = pCell->custom_data[max_cell_speed_index] * ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); // magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 	}
 
 	else //if (ECM_density >= rho_high)
