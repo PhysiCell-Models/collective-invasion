@@ -1,5 +1,14 @@
 <PhysiCell_settings version="devel-version">
 
+    <cell_rules>
+        <rulesets>
+            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+                <folder>/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/config/</folder>
+                <filename>invasive_spheroid_chemoattractant_rules.csv</filename>
+            </ruleset>
+        </rulesets>
+    </cell_rules>
+
     <domain>
         <x_min>-800</x_min>
         <x_max>800</x_max>
@@ -27,7 +36,7 @@
     </parallel>
 
     <save>
-        <folder>invasive_spheroid_output</folder>
+        <folder>invasive_spheroid_longer_diffusion_length</folder>
         <full_data>
             <interval units="min">60</interval>
             <enable>true</enable>
@@ -51,7 +60,7 @@
         <variable name="oxygen" units="dimensionless" ID="0">
             <physical_parameter_set>
                 <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-                <decay_rate units="1/min">0.1</decay_rate>
+                <decay_rate units="1/min">1.0</decay_rate>
             </physical_parameter_set>
             <initial_condition units="mmHg">0</initial_condition>
             <Dirichlet_boundary_condition units="mmHg" enabled="True">38</Dirichlet_boundary_condition>
@@ -67,7 +76,7 @@
         <variable name="inflammatory_signal" units="dimensionless" ID="1">
             <physical_parameter_set>
                 <diffusion_coefficient units="micron^2/min">100000</diffusion_coefficient>
-                <decay_rate units="1/min">1</decay_rate>
+                <decay_rate units="1/min">0.1</decay_rate>
             </physical_parameter_set>
             <initial_condition units="dimensionless">0.0</initial_condition>
             <Dirichlet_boundary_condition units="dimensionless" enabled="False">0.0</Dirichlet_boundary_condition>
@@ -235,6 +244,7 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0.001</ECM_production_rate>
                 <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">1.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
+                <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
             </custom_data>
         </cell_definition>
         <cell_definition name="cancer cell" ID="1">
@@ -379,6 +389,7 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0</ECM_production_rate>
                 <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
+                <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
             </custom_data>
         </cell_definition>
     </cell_definitions>
@@ -435,5 +446,7 @@
         <visual_guideline_pattern type="string" units="" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles">none</visual_guideline_pattern>
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
         <link_anisotropy_and_bias type="int" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0</link_anisotropy_and_bias>
+        <heterogeneous_invasive_spheroid type="bool" units="" description="false - two values for density; true - three values">false</heterogeneous_invasive_spheroid>
+        <reduce_adhesion_on_groomed_matrix type="bool" units="" description="false - cancer_cell adhesion is constant; true- adhesion decreases when anisotropy is above threshold">false</reduce_adhesion_on_groomed_matrix>
     </user_parameters>
 </PhysiCell_settings>

@@ -180,7 +180,7 @@ void create_cell_types( void )
 		return;
 	}
 
-	cancer_cell->functions.custom_cell_rule = ECM_remodeling_function;
+	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function;
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -276,6 +276,17 @@ void setup_extracellular_matrix( void )
 				ecm.ecm_voxels[n].density = 1.0;
 			}
 
+			if(parameters.bools( "heterogeneous_invasive_spheroid") == true)
+				{if(ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("tumor_radius"))
+					{
+						double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+						// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+						// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+						// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+						ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+						ecm.ecm_voxels[n].density = 0.25;
+					}
+				}
 			else
 			{
 				double theta = 6.2831853071795864769252867665590 * uniform_random(); 
@@ -1034,7 +1045,6 @@ void cancer_cell_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenoty
 
 	return; 
 }
-
 
 void fibroblast_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -2451,6 +2461,37 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 
     return;
+}
+
+void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// Find correct items
+	std::vector<double> cell_position = pCell->position;
+	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
+	double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
+	int adhesion_change_threshold_index = pCell->custom_data.find_variable_index( "adhesion_change_threshold");
+	if (adhesion_change_threshold_index < 0) 
+    {
+        std::cout << "        static int adhesion_change_threshold_index = " <<adhesion_change_threshold_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
+	
+	if(anisotropy>pCell->custom_data[adhesion_change_threshold_index])
+	{pCell->phenotype.mechanics.cell_cell_adhesion_strength = 5.0;}
+	else
+	{pCell->phenotype.mechanics.cell_cell_adhesion_strength = 10.0;}
+}
+
+void custom_cancer_cell_ECM_remodeling_and_adhesion_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	ECM_remodeling_function( pCell, phenotype, dt );
+
+	if (parameters.bools("reduce_adhesion_on_groomed_matrix")==true)
+	{
+		update_adhesion( pCell, phenotype, dt );
+	}
+
+	return;
 }
 
 void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , double dt) 

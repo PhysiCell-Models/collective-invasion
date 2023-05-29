@@ -80,6 +80,10 @@ void fibroblast_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotyp
 
 void cancer_cell_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );
 
+void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt );
+
+void custom_cancer_cell_ECM_remodeling_and_adhesion_function( Cell* pCell, Phenotype& phenotype, double dt );
+
 void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
 
 // cancer cell rules 
