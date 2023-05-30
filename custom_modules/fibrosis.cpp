@@ -427,6 +427,7 @@ void setup_tissue( void )
 	SeedRandom(0);
 	static Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
 	static Cell_Definition* cancer_cell = find_cell_definition("cancer cell");	
+	static Cell_Definition* macrophage = find_cell_definition("macrophage");
 
 	if (parameters.ints("march_unit_test_setup") == 0)
 	{
@@ -691,12 +692,24 @@ void setup_tissue( void )
 
 			/***********************************Add in the fibroblasts**************************************/
 
-			int number_of_fibroblasts = parameters.ints("number_of_fibroblasts");
+			// int number_of_fibroblasts = parameters.ints("number_of_fibroblasts");
 			double theta2 = 0.0;
 			for (int a = 0; a<42; a++)
 			{
 				Cell* pCell = NULL;
 				pCell = create_cell(*fibroblast); 
+				pCell->assign_position( 600 * cos(theta2) , 600 * sin(theta2) , 0.0 );
+				theta2 += 0.14959952;
+			}
+
+			/***********************************Add in the macrophages**************************************/
+
+			// int number_of_fibroblasts = parameters.ints("number_of_fibroblasts");
+			theta2 = 0.749;
+			for (int a = 0; a<42; a++)
+			{
+				Cell* pCell = NULL;
+				pCell = create_cell(*macrophage); 
 				pCell->assign_position( 300 * cos(theta2) , 300 * sin(theta2) , 0.0 );
 				theta2 += 0.14959952;
 			}

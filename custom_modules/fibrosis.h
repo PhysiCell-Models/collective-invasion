@@ -69,7 +69,7 @@ using namespace PhysiCell;
 
 extern Cell_Definition fibroblast; // are these needed?
 extern Cell_Definition cancer_cell; 
-
+extern Cell_Definition macrophage;
 // overall rules 
 
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) ;// done 
