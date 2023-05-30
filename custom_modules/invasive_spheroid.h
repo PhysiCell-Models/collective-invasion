@@ -84,7 +84,7 @@ void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt );
 
 void custom_cancer_cell_ECM_remodeling_and_adhesion_function( Cell* pCell, Phenotype& phenotype, double dt );
 
-void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
+// void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
 
 // cancer cell rules 
 
@@ -135,4 +135,5 @@ void alter_cell_uptake_secretion_saturation ( void );
 void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
 void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern );
 void write_ECM_Data_matlab( std::string filename );
-double sign_function (double number);
+double sign_function_old (double number);
+double dot_product_ext_old( const std::vector<double>& v , const std::vector<double>& w );

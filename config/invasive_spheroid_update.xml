@@ -36,7 +36,7 @@
     </parallel>
 
     <save>
-        <folder>invasive_spheroid_longer_diffusion_length</folder>
+        <folder>invasive_spheroid_output</folder>
         <full_data>
             <interval units="min">60</interval>
             <enable>true</enable>
@@ -57,23 +57,7 @@
     </options>
 
     <microenvironment_setup>
-        <variable name="oxygen" units="dimensionless" ID="0">
-            <physical_parameter_set>
-                <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-                <decay_rate units="1/min">1.0</decay_rate>
-            </physical_parameter_set>
-            <initial_condition units="mmHg">0</initial_condition>
-            <Dirichlet_boundary_condition units="mmHg" enabled="True">38</Dirichlet_boundary_condition>
-            <Dirichlet_options>
-                <boundary_value ID="xmin" enabled="True">38</boundary_value>
-                <boundary_value ID="xmax" enabled="True">38</boundary_value>
-                <boundary_value ID="ymin" enabled="True">38</boundary_value>
-                <boundary_value ID="ymax" enabled="True">38</boundary_value>
-                <boundary_value ID="zmin" enabled="False">38</boundary_value>
-                <boundary_value ID="zmax" enabled="False">38</boundary_value>
-            </Dirichlet_options>
-        </variable>
-        <variable name="inflammatory_signal" units="dimensionless" ID="1">
+        <variable name="inflammatory_signal" units="dimensionless" ID="0">
             <physical_parameter_set>
                 <diffusion_coefficient units="micron^2/min">100000</diffusion_coefficient>
                 <decay_rate units="1/min">0.1</decay_rate>
@@ -87,6 +71,22 @@
                 <boundary_value ID="ymax" enabled="False" />
                 <boundary_value ID="zmin" enabled="False" />
                 <boundary_value ID="zmax" enabled="False" />
+            </Dirichlet_options>
+        </variable>
+        <variable name="oxygen" units="dimensionless" ID="1">
+            <physical_parameter_set>
+                <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+                <decay_rate units="1/min">1.0</decay_rate>
+            </physical_parameter_set>
+            <initial_condition units="mmHg">0</initial_condition>
+            <Dirichlet_boundary_condition units="mmHg" enabled="True">38</Dirichlet_boundary_condition>
+            <Dirichlet_options>
+                <boundary_value ID="xmin" enabled="True">38</boundary_value>
+                <boundary_value ID="xmax" enabled="True">38</boundary_value>
+                <boundary_value ID="ymin" enabled="True">38</boundary_value>
+                <boundary_value ID="ymax" enabled="True">38</boundary_value>
+                <boundary_value ID="zmin" enabled="False">38</boundary_value>
+                <boundary_value ID="zmax" enabled="False">38</boundary_value>
             </Dirichlet_options>
         </variable>
         <options>
@@ -185,24 +185,24 @@
                             <enabled>false</enabled>
                             <normalize_each_gradient>false</normalize_each_gradient>
                             <chemotactic_sensitivities>
-                                <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
                                 <chemotactic_sensitivity substrate="inflammatory_signal">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
                             </chemotactic_sensitivities>
                         </advanced_chemotaxis>
                     </options>
                 </motility>
                 <secretion>
-                    <substrate name="oxygen">
-                        <secretion_rate units="1/min">0</secretion_rate>
-                        <secretion_target units="substrate density">38</secretion_target>
-                        <uptake_rate units="1/min">10</uptake_rate>
-                        <net_export_rate units="total substrate/min">0</net_export_rate>
-                    </substrate>
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">0.0</secretion_rate>
                         <secretion_target units="substrate density">0.0</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
+                    <substrate name="oxygen">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">38</secretion_target>
+                        <uptake_rate units="1/min">10</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                 </secretion>
                 <cell_interactions>
@@ -330,24 +330,24 @@
                             <enabled>false</enabled>
                             <normalize_each_gradient>false</normalize_each_gradient>
                             <chemotactic_sensitivities>
-                                <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
                                 <chemotactic_sensitivity substrate="inflammatory_signal">0.0</chemotactic_sensitivity>
+                                <chemotactic_sensitivity substrate="oxygen">0.0</chemotactic_sensitivity>
                             </chemotactic_sensitivities>
                         </advanced_chemotaxis>
                     </options>
                 </motility>
                 <secretion>
-                    <substrate name="oxygen">
-                        <secretion_rate units="1/min">0</secretion_rate>
-                        <secretion_target units="substrate density">38</secretion_target>
-                        <uptake_rate units="1/min">10</uptake_rate>
-                        <net_export_rate units="total substrate/min">0</net_export_rate>
-                    </substrate>
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">50.0</secretion_rate>
                         <secretion_target units="substrate density">1</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
+                    <substrate name="oxygen">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">38</secretion_target>
+                        <uptake_rate units="1/min">10</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                 </secretion>
                 <cell_interactions>
