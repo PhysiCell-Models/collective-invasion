@@ -67,14 +67,24 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
-extern Cell_Definition fibroblast; 
+extern Cell_Definition fibroblast; // are these needed?
 extern Cell_Definition cancer_cell; 
 
 // overall rules 
 
 void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) ;// done 
 void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt ); // done 
-//void change_speed_ecm(Cell* pCell);
+// Cell-ecm interaction rules
+
+void fibroblast_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );
+
+void cancer_cell_ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );
+
+void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt );
+
+void custom_cancer_cell_ECM_remodeling_and_adhesion_function( Cell* pCell, Phenotype& phenotype, double dt );
+
+void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
 
 // cancer cell rules 
 
