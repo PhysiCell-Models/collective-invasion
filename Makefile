@@ -64,7 +64,7 @@ PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_mat
 
 PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o cell_ECM_interactions.o
 
-PhysiCell_custom_module_OBJECT_3 := fibrosis.o extracellular_matrix.o
+PhysiCell_custom_module_OBJECT_3 := fibrosis.o extracellular_matrix.o cell_ECM_interactions.o
 
 pugixml_OBJECTS := pugixml.o
 

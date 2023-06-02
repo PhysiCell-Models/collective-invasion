@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">14400</max_time>
+        <max_time units="min">7200</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -194,17 +194,17 @@
                     </options>
                 </motility>
                 <secretion>
-                    <substrate name="debris">
-                        <secretion_rate units="1/min">0</secretion_rate>
-                        <secretion_target units="substrate density">38</secretion_target>
-                        <uptake_rate units="1/min">0</uptake_rate>
-                        <net_export_rate units="total substrate/min">0</net_export_rate>
-                    </substrate>
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">0.0</secretion_rate>
                         <secretion_target units="substrate density">0.0</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
+                    <substrate name="debris">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">38</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                 </secretion>
                 <cell_interactions>
@@ -317,7 +317,7 @@
                         <cell_adhesion_affinity name="cancer cell">1.0</cell_adhesion_affinity>
                     </cell_adhesion_affinities>
                     <options>
-                        <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
+                        <set_relative_equilibrium_distance enabled="true" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
                     <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
@@ -334,7 +334,7 @@
                         <enabled>false</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
-                            <enabled>true</enabled>
+                            <enabled>false</enabled>
                             <substrate>debris</substrate>
                             <direction>1</direction>
                         </chemotaxis>
@@ -349,17 +349,17 @@
                     </options>
                 </motility>
                 <secretion>
-                    <substrate name="debris">
-                        <secretion_rate units="1/min">10</secretion_rate>
-                        <secretion_target units="substrate density">1</secretion_target>
-                        <uptake_rate units="1/min">0</uptake_rate>
-                        <net_export_rate units="total substrate/min">0</net_export_rate>
-                    </substrate>
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">0</secretion_rate>
                         <secretion_target units="substrate density">1</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
+                    <substrate name="debris">
+                        <secretion_rate units="1/min">10</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                 </secretion>
                 <cell_interactions>
@@ -504,21 +504,21 @@
                     </options>
                 </motility>
                 <secretion>
-                    <substrate name="debris">
-                        <secretion_rate units="1/min">0</secretion_rate>
-                        <secretion_target units="substrate density">0</secretion_target>
-                        <uptake_rate units="1/min">1</uptake_rate>
-                        <net_export_rate units="total substrate/min">0</net_export_rate>
-                    </substrate>
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">10</secretion_rate>
                         <secretion_target units="substrate density">1.0</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
                     </substrate>
+                    <substrate name="debris">
+                        <secretion_rate units="1/min">0</secretion_rate>
+                        <secretion_target units="substrate density">0</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
+                    </substrate>
                 </secretion>
                 <cell_interactions>
-                    <dead_phagocytosis_rate units="1/min">1.0</dead_phagocytosis_rate>
+                    <dead_phagocytosis_rate units="1/min">0.005</dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="fibroblast" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="dead cell" units="1/min">0.0</phagocytosis_rate>
@@ -659,17 +659,17 @@
                     </options>
                 </motility>
                 <secretion>
-                    <substrate name="debris">
-                        <secretion_rate units="1/min">10</secretion_rate>
-                        <secretion_target units="substrate density">1</secretion_target>
-                        <uptake_rate units="1/min">0</uptake_rate>
-                        <net_export_rate units="total substrate/min">0</net_export_rate>
-                    </substrate>
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">0</secretion_rate>
                         <secretion_target units="substrate density">1</secretion_target>
                         <uptake_rate units="1/min">0.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
+                    </substrate>
+                    <substrate name="debris">
+                        <secretion_rate units="1/min">10</secretion_rate>
+                        <secretion_target units="substrate density">1</secretion_target>
+                        <uptake_rate units="1/min">0</uptake_rate>
+                        <net_export_rate units="total substrate/min">0</net_export_rate>
                     </substrate>
                 </secretion>
                 <cell_interactions>
@@ -734,7 +734,7 @@
     <user_parameters>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
         <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
-        <cell_setup type="string" units="" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march">circle_of_fibroblasts</cell_setup>
+        <cell_setup type="string" units="circle_of_fibroblasts" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march">circle_of_fibroblasts</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">175</tumor_radius>
         <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0.0</initial_fibroblast_fraction>
         <oxygen_uptake type="double" units="mmHg/min" description="Default cell oxygen uptake rate">10</oxygen_uptake>
