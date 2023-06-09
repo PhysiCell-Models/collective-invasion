@@ -12,4 +12,4 @@ double sign_function (double number);
 void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
 
 // uses custom chemotaxis function - will upgrade to use the standard one later.
-void ECM_based_cell_motility_update_with_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );
+void ECM_based_cell_motility_update_including_chemotaxis( Cell* pCell, Phenotype& phenotype, double dt );

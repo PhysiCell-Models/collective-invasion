@@ -118,6 +118,13 @@ void create_cell_types( void )
 
 	setup_signal_behavior_dictionaries(); 	
 
+	/*
+       Cell rule definitions 
+	*/
+
+	setup_cell_rules(); 
+
+
 	/* 
 	   Put any modifications to individual cell definitions here. 
 	   
@@ -130,7 +137,7 @@ void create_cell_types( void )
 
 	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; 
 	
-	fibroblast->functions.update_migration_bias = fibroblast_ECM_informed_motility_update_w_chemotaxis;
+	fibroblast->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_2; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -140,7 +147,7 @@ void create_cell_types( void )
 
     // dead_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
-	// macrophage->functions.update_migration_bias = ECM_based_cell_motility_update_with_chemotaxis;
+	macrophage->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_2;
 
 
 	/*
@@ -536,10 +543,6 @@ void setup_tissue( void )
 	{
 		std::cout<<"NO algorithmic initial cell configuration!!!"<<std::endl;
 		std::cout<<"Enable running from CSV or SOMETHNG!!!"<<std::endl;
-
-
-
-		return;
 	}
 	
 	// load cells from your CSV file (if enabled)

@@ -63,6 +63,7 @@
 
 #include "./AMIGOS-invasion_uncoupled.h"
 #include "./extracellular_matrix.h"
+#include "./cell_ECM_interactions.h"
 #include <chrono>  // for high_resolution_clock - https://www.pluralsight.com/blog/software-development/how-to-measure-execution-time-intervals-in-c--
 // std::vector< std::vector<double> > ECM_fiber_alignment; 
 unsigned long long int counter=0; // counter for calculating average for the ad hoc timing I am doing ... 
@@ -466,7 +467,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	leader_cell->functions.update_migration_bias = chemotaxis_oxygen;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
+	leader_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
     leader_cell->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -487,7 +488,7 @@ void create_cell_types( void )
     // rwh: doing this one:
     if ( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
-		follower_cell->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis;
+		follower_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;
 		std::cout<<"I selected follower chemotaxsis" << std::endl;   // <------ rwh
 	}
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")
@@ -889,9 +890,8 @@ void set_cell_motility_vectors( void )
 	for( int i=0 ; i < (*all_cells).size() ; i++ )
 	{
 		Cell* pCell = (*all_cells)[i];
-		pCell->update_motility_vector( 20 );
+		pCell->update_motility_vector( 100 );
 		std::cout<<"Initial Motility vector "<<pCell->phenotype.motility.motility_vector<<std::endl;
-
 	}
 }
 
@@ -1386,7 +1386,7 @@ void setup_tissue( void )
 }
 #endif
 
-double dot_product( const std::vector<double>& v , const std::vector<double>& w )
+double dot_product_ext_old ( const std::vector<double>& v , const std::vector<double>& w )
 {
 	double out = 0.0; 
 	for( unsigned int i=0 ; i < v.size() ; i++ )
@@ -1398,7 +1398,7 @@ double dot_product( const std::vector<double>& v , const std::vector<double>& w 
 	return out; 
 }
 
-double sign_function (double number)
+double sign_function_old (double number)
 {
 	// double sign = 0.0
 	if (number<0)
@@ -1499,12 +1499,12 @@ void ECM_informed_motility_update_w_chemotaxis( Cell* pCell, Phenotype& phenotyp
 	double angle = UniformRandom() * 6.283185307179586;
 	std::vector<double> d_random = { cos(angle) , sin(angle) , 0.0 };
 
-	// std::cout<<"D random "<<d_random<<std::endl;
+	std::cout<<"D random "<<d_random<<std::endl;
 
 	// get vector for chemotaxis (sample uE)
 	std::vector<double> chemotaxis_grad = pCell->nearest_gradient(o2_index);
 
-	// std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
+	std::cout<<"D chemo"<<chemotaxis_grad<<std::endl;
 
 	normalize( &chemotaxis_grad ); 
 

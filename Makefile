@@ -60,7 +60,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o
+PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o cell_ECM_interactions.o
 
 PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o cell_ECM_interactions.o
 
@@ -69,13 +69,14 @@ PhysiCell_custom_module_OBJECT_3 := fibrosis.o extracellular_matrix.o cell_ECM_i
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+
+LEADER_FOLLOWER_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 INVASIVE_SPHEROID_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECT_2)
 FIBROSIS_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECT_3)
 #compile the project 
 	
-all: main-ecm.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main-ecm.cpp 
+all: main-ecm.cpp $(LEADER_FOLLOWER_OBJECTS)
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(LEADER_FOLLOWER_OBJECTS) main-ecm.cpp 
 
 invasive_spheroid: main_invasive_spheroid.cpp $(INVASIVE_SPHEROID_OBJECTS)
 	$(COMPILE_COMMAND) -o invasive_spheroid $(INVASIVE_SPHEROID_OBJECTS) main_invasive_spheroid.cpp 

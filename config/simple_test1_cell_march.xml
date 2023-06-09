@@ -1,5 +1,14 @@
 <PhysiCell_settings version="devel-version">
 
+    <cell_rules>
+        <rulesets>
+            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+                <folder />
+                <filename />
+            </ruleset>
+        </rulesets>
+    </cell_rules>
+
     <domain>
         <x_min>-500</x_min>
         <x_max>500</x_max>
@@ -29,11 +38,11 @@
     <save>
         <folder>simple_test1</folder>
         <full_data>
-            <interval units="min">6</interval>
+            <interval units="min">600</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">6</interval>
+            <interval units="min">600</interval>
             <enable>true</enable>
         </SVG>
         <legacy_data>

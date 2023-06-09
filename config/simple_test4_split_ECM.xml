@@ -1,5 +1,14 @@
 <PhysiCell_settings version="devel-version">
 
+    <cell_rules>
+        <rulesets>
+            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+                <folder />
+                <filename />
+            </ruleset>
+        </rulesets>
+    </cell_rules>
+
     <domain>
         <x_min>-500</x_min>
         <x_max>500</x_max>
@@ -208,6 +217,7 @@
                 <target_ECM_density conserved="false" units="dimensionless" description="Cell ECM density target">0.5</target_ECM_density>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="Anisotropy rate of increase">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">0.0</Fiber_realignment_rate>
+                <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
             </custom_data>
         </cell_definition>
         <cell_definition name="leader cell" ID="1">
@@ -341,6 +351,7 @@
                 <target_ECM_density conserved="false" units="dimensionless" description="Cell ECM density target">0.5</target_ECM_density>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="Anisotropy rate of increase">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">0.0</Fiber_realignment_rate>
+                <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
             </custom_data>
         </cell_definition>
     </cell_definitions>

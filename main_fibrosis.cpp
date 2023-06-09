@@ -247,11 +247,8 @@ int main( int argc, char* argv[] )
 			// update the microenvironment
 
 			// if(parameters.bools("freeze_uE_profile")==true)
-
-			if( parameters.ints("unit_test_setup") == 0 && parameters.bools("freeze_uE_profile")==0 ) // Is there a way to set this only once??
-			{
-				microenvironment.simulate_diffusion_decay( diffusion_dt );
-			}
+			
+			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
