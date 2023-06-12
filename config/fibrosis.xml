@@ -59,8 +59,8 @@
     <microenvironment_setup>
         <variable name="inflammatory_signal" units="dimensionless" ID="0">
             <physical_parameter_set>
-                <diffusion_coefficient units="micron^2/min">10000</diffusion_coefficient>
-                <decay_rate units="1/min">1</decay_rate>
+                <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
+                <decay_rate units="1/min">10</decay_rate>
             </physical_parameter_set>
             <initial_condition units="dimensionless">0.0</initial_condition>
             <Dirichlet_boundary_condition units="dimensionless" enabled="False">0.0</Dirichlet_boundary_condition>
@@ -247,10 +247,10 @@
                 <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
-                <chemotaxis_bias conserved="false" units="dimensionless" description="">1.0</chemotaxis_bias>
+                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.25</chemotaxis_bias>
                 <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
-                <target_ECM_density conserved="false" units="dimensionless" description="">1.0</target_ECM_density>
+                <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
@@ -557,15 +557,15 @@
                 <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
-                <chemotaxis_bias conserved="false" units="dimensionless" description="">1.0</chemotaxis_bias>
+                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.25</chemotaxis_bias>
                 <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
-                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
-                <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
-                <ECM_production_rate conserved="false" units="1/min" description="">0.001</ECM_production_rate>
+                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.00</Anisotropy_increase_rate>
+                <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.000</ECM_production_rate>
                 <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.8</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>

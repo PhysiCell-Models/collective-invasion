@@ -137,7 +137,7 @@ void create_cell_types( void )
 
 	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; 
 	
-	fibroblast->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_2; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
+	fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -147,7 +147,7 @@ void create_cell_types( void )
 
     // dead_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
-	macrophage->functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_2;
+	macrophage->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;
 
 
 	/*
