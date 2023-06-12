@@ -3,7 +3,7 @@
     <cell_rules>
         <rulesets>
             <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
-                <folder>/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/config/</folder>
+                <folder>config/</folder>
                 <filename>fibrosis_rules.csv</filename>
             </ruleset>
         </rulesets>
