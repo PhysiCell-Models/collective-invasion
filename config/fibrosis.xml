@@ -4,7 +4,7 @@
         <rulesets>
             <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
                 <folder>config/</folder>
-                <filename>fibrosis_rules.csv</filename>
+                <filename>fibrosis_rules_demo_for_michael.csv</filename>
             </ruleset>
         </rulesets>
     </cell_rules>
@@ -60,13 +60,13 @@
         <variable name="inflammatory_signal" units="dimensionless" ID="0">
             <physical_parameter_set>
                 <diffusion_coefficient units="micron^2/min">1000</diffusion_coefficient>
-                <decay_rate units="1/min">10</decay_rate>
+                <decay_rate units="1/min">0.1</decay_rate>
             </physical_parameter_set>
             <initial_condition units="dimensionless">0.0</initial_condition>
-            <Dirichlet_boundary_condition units="dimensionless" enabled="False">0.0</Dirichlet_boundary_condition>
+            <Dirichlet_boundary_condition units="dimensionless" enabled="False">0.5</Dirichlet_boundary_condition>
             <Dirichlet_options>
                 <boundary_value ID="xmin" enabled="False" />
-                <boundary_value ID="xmax" enabled="False" />
+                <boundary_value ID="xmax" enabled="False">0.5</boundary_value>
                 <boundary_value ID="ymin" enabled="False" />
                 <boundary_value ID="ymax" enabled="False" />
                 <boundary_value ID="zmin" enabled="False" />
@@ -75,7 +75,7 @@
         </variable>
         <variable name="debris" units="dimensionless" ID="1">
             <physical_parameter_set>
-                <diffusion_coefficient units="micron^2/min">1</diffusion_coefficient>
+                <diffusion_coefficient units="micron^2/min">5</diffusion_coefficient>
                 <decay_rate units="1/min">0</decay_rate>
             </physical_parameter_set>
             <initial_condition units="mmHg">0</initial_condition>
@@ -152,8 +152,8 @@
                     <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                 </volume>
                 <mechanics>
-                    <cell_cell_adhesion_strength units="micron/min">5</cell_cell_adhesion_strength>
-                    <cell_cell_repulsion_strength units="micron/min">25.0</cell_cell_repulsion_strength>
+                    <cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
                         <cell_adhesion_affinity name="fibroblast">1.0</cell_adhesion_affinity>
@@ -173,7 +173,7 @@
                 </mechanics>
                 <motility>
                     <speed units="micron/min">0.5</speed>
-                    <persistence_time units="min">10</persistence_time>
+                    <persistence_time units="min">10.0</persistence_time>
                     <migration_bias units="dimensionless">0.8</migration_bias>
                     <options>
                         <enabled>true</enabled>
@@ -247,16 +247,15 @@
                 <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
-                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.25</chemotaxis_bias>
+                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.9</chemotaxis_bias>
                 <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
-                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
-                <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
-                <ECM_production_rate conserved="false" units="1/min" description="">0.001</ECM_production_rate>
-                <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">1.0</inflam_sig_migration_bias_for_fibroblasts>
+                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.000</Anisotropy_increase_rate>
+                <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.000</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
             </custom_data>
@@ -411,7 +410,6 @@
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="">0</ECM_production_rate>
-                <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
             </custom_data>
@@ -557,7 +555,7 @@
                 <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
-                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.25</chemotaxis_bias>
+                <chemotaxis_bias conserved="false" units="dimensionless" description="">1.0</chemotaxis_bias>
                 <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
@@ -566,7 +564,6 @@
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.00</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.000</ECM_production_rate>
-                <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.8</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
             </custom_data>
@@ -721,7 +718,6 @@
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="">0</ECM_production_rate>
-                <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
             </custom_data>
@@ -729,18 +725,18 @@
     </cell_definitions>
 
     <initial_conditions>
-        <cell_positions type="csv" enabled="false">
+        <cell_positions type="csv" enabled="true">
             <folder>./config</folder>
-            <filename>cells.csv</filename>
+            <filename>fibrosis_random_annulus_cells.csv</filename>
         </cell_positions>
     </initial_conditions>
 
     <user_parameters>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
         <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
-        <cell_setup type="string" units="circle_of_fibroblasts" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march">circle_of_fibroblasts</cell_setup>
+        <cell_setup type="string" units="dimensionless" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march">None</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">175</tumor_radius>
-        <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0.0</initial_fibroblast_fraction>
+        <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0</initial_fibroblast_fraction>
         <oxygen_uptake type="double" units="mmHg/min" description="Default cell oxygen uptake rate">10</oxygen_uptake>
         <default_cell_speed type="double" units="microns/minute" description="Base/maximum cell speed">0.5</default_cell_speed>
         <default_persistence_time type="double" units="minutes" description="Cell directional persistence time">10.0</default_persistence_time>
@@ -765,7 +761,7 @@
         <chemotactic_substrate_decay_rate type="double" units="1/minutes" description="Oxygen decay rate">0.1</chemotactic_substrate_decay_rate>
         <chemical_field_setup type="string" units="" description="Starburst, vertical up, horizontal right, angle, or none">none</chemical_field_setup>
         <angle_of_chemical_field_gradient type="double" units="" description="Angle of chemical field gradient orientation, specified in degrees">45.0</angle_of_chemical_field_gradient>
-        <ECM_orientation_setup type="string" units="" description="Random, horizontal, vertical, circular, starburst, hard_line, or split">random</ECM_orientation_setup>
+        <ECM_orientation_setup type="string" units="" description="random, horizontal, vertical, circular, starburst, hard_line, or split">random</ECM_orientation_setup>
         <ECM_dx type="double" units="um" description="Length of ECM unit in x-direction">20</ECM_dx>
         <ECM_dy type="double" units="um" description="Length of ECM unit in y-direction">20</ECM_dy>
         <ECM_dz type="double" units="um" description="Length of ECM unit in z-direction">20</ECM_dz>

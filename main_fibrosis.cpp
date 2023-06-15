@@ -89,16 +89,26 @@ using namespace PhysiCell;
 
 int main( int argc, char* argv[] )
 {
-	std::cout<<"test"<<std::endl;
+	// std::cout<<"test"<<std::endl;
 	// load and parse settings file(s)
  
 	bool XML_status = false; 
+	char copy_command [1024]; 
 	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	{
+		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	}
 	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{
+		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+	}
 	if( !XML_status )
 	{ exit(-1); }
+
+	// copy config file to output directry 
+	system( copy_command ); 
 
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
@@ -112,8 +122,6 @@ int main( int argc, char* argv[] )
 	std::string time_units = "min"; 
 	
 	double t_max = PhysiCell_settings.max_time;  // 1 days
-
-	std::cout<<"test"<<std::endl;
 
 	/* Microenvironment setup */ 
 	setup_microenvironment();
@@ -144,7 +152,8 @@ int main( int argc, char* argv[] )
 	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+	// save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -158,6 +167,9 @@ int main( int argc, char* argv[] )
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );
 	
+	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() );
+	create_plot_legend( filename , cell_coloring_function ); 
+
 	display_citations(); 
 	
 	run_biotransport( parameters.doubles("duration_of_uE_conditioning") ); 
@@ -209,7 +221,7 @@ int main( int argc, char* argv[] )
 				{	
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
-					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 				}
 				if( parameters.bools("enable_ecm_outputs") == true)
 				{
@@ -279,7 +291,7 @@ int main( int argc, char* argv[] )
 	// save a final simulation snapshot 
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );

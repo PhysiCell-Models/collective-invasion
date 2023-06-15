@@ -135,9 +135,9 @@ void create_cell_types( void )
 	Cell_Definition* dead_cell = find_cell_definition("dead cell");	
 	Cell_Definition* macrophage = find_cell_definition("macrophage");	
 
-	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; 
+	fibroblast->functions.custom_cell_rule = NULL; 
 	
-	fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
+	// fibroblast->functions.update_migration_bias = chemotaxis_function; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -147,7 +147,7 @@ void create_cell_types( void )
 
     // dead_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
-	macrophage->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;
+	// macrophage->functions.update_migration_bias = chemotaxis_function; //ECM_based_cell_motility_update_including_chemotaxis;
 
 
 	/*
