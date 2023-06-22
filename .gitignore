@@ -18,6 +18,7 @@ initial*.mat
 *.jpg
 *.png
 *.exe
+out*.txt
 
 # Development
 *.xcworkspace

@@ -135,6 +135,15 @@ void create_cell_types( void )
 	Cell_Definition* dead_cell = find_cell_definition("dead cell");	
 	Cell_Definition* macrophage = find_cell_definition("macrophage");	
 
+	/* required to enable XML definition of chemotaxis module */
+	bool simple_chemotaxis = true;  // defined at top of file: boolean simple_chemotaxis;
+	
+    if (fibroblast->functions.update_migration_bias == advanced_chemotaxis_function)
+    {
+		std::cout<< "fibroblast->functions.update_migration_bias == advanced_chemotaxis_function"<<std::endl;
+        simple_chemotaxis = false;
+    }
+
 	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; 
 	
 	fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //fibroblast_ECM_informed_motility_update_w_chemotaxis;

@@ -32,11 +32,7 @@ void ECM_based_cell_motility_update_including_chemotaxis( Cell* pCell, Phenotype
 {
     /*********************************************Chemotaxsis update***************************************************/
 	
-	// sample uE
-
-	// std::cout<<"In development - do not use. needs generalized. Exiting until it is fixed!\n";  
-    // std::exit(-1);  
-	// std::cout<<"Cell name "<< pCell->type_name<<std::endl;
+	// std::cout<<"Cell name 1 "<< pCell->type_name<<std::endl;
 
 	Cell_Definition* pCD = find_cell_definition(pCell->type_name);	
 	// get_single_base_behavior( Cell_Definition* pCD , std::string behavior ); 
@@ -283,6 +279,7 @@ void ECM_based_cell_motility_update_including_chemotaxis( Cell* pCell, Phenotype
 // uses cell motility vector for realigning ECM. 
 void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
+	// std::cout<<"Cell name 2 "<< pCell->type_name<<std::endl;
 
 	// this is based in ecm_update_from_cell_motility_vector from PC_ECM_extension v.1.x
 
@@ -296,6 +293,11 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 	// std::cin.get();
 
 	static int Cell_ECM_target_density_index = pCell->custom_data.find_variable_index( "target_ECM_density");
+	if (Cell_ECM_target_density_index < 0) 
+    {
+        std::cout << "        static int Cell_ECM_target_density_index = " <<Cell_ECM_target_density_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }
 	static int Cell_ECM_production_rate_index = pCell->custom_data.find_variable_index( "ECM_production_rate");
 	if (Cell_ECM_production_rate_index < 0) 
     {
@@ -303,7 +305,17 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
         std::exit(-1);  //rwh: should really do these for each
     }
 	static int Cell_anistoropy_rate_of_increase_index = pCell->custom_data.find_variable_index( "Anisotropy_increase_rate");
+	if (Cell_anistoropy_rate_of_increase_index < 0) 
+    {
+        std::cout << "        static int Cell_anistoropy_rate_of_increase_index = " <<Cell_anistoropy_rate_of_increase_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }	
 	static int Cell_fiber_realignment_rate_index = pCell->custom_data.find_variable_index( "Fiber_realignment_rate");
+	if (Cell_fiber_realignment_rate_index < 0) 
+    {
+        std::cout << "        static int Cell_fiber_realignment_rate_index = " <<Cell_fiber_realignment_rate_index << std::endl;
+        std::exit(-1);  //rwh: should really do these for each
+    }	
 
     // Cell-ECM density interaction
 

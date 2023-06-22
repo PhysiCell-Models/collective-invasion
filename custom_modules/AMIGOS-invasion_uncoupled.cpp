@@ -455,12 +455,16 @@ void create_cell_types( void )
 	// pCD->functions.update_phenotype = worker_cell_rule; 
 	// pCD->functions.contact_function = standard_elastic_contact_function; 
 
+	// fibroblast->functions.custom_cell_rule = ECM_remodeling_function; 
+	
+	// fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
+
     Cell_Definition* leader_cell = find_cell_definition("leader cell");	
 	Cell_Definition* follower_cell = find_cell_definition("follower cell");	
 
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
     {
-    	leader_cell->functions.custom_cell_rule = ecm_update_from_cell_motility_vector; // Only leaders can modify ECM (phenotype -> ECM)
+    	leader_cell->functions.custom_cell_rule = ECM_remodeling_function; // In cell_ECM_interactions.cpp
     }
 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
 	{
@@ -473,7 +477,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	leader_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
+	leader_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //in cell_ECM_interactions.cpp
 	
     leader_cell->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -494,7 +498,7 @@ void create_cell_types( void )
     // rwh: doing this one:
     if ( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
-		follower_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;
+		follower_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; // In cell_ECM_interactions.cpp
 		std::cout<<"I selected follower chemotaxsis" << std::endl;   // <------ rwh
 	}
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")

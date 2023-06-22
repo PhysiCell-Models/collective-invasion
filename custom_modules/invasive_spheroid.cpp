@@ -135,13 +135,13 @@ void create_cell_types( void )
 
 	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; // Only leaders can modify ECM (phenotype -> ECM)
 	
-	fibroblast->functions.update_migration_bias = fibroblast_ECM_informed_motility_update_w_chemotaxis;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
+	fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
 	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function;
 
-	cancer_cell->functions.update_migration_bias = cancer_cell_ECM_informed_motility_update_w_chemotaxis;
+	cancer_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;
 
 	cancer_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
