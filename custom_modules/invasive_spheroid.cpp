@@ -231,13 +231,30 @@ void setup_extracellular_matrix( void )
 			ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
 		}
 
-		else if(parameters.strings( "ECM_orientation_setup") == "hard_line")
+		else if(parameters.strings( "ECM_orientation_setup") == "basement_membrane")
 		{
 			// std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
 			if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("tumor_radius") && ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("tumor_radius") - 60)
 			{
 				ecm.ecm_voxels[n].ecm_fiber_alignment = {1.0, 0.0, 0.0};
 				ecm.ecm_voxels[n].density = 1.0;
+			}
+			
+			else if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("tumor_radius") - 60)
+				{
+					double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+					// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+					// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+					// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+					ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+					ecm.ecm_voxels[n].density = 0.25;
+				}
+
+			else
+			{
+				double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+				ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+				ecm.ecm_voxels[n].density = 0.0;
 			}
 
 			if(parameters.bools( "heterogeneous_invasive_spheroid") == true)

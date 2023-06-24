@@ -76,7 +76,7 @@
         <variable name="oxygen" units="dimensionless" ID="1">
             <physical_parameter_set>
                 <diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-                <decay_rate units="1/min">1.0</decay_rate>
+                <decay_rate units="1/min">0.10</decay_rate>
             </physical_parameter_set>
             <initial_condition units="mmHg">0</initial_condition>
             <Dirichlet_boundary_condition units="mmHg" enabled="True">38</Dirichlet_boundary_condition>
@@ -195,7 +195,7 @@
                     <substrate name="inflammatory_signal">
                         <secretion_rate units="1/min">0.0</secretion_rate>
                         <secretion_target units="substrate density">0.0</secretion_target>
-                        <uptake_rate units="1/min">0.0</uptake_rate>
+                        <uptake_rate units="1/min">1.0</uptake_rate>
                         <net_export_rate units="total substrate/min">0.0</net_export_rate>
                     </substrate>
                     <substrate name="oxygen">
@@ -431,7 +431,7 @@
         <chemotactic_substrate_decay_rate type="double" units="1/minutes" description="Oxygen decay rate">0.1</chemotactic_substrate_decay_rate>
         <chemical_field_setup type="string" units="" description="Starburst, vertical up, horizontal right, angle, or none">none</chemical_field_setup>
         <angle_of_chemical_field_gradient type="double" units="" description="Angle of chemical field gradient orientation, specified in degrees">45.0</angle_of_chemical_field_gradient>
-        <ECM_orientation_setup type="string" units="" description="Random, horizontal, vertical, circular, starburst, hard_line, or split">hard_line</ECM_orientation_setup>
+        <ECM_orientation_setup type="string" units="" description="Random, horizontal, vertical, circular, starburst, basement_membrane, or split">basement_membrane</ECM_orientation_setup>
         <ECM_dx type="double" units="um" description="Length of ECM unit in x-direction">20</ECM_dx>
         <ECM_dy type="double" units="um" description="Length of ECM unit in y-direction">20</ECM_dy>
         <ECM_dz type="double" units="um" description="Length of ECM unit in z-direction">20</ECM_dz>

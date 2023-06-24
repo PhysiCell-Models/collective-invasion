@@ -158,6 +158,7 @@ void create_cell_types( void )
 
 	macrophage->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //ECM_based_cell_motility_update_including_chemotaxis;
 
+	macrophage->functions.custom_cell_rule = ECM_remodeling_function;
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 

@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">14400</max_time>
+        <max_time units="min">21600</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -235,7 +235,7 @@
             </phenotype>
             <custom_data>
                 <min_ECM_motility_density conserved="false" units="dimensionless" description="">0.0</min_ECM_motility_density>
-                <max_ECM_motility_density conserved="false" units="dimensionless" description="">0.9</max_ECM_motility_density>
+                <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
                 <chemotaxis_bias conserved="false" units="dimensionless" description="">0.5</chemotaxis_bias>
@@ -533,7 +533,7 @@
             </phenotype>
             <custom_data>
                 <min_ECM_motility_density conserved="false" units="dimensionless" description="">0.0</min_ECM_motility_density>
-                <max_ECM_motility_density conserved="false" units="dimensionless" description="">0.9</max_ECM_motility_density>
+                <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
                 <chemotaxis_bias conserved="false" units="dimensionless" description="">1.0</chemotaxis_bias>
@@ -553,14 +553,14 @@
 
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
-            <folder>./config</folder>
+            <folder>/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/config</folder>
             <filename>fibrosis_square_random_cells.csv</filename>
         </cell_positions>
     </initial_conditions>
 
     <user_parameters>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
-        <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
+        <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">.99</initial_ECM_density>
         <cell_setup type="string" units="dimensionless" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march">None</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">175</tumor_radius>
         <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0</initial_fibroblast_fraction>
