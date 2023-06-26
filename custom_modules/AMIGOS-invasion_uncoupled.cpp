@@ -464,7 +464,7 @@ void create_cell_types( void )
 
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
     {
-    	leader_cell->functions.custom_cell_rule = ECM_remodeling_function; // In cell_ECM_interactions.cpp
+    	leader_cell->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; // In cell_ECM_interactions.cpp
     }
 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
 	{
@@ -477,7 +477,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	leader_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //in cell_ECM_interactions.cpp
+	leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
 	
     leader_cell->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -492,13 +492,14 @@ void create_cell_types( void )
     //--------- now follower:
 
     follower_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
+	follower_cell->functions.custom_cell_rule = ECM_based_speed_update; // includes both speed and ECM remodeling
 
 // <cell_motility_ECM_interaction_model_selector type="string" units="" description="follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis<
 
     // rwh: doing this one:
     if ( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
-		follower_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; // In cell_ECM_interactions.cpp
+		follower_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; // In cell_ECM_interactions.cpp
 		std::cout<<"I selected follower chemotaxsis" << std::endl;   // <------ rwh
 	}
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")

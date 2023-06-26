@@ -3,7 +3,7 @@
     <cell_rules>
         <rulesets>
             <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
-                <folder>/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/config</folder>
+                <folder>./config</folder>
                 <filename>fibrosis_rules.csv</filename>
             </ruleset>
         </rulesets>
@@ -178,12 +178,12 @@
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
-                            <enabled>false</enabled>
+                            <enabled>true</enabled>
                             <substrate>inflammatory_signal</substrate>
                             <direction>1</direction>
                         </chemotaxis>
                         <advanced_chemotaxis>
-                            <enabled>true</enabled>
+                            <enabled>false</enabled>
                             <normalize_each_gradient>false</normalize_each_gradient>
                             <chemotactic_sensitivities>
                                 <chemotactic_sensitivity substrate="inflammatory_signal">0.0</chemotactic_sensitivity>
@@ -553,14 +553,14 @@
 
     <initial_conditions>
         <cell_positions type="csv" enabled="true">
-            <folder>/Users/JohnMetzcar/Documents/GitHub/AMIGOS-invasion/config</folder>
+            <folder>./config</folder>
             <filename>fibrosis_square_random_cells.csv</filename>
         </cell_positions>
     </initial_conditions>
 
     <user_parameters>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
-        <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">.99</initial_ECM_density>
+        <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">.5</initial_ECM_density>
         <cell_setup type="string" units="dimensionless" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march">None</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">175</tumor_radius>
         <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0</initial_fibroblast_fraction>

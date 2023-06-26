@@ -133,15 +133,15 @@ void create_cell_types( void )
     Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
 	Cell_Definition* cancer_cell = find_cell_definition("cancer cell");	
 
-	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; // Only leaders can modify ECM (phenotype -> ECM)
+	fibroblast->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; // Only leaders can modify ECM (phenotype -> ECM)
 	
-	fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
+	fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
-	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function;
+	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function; // includes speed and remodeling
 
-	cancer_cell->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis;
+	cancer_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update;
 
 	cancer_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
@@ -1698,7 +1698,7 @@ void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt )
 
 void custom_cancer_cell_ECM_remodeling_and_adhesion_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	ECM_remodeling_function( pCell, phenotype, dt );
+	combined_ECM_remodeling_and_speed_update( pCell, phenotype, dt );
 
 	if (parameters.bools("reduce_adhesion_on_groomed_matrix")==true)
 	{

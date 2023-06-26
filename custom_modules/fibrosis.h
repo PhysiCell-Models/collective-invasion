@@ -118,7 +118,7 @@ void setup_tissue(void); // done
 
 // set up the microenvironment to include the immunostimulatory factor 
 void setup_microenvironment( void );  // done 
-
+void ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype, double dt);
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
 std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
 void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19

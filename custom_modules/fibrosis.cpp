@@ -144,9 +144,9 @@ void create_cell_types( void )
         simple_chemotaxis = false;
     }
 
-	fibroblast->functions.custom_cell_rule = ECM_remodeling_function; 
+	fibroblast->functions.custom_cell_rule = ECM_remodeling_and_speed_update; 
 	
-	fibroblast->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
+	fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -156,9 +156,9 @@ void create_cell_types( void )
 
     // dead_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
-	macrophage->functions.update_migration_bias = ECM_based_cell_motility_update_including_chemotaxis; //ECM_based_cell_motility_update_including_chemotaxis;
+	macrophage->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //ECM_based_cell_motility_update_including_chemotaxis;
 
-	macrophage->functions.custom_cell_rule = ECM_remodeling_function;
+	macrophage->functions.custom_cell_rule = ECM_remodeling_and_speed_update;
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -571,6 +571,13 @@ double dot_product_ext_old( const std::vector<double>& v , const std::vector<dou
 	{out = 0.0;}
 
 	return out; 
+}
+
+void ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype, double dt)
+{
+	ECM_based_speed_update(pCell, phenotype, dt );
+
+	ECM_remodeling_function(pCell, phenotype, dt);
 }
 
 double sign_function_old (double number)
