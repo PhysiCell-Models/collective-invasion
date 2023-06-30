@@ -139,9 +139,9 @@ void create_cell_types( void )
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
-	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function; // includes speed and remodeling
+	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function; // includes speed and remodeling combined_ECM_remodeling_and_speed_update
 
-	cancer_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update;
+	cancer_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; // this needs fied or something
 
 	cancer_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
@@ -234,20 +234,20 @@ void setup_extracellular_matrix( void )
 		else if(parameters.strings( "ECM_orientation_setup") == "basement_membrane")
 		{
 			// std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
-			if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("tumor_radius") && ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("tumor_radius") - 60)
+			if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("basement_membrane_location") && ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("basement_membrane_location") - 20)
 			{
 				ecm.ecm_voxels[n].ecm_fiber_alignment = {1.0, 0.0, 0.0};
 				ecm.ecm_voxels[n].density = 1.0;
 			}
 			
-			else if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("tumor_radius") - 60)
+			else if(ecm.ecm_mesh.voxels[n].center[1] < -parameters.doubles("basement_membrane_location") - 20)
 				{
 					double theta = 6.2831853071795864769252867665590 * uniform_random(); 
 					// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
 					// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
 					// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
 					ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
-					ecm.ecm_voxels[n].density = 0.25;
+					ecm.ecm_voxels[n].density = 0.5;
 				}
 
 			else
@@ -257,25 +257,25 @@ void setup_extracellular_matrix( void )
 				ecm.ecm_voxels[n].density = 0.0;
 			}
 
-			if(parameters.bools( "heterogeneous_invasive_spheroid") == true)
-				{if(ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("tumor_radius"))
-					{
-						double theta = 6.2831853071795864769252867665590 * uniform_random(); 
-						// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
-						// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
-						// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
-						ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
-						ecm.ecm_voxels[n].density = 0.25;
-					}
-				}
-			else
-			{
-				double theta = 6.2831853071795864769252867665590 * uniform_random(); 
-				// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
-				// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
-				// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
-				ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
-			}
+			// if(parameters.bools( "heterogeneous_invasive_spheroid") == true)
+			// 	{if(ecm.ecm_mesh.voxels[n].center[1] > -parameters.doubles("basement_membrane_location"))
+			// 		{
+			// 			double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+			// 			// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+			// 			// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+			// 			// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+			// 			ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+			// 			ecm.ecm_voxels[n].density = 0.5;
+			// 		}
+			// 	}
+			// else
+			// {
+			// 	double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+			// 	// ecm.ecm_data[i].ECM_orientation[0] = cos(theta);
+			// 	// ecm.ecm_data[i].ECM_orientation[1] = sin(theta);
+			// 	// ecm.ecm_data[i].ECM_orientation[2] = 0.0;
+			// 	ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
+			// }
 		}
 
 		// for starburst initialization 
@@ -617,7 +617,7 @@ void setup_tissue( void )
 			}
 
 			int n = 0; 
-			while( y < tumor_radius )
+			while( y < tumor_radius && y >= 0 )
 			{
 				x = 0.0; 
 				if( n % 2 == 1 )
@@ -626,6 +626,7 @@ void setup_tissue( void )
 				
 				while( x < x_outer )
 				{
+					// 1st quadrant
 					if( UniformRandom() < fibroblast_fraction )
 					{ pCell = create_cell(*fibroblast); }
 					else
@@ -633,32 +634,37 @@ void setup_tissue( void )
 						
 					pCell->assign_position( x , y , 0.0 );
 					
-					if( fabs( y ) > 0.01 )
-					{
-						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(*fibroblast); }
-						else
-						{ pCell = create_cell(*cancer_cell); }
-						pCell->assign_position( x , -y , 0.0 );
-					}
+					// 4th quadrant
+					// if( fabs( y ) > 0.01 ) - for full circle
+					// if( y > 0.01 )
+					// {
+					// 	if( UniformRandom() < fibroblast_fraction )
+					// 	{ pCell = create_cell(*fibroblast); }
+					// 	else
+					// 	{ pCell = create_cell(*cancer_cell); }
+					// 	pCell->assign_position( x , -y , 0.0 );
+					// }
 					
 					if( fabs( x ) > 0.01 )
 					{ 
+						// 2nd quadrant
 						if( UniformRandom() < fibroblast_fraction )
 						{ pCell = create_cell(*fibroblast); }
 						else
 						{ pCell = create_cell(*cancer_cell); }
 						pCell->assign_position( -x , y , 0.0 );
 						
-						if( fabs( y ) > 0.01 )
-						{
-							if( UniformRandom() < fibroblast_fraction )
-							{ pCell = create_cell(*fibroblast); }
-							else
-							{ pCell = create_cell(*cancer_cell); }
+						// if( fabs( y ) > 0.01 )
+						// third quadrant
+						// if( y > 0.01 )
+						// {
+						// 	if( UniformRandom() < fibroblast_fraction )
+						// 	{ pCell = create_cell(*fibroblast); }
+						// 	else
+						// 	{ pCell = create_cell(*cancer_cell); }
 							
-							pCell->assign_position( -x , -y , 0.0 );
-						}
+						// 	pCell->assign_position( -x , -y , 0.0 );
+						// }
 					}
 					x += cell_spacing; 
 					
@@ -677,7 +683,7 @@ void setup_tissue( void )
 			for(int i=0; i<number_of_fibroblasts; i++)
 			{
 				pCell = create_cell(*fibroblast);
-				pCell->assign_position( n , -600.0, 0.0 );
+				pCell->assign_position( n , -450.0, 0.0 );
 				std::cout<<"Fibroblast placed at "<<pCell->position<<std::endl;
 				n += 100.0;
 			}
@@ -1683,17 +1689,18 @@ void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt )
 	std::vector<double> cell_position = pCell->position;
 	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 	double anisotropy = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy;
-	int adhesion_change_threshold_index = pCell->custom_data.find_variable_index( "adhesion_change_threshold");
-	if (adhesion_change_threshold_index < 0) 
-    {
-        std::cout << "        static int adhesion_change_threshold_index = " <<adhesion_change_threshold_index << std::endl;
-        std::exit(-1);  //rwh: should really do these for each
-    }
+
+	phenotype.mechanics.cell_cell_adhesion_strength = get_single_base_behavior(pCell, "cell-cell adhesion")  * (1 - Hill_response_function( anisotropy, 0.25, 4)); // This has no floor
+	phenotype.mechanics.cell_cell_adhesion_strength =(get_single_base_behavior(pCell, "cell-cell adhesion") - 5) * (1 - Hill_response_function( anisotropy, 0.25, 4)) + 5; // this has a floor of 5
+	double temp_affinity = (get_single_base_behavior(pCell, "adhesive affinity to cancer cell") - 0.5) * (1 - Hill_response_function( anisotropy, 0.25, 4)) + 0.5; // this has a floor of 5
+	set_single_behavior(pCell, "adhesive affinity to cancer cell", temp_affinity);
 	
-	if(anisotropy>pCell->custom_data[adhesion_change_threshold_index])
-	{pCell->phenotype.mechanics.cell_cell_adhesion_strength = 5.0;}
-	else
-	{pCell->phenotype.mechanics.cell_cell_adhesion_strength = 10.0;}
+	// if(phenotype.mechanics.cell_cell_adhesion_strength < 8)
+	// {
+	// 	std::cout<<"affinity to cancer cell "<<phenotype.mechanics.cell_adhesion_affinity("cancer cell")<<std::endl;
+	// 	std::cout<<"cell cell adhesion strength"<<phenotype.mechanics.cell_cell_adhesion_strength <<std::endl;
+	// 	std::cout<<"anisotropy "<<anisotropy<<std::endl;
+	// }
 }
 
 void custom_cancer_cell_ECM_remodeling_and_adhesion_function( Cell* pCell, Phenotype& phenotype, double dt )

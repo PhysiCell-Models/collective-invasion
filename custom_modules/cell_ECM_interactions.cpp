@@ -5,6 +5,45 @@ using namespace PhysiCell;
 
 extern ECM ecm;
 
+// This enables the use of rules to change the cell behaviors as well as aspects of visualization in the Studio
+// this is ONE WAY!!! DO NOT MODIFY WITHING BIOFVM!!! OR USE CELLS TO CHANGE THIS!!!!!!!!!
+
+// void copy_ECM_data_to_BioFVM( Cell* pCell, Phenotype& phenotype, double dt )
+// {
+
+//     int number_of_voxels = ecm.ecm_mesh.voxels.size();
+	
+// 	static int ECM_anisotropy_index = BioFVM::microenvironment.find_density_index( "ECM_anisotropy" ); 
+// 	if (ECM_anisotropy_index < 0) 
+//     {
+//         std::cout << "        static int ECM_anisotropy_index = " <<ECM_anisotropy_index << std::endl;
+//         std::exit(-1);  //rwh: should really do these for each
+//     }
+// 	static int ECM_density_index = BioFVM::microenvironment.find_density_index( "ECM_density" ); 
+// 	if (ECM_density_index < 0) 
+//     {
+//         std::cout << "        static int ECM_density_index = " <<ECM_density_index << std::endl;
+//         std::exit(-1);  //rwh: should really do these for each
+//     }
+//     for( int n=0; n < number_of_voxels ; n++ )
+//     {
+// 		BioFVM::microenvironment(*p_density_vectors)[n][ECM_anisotropy_index] = ecm.ecm_voxels[n].anisotropy;
+// 		(*p_density_vectors)[n][ECM_density_index] = ecm.ecm_voxels[n].density;
+// 		// std::cout<<BioFVM::microenvironment.density_vector(n)[ECM_anisotropy_index]<<std::endl;
+// 		// std::cout<<&BioFVM::microenvironment.density_vector(n)[ECM_anisotropy_index]<<std::endl;
+// 		BioFVM::microenvironment.density_vector(n)[ECM_anisotropy_index] = ecm.ecm_voxels[n].anisotropy;
+// 		// std::cout<<BioFVM::microenvironment.density_vector(n)[ECM_anisotropy_index]<<std::endl;
+// 		BioFVM::microenvironment.density_vector(n)[ECM_density_index] = ecm.ecm_voxels[n].density;
+// 		// std::cout<<BioFVM::microenvironment.density_vector(n)[ECM_density_index]<<std::endl;
+// 		// BioFVM::microenvironment.voxels[i].density_vector[ECM_density_index] = ecm.ecm_voxels[i].density;
+// 		//  = ecm.ecm_voxels[i].anisotropy;
+	
+//         // BioFVM::microenvironment.voxels[i].density_vector[ECM_density_index] = ecm.ecm_voxels[i].density;
+//     }
+//     return;
+
+// }
+
 double dot_product_ext( const std::vector<double>& v , const std::vector<double>& w )
 {
 	double out = 0.0; 
@@ -115,7 +154,9 @@ void ECM_based_speed_update( Cell* pCell, Phenotype& phenotype, double dt )
 
 		pCell->phenotype.motility.migration_speed = get_single_base_behavior( pCD, "migration speed" ) * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
+		// std::cout<<"base speed = "<<get_single_base_behavior( pCD, "migration speed" )<<std::endl;
 		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+		// std::cout<<"ECM density = "<<ECM_density<<std::endl;
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -280,8 +321,10 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 
 	// std::cout<<"D motility "<<d_motility<<std::endl;
 
+	// ******************************************************************************************************//
 	// ****** Finish with linear combination of random biased migration and ECM orientation following. ********//
-
+	// ******************************************************************************************************//
+	
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
 	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
 	
@@ -339,7 +382,7 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 
 	/*********************************************Begin speed update***************************************************/
 	
-	// New speed update (06.18.19) - piece wise continous
+	// needed to reassign speed after update.
 	
 	double rho_low = pCell->custom_data[min_ECM_mot_den_index];
 	double rho_high = pCell->custom_data[max_ECM_mot_den_index];
@@ -362,8 +405,9 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 		// So finally: speed = max_speed * (1/(rho_ideal - rho_l) * (rho - rho_l))
 
 		pCell->phenotype.motility.migration_speed = get_single_base_behavior( pCD, "migration speed" ) * ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); // magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
-		// std::cout<<"max_cell_speed = "<<pCell->custom_data[max_cell_speed_index]<<std::endl;
-		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+		// std::cout<<"base speed motility = "<<get_single_base_behavior( pCD, "migration speed" )<<std::endl;
+		// std::cout<<"speed motility = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+		// std::cout<<"ECM density = "<<ECM_density<<std::endl;
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
@@ -543,4 +587,6 @@ void combined_ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype
 	ECM_based_speed_update(pCell, phenotype, dt );
 
 	ECM_remodeling_function(pCell, phenotype, dt);
+
+	// copy_ECM_data_to_BioFVM(pCell, phenotype, dt);
 }

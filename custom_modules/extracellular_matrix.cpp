@@ -1,5 +1,8 @@
 #include "./extracellular_matrix.h"
 
+extern ECM ecm;
+extern BioFVM::Microenvironment microenvironment;
+
 ECM_Cartesian_Mesh::ECM_Cartesian_Mesh()
 {
 

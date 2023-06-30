@@ -144,7 +144,7 @@ void create_cell_types( void )
         simple_chemotaxis = false;
     }
 
-	fibroblast->functions.custom_cell_rule = ECM_remodeling_and_speed_update; 
+	fibroblast->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; 
 	
 	fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
 	
@@ -158,7 +158,7 @@ void create_cell_types( void )
 
 	macrophage->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //ECM_based_cell_motility_update_including_chemotaxis;
 
-	macrophage->functions.custom_cell_rule = ECM_remodeling_and_speed_update;
+	macrophage->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update;
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
