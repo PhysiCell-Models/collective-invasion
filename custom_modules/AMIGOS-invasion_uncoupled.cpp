@@ -492,7 +492,7 @@ void create_cell_types( void )
     //--------- now follower:
 
     follower_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
-	follower_cell->functions.custom_cell_rule = ECM_based_speed_update; // includes both speed and ECM remodeling
+	// follower_cell->functions.custom_cell_rule = ECM_based_speed_update; // includes both speed and ECM remodeling
 
 // <cell_motility_ECM_interaction_model_selector type="string" units="" description="follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis<
 

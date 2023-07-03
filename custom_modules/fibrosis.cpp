@@ -558,6 +558,9 @@ void setup_tissue( void )
 	// load cells from your CSV file (if enabled)
 	load_cells_from_pugixml(); 
 
+	// Kill cells of type dead_cell wihtin a circle. That will work. Or I could jsut do two types of epithelial cells
+	// Could also remove som cells (like a wound??) then add distress to preferin the wound area.
+
 	return; 
 }
 
