@@ -250,6 +250,7 @@
                 <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">1.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
+                <migration_bias_norm conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</migration_bias_norm>
             </custom_data>
         </cell_definition>
         <cell_definition name="cancer cell" ID="1">
@@ -400,6 +401,7 @@
                 <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
+                <migration_bias_norm conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</migration_bias_norm>
             </custom_data>
         </cell_definition>
         <cell_definition name="ctype_wmb" ID="2">
@@ -550,6 +552,7 @@
                 <inflam_sig_migration_bias_for_fibroblasts conserved="false" units="dimensionless" description="">0.0</inflam_sig_migration_bias_for_fibroblasts>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
+                <migration_bias_norm conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</migration_bias_norm>
             </custom_data>
         </cell_definition>
     </cell_definitions>
