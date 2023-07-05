@@ -249,6 +249,7 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0.001</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
+                <migration_bias_norm conserved="false" units="" description="Intenral variable - set to 1.0">1.0</migration_bias_norm>
             </custom_data>
         </cell_definition>
         <cell_definition name="dead cell" ID="1">
@@ -398,6 +399,7 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
+                <migration_bias_norm conserved="false" units="" description="Intenral variable - set to 1.0">1.0</migration_bias_norm>
             </custom_data>
         </cell_definition>
         <cell_definition name="macrophage" ID="2">
@@ -547,6 +549,7 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0.000</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
+                <migration_bias_norm conserved="false" units="" description="Intenral variable - set to 1.0">1.0</migration_bias_norm>
             </custom_data>
         </cell_definition>
     </cell_definitions>

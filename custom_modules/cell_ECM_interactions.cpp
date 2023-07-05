@@ -164,11 +164,11 @@ void ECM_based_speed_update( Cell* pCell, Phenotype& phenotype, double dt )
 		pCell->phenotype.motility.migration_speed *= ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); 
 		// magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 
-		std::cout<<"max_cell_speed = "<<pCell->custom_data[migration_bias_norm_index]<<std::endl;
-		std::cout<<"base speed = "<<get_single_base_behavior( pCD, "migration speed" )<<std::endl;
-		std::cout<<"ECM density influenc = "<< ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); 
-		std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
-		std::cout<<"ECM density = "<<ECM_density<<std::endl;
+		// std::cout<<"max_cell_speed = "<<pCell->custom_data[migration_bias_norm_index]<<std::endl;
+		// std::cout<<"base speed = "<<get_single_base_behavior( pCD, "migration speed" )<<std::endl;
+		// std::cout<<"ECM density influenc = "<< ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); 
+		// std::cout<<"speed = "<<pCell->phenotype.motility.migration_speed<<std::endl;
+		// std::cout<<"ECM density = "<<ECM_density<<std::endl;
 	}
 
 	else if (rho_ideal < ECM_density && ECM_density < rho_high )
