@@ -408,7 +408,8 @@ void create_cell_types( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 
     cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
-	
+	// std::vector<double> temp = {0.0,0.0,0.0};
+	// cell_defaults.custom_data.add_vector_variable( "custom_cell_velocity" , "micron" , temp); 
 	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
@@ -461,10 +462,13 @@ void create_cell_types( void )
 
     Cell_Definition* leader_cell = find_cell_definition("leader cell");	
 	Cell_Definition* follower_cell = find_cell_definition("follower cell");	
+	
+
+	leader_cell->functions.update_velocity = custom_update_cell_velocity;
 
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
     {
-    	leader_cell->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; // In cell_ECM_interactions.cpp
+    	leader_cell->functions.custom_cell_rule = ECM_remodeling_function; // In cell_ECM_interactions.cpp
     }
 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
 	{
@@ -477,7 +481,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
+	// leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
 	
     leader_cell->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -492,15 +496,19 @@ void create_cell_types( void )
     //--------- now follower:
 
     follower_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
-	follower_cell->functions.custom_cell_rule = ECM_based_speed_update; // includes both speed and ECM remodeling
+	// follower_cell->functions.custom_cell_rule = ECM_based_speed_update; // includes both speed and ECM remodeling
+
+	follower_cell->functions.update_velocity = custom_update_cell_velocity;
 
 // <cell_motility_ECM_interaction_model_selector type="string" units="" description="follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis<
 
     // rwh: doing this one:
     if ( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis/no follower hysteresis" || parameters.ints("unit_test_setup") == 1)
 	{
-		follower_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; // In cell_ECM_interactions.cpp
-		std::cout<<"I selected follower chemotaxsis" << std::endl;   // <------ rwh
+		// follower_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; // In cell_ECM_interactions.cpp
+		std::cout<<"Selection not currently supported" << std::endl;   // <------ rwh
+		std::cout<<"Using default chemotaxis" << std::endl;   // <------ rwh
+		// exit(-1);
 	}
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower hysteresis/no follower chemotaxis")
 	{
@@ -508,6 +516,8 @@ void create_cell_types( void )
 		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
 		std::cout<<"I selected follower hysteresis" << std::endl;
+				std::cout<<"Selection not currently supported" << std::endl;   // <------ rwh
+		exit(-1);
 	}
 	else if( parameters.strings("cell_motility_ECM_interaction_model_selector") == "follower chemotaxis with variable follower speed")
 	{
@@ -515,6 +525,8 @@ void create_cell_types( void )
 		// follower_cell.functions.update_migration_bias = ECM_informed_motility_update_w_chemotaxis_w_variable_speed;
 		// void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt )
 		std::cout<<"I selected follower chemotaxis with variable follower speed" << std::endl;
+				std::cout<<"Selection not currently supported" << std::endl;   // <------ rwh
+		exit(-1);
 	}
 	else
 	{

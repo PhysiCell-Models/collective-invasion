@@ -19,5 +19,9 @@ void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt);
 
 // uses custom chemotaxis function - will upgrade to use the standard one later.
 void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phenotype, double dt );
+void custom_update_motility_vector( Cell* pCell, Phenotype& phenotype, double dt_  );
+void ECM_to_cell_interaction_motility_and_mechanics_update(Cell* pCell, Phenotype& phenotype, double dt);
+
+void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt);
 
 void combined_ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype, double dt);

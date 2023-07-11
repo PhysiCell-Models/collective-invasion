@@ -156,12 +156,12 @@
                 <motility>
                     <speed units="micron/min">1</speed>
                     <persistence_time units="min">10</persistence_time>
-                    <migration_bias units="dimensionless">.5</migration_bias>
+                    <migration_bias units="dimensionless">1.0</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
-                            <enabled>false</enabled>
+                            <enabled>true</enabled>
                             <substrate>oxygen</substrate>
                             <direction>1</direction>
                         </chemotaxis>
