@@ -155,7 +155,7 @@
                 </mechanics>
                 <motility>
                     <speed units="micron/min">1</speed>
-                    <persistence_time units="min">30</persistence_time>
+                    <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">0</migration_bias>
                     <options>
                         <enabled>true</enabled>

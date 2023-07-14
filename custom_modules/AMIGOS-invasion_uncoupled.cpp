@@ -464,7 +464,7 @@ void create_cell_types( void )
 	Cell_Definition* follower_cell = find_cell_definition("follower cell");	
 	
 
-	leader_cell->functions.update_velocity = custom_update_cell_velocity;
+	// leader_cell->functions.update_velocity = custom_update_cell_velocity;
 
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
     {
@@ -481,7 +481,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	// leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
+	leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
 	
     leader_cell->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -913,7 +913,8 @@ void set_cell_motility_vectors( void )
 	for( int i=0 ; i < (*all_cells).size() ; i++ )
 	{
 		Cell* pCell = (*all_cells)[i];
-		pCell->update_motility_vector( 100 );
+		pCell->update_motility_vector( 100000000 );
+		// pCell->custom_update_motility_vector( 100000000 );
 		std::cout<<"Initial Motility vector "<<pCell->phenotype.motility.motility_vector<<std::endl;
 	}
 }
