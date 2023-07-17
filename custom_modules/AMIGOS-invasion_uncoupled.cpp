@@ -408,8 +408,8 @@ void create_cell_types( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 
     cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
-	// std::vector<double> temp = {0.0,0.0,0.0};
-	// cell_defaults.custom_data.add_vector_variable( "custom_cell_velocity" , "micron" , temp); 
+	std::vector<double> temp = {0.0,0.0,0.0};
+	cell_defaults.custom_data.add_vector_variable( "custom_cell_velocity" , "micron" , temp); 
 	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
@@ -464,11 +464,11 @@ void create_cell_types( void )
 	Cell_Definition* follower_cell = find_cell_definition("follower cell");	
 	
 
-	// leader_cell->functions.update_velocity = custom_update_cell_velocity;
+	leader_cell->functions.update_velocity = custom_update_cell_velocity;
 
 	if ( parameters.strings("ecm_update_model") == "ecm_update_from_cell_motility_vector")
     {
-    	leader_cell->functions.custom_cell_rule = ECM_remodeling_function; // In cell_ECM_interactions.cpp
+    	leader_cell->functions.custom_cell_rule = ECM_remodeling_function;  // combined_ECM_remodeling_and_speed_update; // In cell_ECM_interactions.cpp
     }
 	else if( parameters.strings("ecm_update_model") == "ecm_update_from_cell_velocity_vector")
 	{
@@ -481,7 +481,7 @@ void create_cell_types( void )
 		return;
 	}
 	
-	leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
+	// leader_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //in cell_ECM_interactions.cpp
 	
     leader_cell->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -1368,9 +1368,10 @@ void setup_tissue( void )
 				else 
 				{pC = create_cell( *follower_cell );}
 				pC->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-				n = n + 10.0;
+				std::cout<<"Fuck this"<<std::endl;
+				n = n + 20.0;
 			}
-			std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
+			std::cout<<"Cell's placed at left boundary for march test 000"<<std::endl;
 		}
 
 		else
@@ -1390,7 +1391,7 @@ void setup_tissue( void )
 		{
 			pC = create_cell( *leader_cell ); 
 			pC->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-			n = n + 10.0;
+			n = n + 20.0;
 		}
 		std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
 

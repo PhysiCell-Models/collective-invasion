@@ -367,13 +367,6 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 
 	normalize( &d_motility ); 
 
-	if(d_motility[1]>0)
-	{
-	std::cout<<"Time: " << PhysiCell_globals.current_time <<std::endl;
-	std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
-	std::cout<<"Y-componenent migration_bias_direction " << d_motility[1] <<" line 374 "<<std::endl;
-	}
-
 	// std::cout<<"D motility "<<d_motility<<std::endl;
 
 	// ******************************************************************************************************//
@@ -381,7 +374,7 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 	// ******************************************************************************************************//
 	
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
-	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
 
@@ -390,8 +383,8 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
-	double c_1 = dot_product( d_motility , d_perp ); 
-	double c_2 = dot_product( d_motility, f ); 
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
 	// std::cout<<"f = "<<f<<std::endl;
 	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
 	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
@@ -424,6 +417,8 @@ void ECM_and_chemotaxis_based_cell_migration_update( Cell* pCell, Phenotype& phe
 		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
 	}
 	
+	normalize( &phenotype.motility.migration_bias_direction ); 
+
 	if(phenotype.motility.migration_bias_direction[1]>0)
 	{
 	std::cout<<"Time: " << PhysiCell_globals.current_time <<std::endl;
@@ -638,6 +633,9 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 
 	// sample ECM 
 	std::vector<double> cell_position = pCell->position;
+
+	std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
+	std::cout<<"cell_position: " << cell_position[0] << " " << cell_position[1] <<std::endl;
 	int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 	double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
 	// std::cout<<"ECM density "<<ECM_density<<std::endl;
@@ -702,11 +700,18 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
         std::exit(-1);  //rwh: should really do these for each
     }
 
+	static int custom_velocity_vector_index = pCell->custom_data.find_vector_variable_index("custom_cell_velocity");
+	if (custom_velocity_vector_index < 0)
+	{
+		std::cout << "        static int custom_velocity_vector_index = " <<custom_velocity_vector_index << std::endl;
+		std::exit(-1);  //rwh: should really do these for each
+	}
+
 	// ******************************************************************************************************//
 	// ****** Use linear combination of random biased migration (motility_vector) and ECM orientation following. ********//
 	// ******************************************************************************************************//
 	
-	phenotype.motility.motility_vector.assign( 3, 0.0 ); // clean the previous values
+	// phenotype.motility.motility_vector.assign( 3, 0.0 ); // clean the previous values
 
 	if(phenotype.motility.motility_vector[1]>0)
 	{
@@ -717,10 +722,12 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 
 	std::vector<double> d_motility = {0,0,0};
 
-	d_motility = phenotype.motility.migration_bias_direction; // ECM linked way to signal
+	d_motility = phenotype.motility.motility_vector; // ECM linked way to signal
+
+	normalize( &d_motility ); 
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
-	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
 	
 	normalize( &d_perp ); 
 
@@ -729,8 +736,8 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 	// std::cout<<"Fiber "<<f<<std::endl;
 	
 	// find constants to span d_choice with d_perp and f
-	double c_1 = dot_product( d_motility , d_perp ); 
-	double c_2 = dot_product( d_motility, f ); 
+	double c_1 = dot_product_ext( d_motility , d_perp ); 
+	double c_2 = dot_product_ext( d_motility, f ); 
 	// std::cout<<"f = "<<f<<std::endl;
 	// std::cout<<"D_mot dot d_perp c_1 = "<<c_1<<std::endl;
 	// std::cout<<"D_mot dot f c_2 = "<<c_2<<std::endl;
@@ -744,9 +751,13 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 	// std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
 	// std::cout<<"c_2*f"<<c_2*f<<std::endl;
 
-	phenotype.motility.motility_vector = (1.0-gamma)*c_1*d_perp + c_2*f;
-	// std::cout<<"migration_bias_direction before normalization"<<phenotype.motility.migration_bias_direction<<std::endl;
-	// std::cout<<"curent min_ECM_motility_density: "<<pCell->custom_data[min_ECM_mot_den_index] <<std::endl;
+	pCell->custom_data.vector_variables[custom_velocity_vector_index].value = {0,0,0};
+
+	// phenotype.motility.motility_vector = (1.0-gamma)*c_1*d_perp + c_2*f;
+	pCell->custom_data.vector_variables[custom_velocity_vector_index].value = (1.0-gamma)*c_1*d_perp + c_2*f;
+	
+	// std::cout<<"Vector data: "<<pCell->custom_data.vector_variables[custom_velocity_vector_index].value<<std::endl;
+
 	if(parameters.bools("normalize_ECM_influenced_motility_vector") == true)
 	{
 		// normalize( &phenotype.motility.migration_bias_direction ); // only needed if not running through the update_migration_bias code/bias not set to 1.0
@@ -758,19 +769,25 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 	{
 		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
 		// pCell->phenotype.motility.migration_speed *= norm( phenotype.motility.migration_bias_direction);
-		pCell->custom_data[migration_bias_norm_index] = norm( phenotype.motility.motility_vector);
+		pCell->custom_data[migration_bias_norm_index] = norm( pCell->custom_data.vector_variables[custom_velocity_vector_index].value);
 		// std::cout<<"curent min_ECM_motility_density: "<<pCell->custom_data[min_ECM_mot_den_index] <<std::endl;
 		//  std::cout<<"Magnitutude of motility vector is "<< pCell->phenotype.motility.migration_speed<<std::endl;
 	}
 
-	if(phenotype.motility.motility_vector[1]>0)
-	{
-	std::cout<<"Time: " << PhysiCell_globals.current_time <<std::endl;
-	std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
-	std::cout<<"Y-componenent migration_bias_direction " << phenotype.motility.motility_vector[1] <<" line 755 "<<std::endl;
-	}
+	// if(phenotype.motility.motility_vector[1]>0)
+	// {
+	// std::cout<<"Time: " << PhysiCell_globals.current_time <<std::endl;
+	// std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
+	// std::cout<<"Y-componenent migration_bias_direction " << phenotype.motility.motility_vector[1] <<" line 755 "<<std::endl;
 
-	normalize( &(phenotype.motility.motility_vector) ); 
+	// 	if(phenotype.motility.motility_vector[1]>0 && phenotype.motility.motility_vector[1]<0.00000000001)
+	// 	{
+	// 		phenotype.motility.motility_vector[1] = 0.0;
+	// 	}
+
+	// }
+
+	normalize( &(pCell->custom_data.vector_variables[custom_velocity_vector_index].value) ); 
 
 	if(phenotype.motility.motility_vector[1]>0)
 	{
@@ -870,7 +887,17 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 		// exit(-1);
 	}
 
-	phenotype.motility.motility_vector *= phenotype.motility.migration_speed;
+	pCell->custom_data.vector_variables[custom_velocity_vector_index].value *= phenotype.motility.migration_speed;
+
+	// std::cout<<"Vector data: "<<pCell->custom_data.vector_variables[custom_velocity_vector_index].value<<" Line 891"<<std::endl;
+
+
+	// if(pCell->custom_data.vector_variables[custom_velocity_vector_index].value[1]>0)
+	// {
+	// 	pCell->custom_data.vector_variables[custom_velocity_vector_index].value[1] = 0;
+	// }
+
+	// std::cout<<"Vector data: "<<pCell->custom_data.vector_variables[custom_velocity_vector_index].value<<" Line 899"<<std::endl;
 
 	if(phenotype.motility.motility_vector[1]>0)
 	{
@@ -1038,6 +1065,13 @@ void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 
 	// Use this in place of standard update_cell_velocity to get fiber following and density based speed changes
 
+	static int custom_velocity_vector_index = pCell->custom_data.find_vector_variable_index("custom_cell_velocity");
+	if (custom_velocity_vector_index < 0)
+	{
+		std::cout << "        static int custom_velocity_vector_index = " <<custom_velocity_vector_index << std::endl;
+		std::exit(-1);  //rwh: should really do these for each
+	}
+
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{
 		pCell->functions.add_cell_basement_membrane_interactions(pCell, phenotype,dt);
@@ -1073,8 +1107,8 @@ void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 
 
 
-	custom_update_motility_vector(pCell, phenotype, dt);
-	// pCell->update_motility_vector(dt); // changes phenotype.motility.motility_vector - uses speed - and thats why having the speed update in the update_migration_bias is required
+	// custom_update_motility_vector(pCell, phenotype, dt);
+	pCell->update_motility_vector(dt); // changes phenotype.motility.motility_vector - uses speed - and thats why having the speed update in the update_migration_bias is required
 										// I could use this still - and just use the migration_bias vector. Then call ECM speed update. Then fiber following. (or do it all in one function.
 										// regardless - I need to have the cell-ECM interaction modify something other than the migration bias. I need to modify the motility vector instead! - yeah, that will all work I think. The only issue is fixing up linking between anisotrpy and chemotaxis bias. One thing at time though. 
 
@@ -1084,14 +1118,27 @@ void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 
 										// Okay - make this work. Do whatever you have to - just get it done. 
 
+										// 07.14.23 - Decided that I would use the standard definitions for motility_vector and migration_bias_direction
+
+										// Means I don't need a custom update_motlity_vector any more ... and I ... Might be able to test now. 
+
+	// ECM_and_chemotaxis_based_cell_migration_update(pCell, phenotype, dt);
+
 	ECM_to_cell_interaction_motility_and_mechanics_update(pCell, phenotype, dt); // actually
 
 	// ECM_based_speed_update(pCell, phenotype, dt );
 
 	// fiber_following(pCell, phenotype, dt); // I think this is what we need next - and it will have have to directly modify the motility vector perhaps???? I need to steal something for that or otherwise have a custom variable for it. Maybe i let the migration bias be the same and then I reuse the motility vector for the fiber following???
 
+	if(phenotype.motility.motility_vector[1]>0)
+	{
+	std::cout<<"Time: " << PhysiCell_globals.current_time <<std::endl;
+	std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
+	std::cout<<"Y-componenent migration_bias_direction " << phenotype.motility.motility_vector[1] <<" line 1103 "<<std::endl;
+	}
 
-	pCell->velocity += phenotype.motility.motility_vector; 
+	pCell->velocity += pCell->custom_data.vector_variables[custom_velocity_vector_index].value; 
+	// pCell->velocity += phenotype.motility.motility_vector; 
 	
 	return; 
 }
@@ -1099,6 +1146,9 @@ void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 void combined_ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype, double dt)
 {
 	ECM_based_speed_update(pCell, phenotype, dt );
+
+	//  ECM_and_chemotaxis_based_cell_migration_update(  pCell,  phenotype,  dt );
+	// ECM_to_cell_interaction_motility_and_mechanics_update(pCell, phenotype, dt); // actually
 
 	ECM_remodeling_function(pCell, phenotype, dt);
 
