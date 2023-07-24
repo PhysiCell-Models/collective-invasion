@@ -1386,12 +1386,12 @@ void setup_tissue( void )
 	// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
 	else if (parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 1)
 	{
-		int n = default_microenvironment_options.X_range[0] + 10.0; 
+		int n = default_microenvironment_options.X_range[0] + 5.0; 
 		while( n <= default_microenvironment_options.X_range[1] - 10.0 )
 		{
 			pC = create_cell( *leader_cell ); 
 			pC->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-			n = n + 20.0;
+			n = n + 10.0;
 		}
 		std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
 
@@ -2131,7 +2131,7 @@ void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , do
 
 void reset_cell_position( void ) // for cell mark/ECM change test
 {
-	int n = default_microenvironment_options.X_range[0] + 10.0;
+	int n = default_microenvironment_options.X_range[0] + 5.0;
 
 	std::cout<<1<<std::endl;
 
