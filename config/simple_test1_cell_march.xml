@@ -32,7 +32,7 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>4</omp_num_threads>
+        <omp_num_threads>1</omp_num_threads>
     </parallel>
 
     <save>
@@ -156,12 +156,12 @@
                 <motility>
                     <speed units="micron/min">1</speed>
                     <persistence_time units="min">10</persistence_time>
-                    <migration_bias units="dimensionless">0.5</migration_bias>
+                    <migration_bias units="dimensionless">0.0</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
-                            <enabled>false</enabled>
+                            <enabled>true</enabled>
                             <substrate>oxygen</substrate>
                             <direction>1</direction>
                         </chemotaxis>
@@ -219,6 +219,7 @@
                 <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">0.0</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="Rate of ECM production">0.0</ECM_production_rate>
                 <migration_bias_norm conserved="false" units="" description="Internal variable. Keep set to 1.0">1.0</migration_bias_norm>
+                <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
             </custom_data>
         </cell_definition>
         <cell_definition name="leader cell" ID="1">
@@ -289,7 +290,7 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">.5</speed>
+                    <speed units="micron/min">0.5</speed>
                     <persistence_time units="min">10</persistence_time>
                     <migration_bias units="dimensionless">1.0</migration_bias>
                     <options>
@@ -354,6 +355,7 @@
                 <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">1</Fiber_realignment_rate>
                 <ECM_production_rate conserved="false" units="1/min" description="Rate of ECM production">0.0</ECM_production_rate>
                 <migration_bias_norm conserved="false" units="" description="Internal variable. Keep set to 1.0">1.0</migration_bias_norm>
+                <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
             </custom_data>
         </cell_definition>
     </cell_definitions>

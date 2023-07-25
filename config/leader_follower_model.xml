@@ -32,17 +32,17 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>4</omp_num_threads>
+        <omp_num_threads>6</omp_num_threads>
     </parallel>
 
     <save>
         <folder>leader_follower</folder>
         <full_data>
-            <interval units="min">6</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">6</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
         </SVG>
         <legacy_data>
@@ -136,7 +136,7 @@
                     <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                 </volume>
                 <mechanics>
-                    <cell_cell_adhesion_strength units="micron/min">10</cell_cell_adhesion_strength>
+                    <cell_cell_adhesion_strength units="micron/min">10.0</cell_cell_adhesion_strength>
                     <cell_cell_repulsion_strength units="micron/min">25.0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
@@ -273,8 +273,8 @@
                     <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                 </volume>
                 <mechanics>
-                    <cell_cell_adhesion_strength units="micron/min">10</cell_cell_adhesion_strength>
-                    <cell_cell_repulsion_strength units="micron/min">25</cell_cell_repulsion_strength>
+                    <cell_cell_adhesion_strength units="micron/min">10.0</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">25.0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
                         <cell_adhesion_affinity name="leader cell">1.0</cell_adhesion_affinity>
