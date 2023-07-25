@@ -408,8 +408,7 @@ void create_cell_types( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 
     cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
-	std::vector<double> temp = {0.0,0.0,0.0};
-	cell_defaults.custom_data.add_vector_variable( "custom_cell_velocity" , "micron" , temp); 
+	
 	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
