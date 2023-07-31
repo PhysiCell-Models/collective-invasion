@@ -1,2 +1,4 @@
 cancer cell,contact with fibroblast,decreases,inflammatory_signal secretion,1.0,0.5,4,0
-cancer cell,oxygen,decreases,inflammatory_signal secretion,1.0,0.5,4,0
+cancer cell,contact with fibroblast,decreases,adhesive affinity to cancer cell,0.25,0.1,4,0
+cancer cell,contact with fibroblast,decreases,cell-cell adhesion,0.25,0.1,4,0
+fibroblast,contact with cancer cell,decreases,custom:rules_based_speed_multiplier,0.5,.1,4,0

@@ -700,6 +700,13 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
         std::exit(-1);  //rwh: should really do these for each
     }
 
+	static int rules_based_speed_multiplier_index = pCell->custom_data.find_variable_index( "rules_based_speed_multiplier");
+	if (rules_based_speed_multiplier_index < 0) 
+	{
+		std::cout << "        static int rules_based_speed_multiplier_index = " <<rules_based_speed_multiplier_index << std::endl;
+		std::exit(-1);  
+	}
+
 	// static int custom_velocity_vector_index = pCell->custom_data.find_vector_variable_index("custom_cell_velocity");
 	// if (custom_velocity_vector_index < 0)
 	// {
@@ -843,6 +850,7 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 
 		pCell->phenotype.motility.migration_speed = pCell->custom_data[migration_bias_norm_index];
 		pCell->phenotype.motility.migration_speed *= get_single_base_behavior( pCD, "migration speed" ); 
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[rules_based_speed_multiplier_index];
 		pCell->phenotype.motility.migration_speed *= ( 1/(rho_ideal - rho_low) * (ECM_density - rho_low)); 
 		// magnitude of direction (from ~50 lines ago) * base speed * ECM density influence
 
@@ -868,6 +876,7 @@ void ECM_to_cell_interaction_motility_and_mechanics_update( Cell* pCell, Phenoty
 		
 		pCell->phenotype.motility.migration_speed = pCell->custom_data[migration_bias_norm_index]; 
 		pCell->phenotype.motility.migration_speed *= get_single_base_behavior( pCD, "migration speed" ); 
+		pCell->phenotype.motility.migration_speed *= pCell->custom_data[rules_based_speed_multiplier_index];
 		pCell->phenotype.motility.migration_speed *= ( 1/(rho_ideal - rho_high) * (ECM_density - rho_high)); 
 		// magnitude of direction (from ~60 lines ago) * base speed * ECM density influence
 		

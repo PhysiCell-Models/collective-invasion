@@ -88,17 +88,18 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
 	
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+	cell_defaults.functions.update_velocity = custom_update_cell_velocity;
 
 	cell_defaults.functions.update_migration_bias = NULL; 
 	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
-	cell_defaults.functions.custom_cell_rule = NULL; 
+	cell_defaults.functions.custom_cell_rule = ECM_remodeling_function; 
 	cell_defaults.functions.contact_function = NULL; 
 	
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	cell_defaults.custom_data.add_variable( "rules_based_speed_multiplier" , "dimensionless", 1.0 );
 
-    cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
+    // cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
 	
 	/*
 	   This parses the cell definitions in the XML config file. 
@@ -133,15 +134,15 @@ void create_cell_types( void )
     Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
 	Cell_Definition* cancer_cell = find_cell_definition("cancer cell");	
 
-	fibroblast->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; // Only leaders can modify ECM (phenotype -> ECM)
+	// fibroblast->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; // Only leaders can modify ECM (phenotype -> ECM)
 	
-	fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
+	// fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update;//rightward_deterministic_cell_march; Use rightward deterministic march for march test. Set leader fraction to 1.0.
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
-	cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function; // includes speed and remodeling combined_ECM_remodeling_and_speed_update
+	// cancer_cell->functions.custom_cell_rule = custom_cancer_cell_ECM_remodeling_and_adhesion_function; // includes speed and remodeling combined_ECM_remodeling_and_speed_update
 
-	cancer_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; // this needs fied or something
+	// cancer_cell->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; // this needs fied or something
 
 	cancer_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
@@ -409,376 +410,136 @@ void setup_tissue( void )
 	static Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
 	static Cell_Definition* cancer_cell = find_cell_definition("cancer cell");	
 
-	if (parameters.ints("march_unit_test_setup") == 0)
-	{
 
-		if(parameters.strings("cell_setup") == "single")
-		{
-			Cell* pC;
-			pC = create_cell(*fibroblast);
-			pC->assign_position(0.0, 0.0, 0.0);
-		}
-
-		else if(parameters.strings("cell_setup") == "random")
-		{
-			std::cout<<"string worked"<<std::endl;
 		
-			/*******************************************Random initialization****************************************/
-			Cell* pC;
-			
-			for( int n = 0 ; n < 200 ; n++ )
-			{
-				pC = create_cell(); 
-				pC->assign_position( -450 + 900*UniformRandom() , -450 + 900*UniformRandom() , 0.0 );
-			}
-
-			std::cout<<"Cell's placed randomly on domain - this function uses a HARD CODED domain size!!!! WARNING!!!!!"<<std::endl;
-			std::cout<<" hit Enter to continue:"<<std::flush;
-			std::cin.get();
-
-		}
 		
-		/******************************************2D Spheroid initialization***************************************/
-		
-		else if(parameters.strings("cell_setup") == "lesion")
-		{
-			// place a cluster of tumor cells at the center
-		
-			//Get tumor radius from XML parameters
-
-			double tumor_radius; 
-
-			if( parameters.ints("unit_test_setup") == 1)
-			{
-				tumor_radius = 150;
-
-			}
-
-			else
-			{
-				tumor_radius = parameters.doubles("tumor_radius");
-			}
-			
-			
-
-			// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
-
-			double cell_radius = cell_defaults.phenotype.geometry.radius;
-			double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
-			double sqrt_adhesion_to_repulsion_ratio;
-			
-			if(parameters.doubles("cancer_cell_repulsion") == 0)
-			{
-				sqrt_adhesion_to_repulsion_ratio = 0.632455; // value for adhesion = 10 and repulsion = 25.0 - "parameter set 21"
-			}
-
-			else
-			{
-				sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("cancer_cell_adhesion")/parameters.doubles("cancer_cell_repulsion"));
-			} 
-
-			double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
-			cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
-			
-			Cell* pCell = NULL; 
-			
-			double x = 0.0;
-			double x_outer = tumor_radius; 
-			double y = 0.0;
-
-			double fibroblast_fraction;
-			
-			if( parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 0)
-			{
-				fibroblast_fraction = 0.0;
-				cell_spacing = 1.90 * cell_radius;
-			}
-
-			else
-			{
-				fibroblast_fraction = parameters.doubles("initial_fibroblast_fraction"); // 0.2;
-			}
-
-			int n = 0; 
-			while( y < tumor_radius )
-			{
-				x = 0.0; 
-				if( n % 2 == 1 )
-				{ x = 0.5*cell_spacing; }
-				x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
-				
-				while( x < x_outer )
-				{
-					if( UniformRandom() < fibroblast_fraction )
-					{ pCell = create_cell(*fibroblast); }
-					else
-					{ pCell = create_cell(*cancer_cell);}
-						
-					pCell->assign_position( x , y , 0.0 );
-					
-					if( fabs( y ) > 0.01 )
-					{
-						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(*fibroblast); }
-						else
-						{ pCell = create_cell(*cancer_cell); }
-						pCell->assign_position( x , -y , 0.0 );
-					}
-					
-					if( fabs( x ) > 0.01 )
-					{ 
-						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(*fibroblast); }
-						else
-						{ pCell = create_cell(*cancer_cell); }
-						pCell->assign_position( -x , y , 0.0 );
-						
-						if( fabs( y ) > 0.01 )
-						{
-							if( UniformRandom() < fibroblast_fraction )
-							{ pCell = create_cell(*fibroblast); }
-							else
-							{ pCell = create_cell(*cancer_cell); }
-							
-							pCell->assign_position( -x , -y , 0.0 );
-						}
-					}
-					x += cell_spacing; 
-					
-				}
-				
-				y += cell_spacing * sqrt(3.0)/2.0; 
-				n++; 
-			}
-
-			std::cout<<"Cell's placed in 2-lesion at center of domain"<<std::endl;
-
-		}
-
-
 		/************************************Spheroid with fibroblasts***************************************/		
 
-		else if(parameters.strings("cell_setup") == "invasive_spheroid")
-		{
-			// place a cluster of tumor cells at the center and fibroblasts below it
+	if(parameters.strings("cell_setup") == "invasive_spheroid")
+	{
+		// place a cluster of tumor cells at the center and fibroblasts below it
+	
+		//Get tumor radius from XML parameters
+
+		double tumor_radius; 
+
+		tumor_radius = parameters.doubles("tumor_radius");
+
+
+		// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
+
+		double cell_radius = cell_defaults.phenotype.geometry.radius;
+		double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
+		double sqrt_adhesion_to_repulsion_ratio;
+		sqrt_adhesion_to_repulsion_ratio = sqrt(cancer_cell->phenotype.mechanics.cell_cell_adhesion_strength/cancer_cell->phenotype.mechanics.cell_cell_repulsion_strength);
+
+		std::cout<<"sqrt_adhesion_to_repulsion_ratio = "<<sqrt_adhesion_to_repulsion_ratio<<" Line 435"<<std::endl;
+
+		double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
+		cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
 		
-			//Get tumor radius from XML parameters
+		Cell* pCell = NULL; 
+		
+		double x = 0.0;
+		double x_outer = tumor_radius; 
+		// double center_offset = 0.0;
+		double y = 0.0;
 
-			double tumor_radius; 
+		double fibroblast_fraction;
+		
+		if( parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 0)
+		{
+			fibroblast_fraction = 0.0;
+			cell_spacing = 1.90 * cell_radius;
+		}
 
-			if( parameters.ints("unit_test_setup") == 1)
-			{
-				tumor_radius = 150;
+		else
+		{
+			fibroblast_fraction = parameters.doubles("initial_fibroblast_fraction"); // 0.2;
+		}
 
-			}
-
-			else
-			{
-				tumor_radius = parameters.doubles("tumor_radius");
-			}
-
-			// these lines produce automatically calcuated equilibirum spacing for intiailizing cells, even when changing adh-rep parameters.
-
-			double cell_radius = cell_defaults.phenotype.geometry.radius;
-			double relative_maximum_adhesion_distance = cell_defaults.phenotype.mechanics.relative_maximum_adhesion_distance;
-			double sqrt_adhesion_to_repulsion_ratio;
+		int n = 0; 
+		while( y < tumor_radius && y >= 0 )
+		{
+			x = 0.0; 
+			if( n % 2 == 1 )
+			{ x = 0.5*cell_spacing; }
+			x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
 			
-			if(parameters.doubles("cancer_cell_repulsion") == 0)
+			while( x < x_outer )
 			{
-				sqrt_adhesion_to_repulsion_ratio = 0.632455; // value for adhesion = 10 and repulsion = 25.0 - "parameter set 21"
-			}
-
-			else
-			{
-				sqrt_adhesion_to_repulsion_ratio = sqrt(parameters.doubles("cancer_cell_adhesion")/parameters.doubles("cancer_cell_repulsion"));
-			} 
-
-			double cell_spacing = (1 - sqrt_adhesion_to_repulsion_ratio);
-			cell_spacing /= (0.5 * 1/cell_radius - 0.5 * sqrt_adhesion_to_repulsion_ratio/(relative_maximum_adhesion_distance * cell_radius));
-			
-			Cell* pCell = NULL; 
-			
-			double x = 0.0;
-			double x_outer = tumor_radius; 
-			// double center_offset = 0.0;
-			double y = 0.0;
-
-			double fibroblast_fraction;
-			
-			if( parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 0)
-			{
-				fibroblast_fraction = 0.0;
-				cell_spacing = 1.90 * cell_radius;
-			}
-
-			else
-			{
-				fibroblast_fraction = parameters.doubles("initial_fibroblast_fraction"); // 0.2;
-			}
-
-			int n = 0; 
-			while( y < tumor_radius && y >= 0 )
-			{
-				x = 0.0; 
-				if( n % 2 == 1 )
-				{ x = 0.5*cell_spacing; }
-				x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
+				// 1st quadrant
+				if( UniformRandom() < fibroblast_fraction )
+				{ pCell = create_cell(*fibroblast); }
+				else
+				{ pCell = create_cell(*cancer_cell);}
+					
+				pCell->assign_position( x , y , 0.0 );
 				
-				while( x < x_outer )
-				{
-					// 1st quadrant
+				// 4th quadrant
+				// if( fabs( y ) > 0.01 ) - for full circle
+				// if( y > 0.01 )
+				// {
+				// 	if( UniformRandom() < fibroblast_fraction )
+				// 	{ pCell = create_cell(*fibroblast); }
+				// 	else
+				// 	{ pCell = create_cell(*cancer_cell); }
+				// 	pCell->assign_position( x , -y , 0.0 );
+				// }
+				
+				if( fabs( x ) > 0.01 )
+				{ 
+					// 2nd quadrant
 					if( UniformRandom() < fibroblast_fraction )
 					{ pCell = create_cell(*fibroblast); }
 					else
-					{ pCell = create_cell(*cancer_cell);}
-						
-					pCell->assign_position( x , y , 0.0 );
+					{ pCell = create_cell(*cancer_cell); }
+					pCell->assign_position( -x , y , 0.0 );
 					
-					// 4th quadrant
-					// if( fabs( y ) > 0.01 ) - for full circle
+					// if( fabs( y ) > 0.01 )
+					// third quadrant
 					// if( y > 0.01 )
 					// {
 					// 	if( UniformRandom() < fibroblast_fraction )
 					// 	{ pCell = create_cell(*fibroblast); }
 					// 	else
 					// 	{ pCell = create_cell(*cancer_cell); }
-					// 	pCell->assign_position( x , -y , 0.0 );
-					// }
-					
-					if( fabs( x ) > 0.01 )
-					{ 
-						// 2nd quadrant
-						if( UniformRandom() < fibroblast_fraction )
-						{ pCell = create_cell(*fibroblast); }
-						else
-						{ pCell = create_cell(*cancer_cell); }
-						pCell->assign_position( -x , y , 0.0 );
 						
-						// if( fabs( y ) > 0.01 )
-						// third quadrant
-						// if( y > 0.01 )
-						// {
-						// 	if( UniformRandom() < fibroblast_fraction )
-						// 	{ pCell = create_cell(*fibroblast); }
-						// 	else
-						// 	{ pCell = create_cell(*cancer_cell); }
-							
-						// 	pCell->assign_position( -x , -y , 0.0 );
-						// }
-					}
-					x += cell_spacing; 
-					
+					// 	pCell->assign_position( -x , -y , 0.0 );
+					// }
 				}
+				x += cell_spacing; 
 				
-				y += cell_spacing * sqrt(3.0)/2.0; 
-				n++; 
 			}
-
-			std::cout<<"Cell's placed in 2-lesion at center of domain"<<std::endl;
-
-			/***********************************Add in the fibroblasts**************************************/
-
-			int number_of_fibroblasts = parameters.ints("number_of_fibroblasts");
-			n =-500.0;
-			for(int i=0; i<number_of_fibroblasts; i++)
-			{
-				pCell = create_cell(*fibroblast);
-				pCell->assign_position( n , -450.0, 0.0 );
-				std::cout<<"Fibroblast placed at "<<pCell->position<<std::endl;
-				n += 100.0;
-			}
-
-		}		
-
-		/******************************************3D Spheroid initialization***************************************/
-
-		/*To come later*/
-
-		/************************************Circle of cells at R = 300 initialization***************************************/
-
-		else if(parameters.strings("cell_setup") == "circle of cells")
-		{
-			double theta2 = 0.0;
-			for (int a = 0; a<42; a++)
-			{
-				Cell* pCell = NULL;
-				pCell = create_cell(*cancer_cell); 
-				pCell->assign_position( 300 * cos(theta2) , 300 * sin(theta2) , 0.0 );
-				theta2 += 0.14959952;
-			}
-
-		}
-
-		/************************************Line of cells at y = 0, x > 0 initialization***************************************/
-
-		else if(parameters.strings("cell_setup") == "cells at y = 0")
-		{
-
-			Cell* pCell = NULL; 
-			int n = default_microenvironment_options.X_range[0] + 10.0; 
-			while( n <= default_microenvironment_options.X_range[1] )
-			{
-				pCell = create_cell(*cancer_cell); 
-
-				// To prevent droping cells in areas of high ECM curvature. 
-				while(abs(n) < 70)
-				{n = n + 30.0;}
-
-				pCell->assign_position( n , 0.0 , 0.0 );
-				n = n + 30.0;
-			}
-			std::cout<<"Cell's placed at y = 0"<<std::endl;
-		}
-
-		/******************************************Line of cells at x = left boundary + 10 initialization***************************************/
-		else if(parameters.strings("cell_setup") == "cells at left boundary/march")
-		{
 			
-			Cell* pCell = NULL; 
-			int n = default_microenvironment_options.X_range[0] + 10.0; 
-			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
-			{
-				if (parameters.ints("march_unit_test_setup") == 1)
-				{pCell = create_cell(*fibroblast);}
-
-				else 
-				{pCell = create_cell(*cancer_cell);}
-				pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-				n = n + 10.0;
-			}
-			std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
+			y += cell_spacing * sqrt(3.0)/2.0; 
+			n++; 
 		}
 
-		else
+		std::cout<<"Cell's placed in 2-D lesion at center of domain"<<std::endl;
+
+		/***********************************Add in the fibroblasts**************************************/
+
+		int number_of_fibroblasts = parameters.ints("number_of_fibroblasts");
+		n =-500.0;
+		for(int i=0; i<number_of_fibroblasts; i++)
 		{
-			std::cout<<"WARNING!!! NO CELL SETUP SPECIFIED. SEE DOCUMENTATION and FIX"<<std::endl;
-			std::cout<<"Halting program!!!"<<std::endl;
-			abort();
-			return;
+			pCell = create_cell(*fibroblast);
+			pCell->assign_position( n , -450.0, 0.0 );
+			std::cout<<"Fibroblast placed at "<<pCell->position<<std::endl;
+			n += 100.0;
 		}
-	}
 
-	else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
-	{
-		Cell* pCell = NULL; 
-		int n = default_microenvironment_options.X_range[0] + 10.0; 
-		while( n <= default_microenvironment_options.X_range[1] - 10.0 )
-		{
-			pCell = create_cell(*fibroblast); 
-			pCell->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-			n = n + 10.0;
-		}
-		std::cout<<"Cell's placed at left boundary for march test"<<std::endl;
-
-	}
+	}		
 
 	else
 	{
-		std::cout<<"RUN MODE (TESTING OR NOT TESTING) NOT SPECIFIED!!!!! WARNING!!!!"<<std::endl;
-		std::cout<<"Halting program!!!"<<std::endl;
-		abort();
-		return;
+		std::cout<<"NO algorithmic initial cell configuration!!!"<<std::endl;
+		std::cout<<"Enable running from CSV or SOMETHNG!!!"<<std::endl;
 	}
+	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 
 	
 
 	return; 
