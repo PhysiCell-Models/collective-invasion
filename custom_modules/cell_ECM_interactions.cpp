@@ -1052,7 +1052,10 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 
  		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
 
+		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment));
+
 		if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
+		{std::cout<<"ECM orientation vector norm = 0"<<std::endl;}
 
 		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
 		}

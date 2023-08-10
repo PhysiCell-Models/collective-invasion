@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">7200</max_time>
+        <max_time units="min">2880</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -136,7 +136,7 @@
                     <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                 </volume>
                 <mechanics>
-                    <cell_cell_adhesion_strength units="micron/min">10.0</cell_cell_adhesion_strength>
+                    <cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
                     <cell_cell_repulsion_strength units="micron/min">25.0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
@@ -216,11 +216,12 @@
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
-                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
-                <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
+                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.00</Anisotropy_increase_rate>
+                <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
                 <migration_bias_norm conserved="false" units="" description="Don't mess with this.">1.0</migration_bias_norm>
+                <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
         <cell_definition name="follower cell" ID="1">
@@ -273,7 +274,7 @@
                     <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                 </volume>
                 <mechanics>
-                    <cell_cell_adhesion_strength units="micron/min">10.0</cell_cell_adhesion_strength>
+                    <cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
                     <cell_cell_repulsion_strength units="micron/min">25.0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
@@ -293,12 +294,12 @@
                 <motility>
                     <speed units="micron/min">0.5</speed>
                     <persistence_time units="min">10</persistence_time>
-                    <migration_bias units="dimensionless">1</migration_bias>
+                    <migration_bias units="dimensionless">0.05</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
                         <chemotaxis>
-                            <enabled>false</enabled>
+                            <enabled>true</enabled>
                             <substrate>oxygen</substrate>
                             <direction>1</direction>
                         </chemotaxis>
@@ -348,16 +349,17 @@
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
                 <chemotaxis_bias conserved="false" units="dimensionless" description="">1.0</chemotaxis_bias>
-                <ECM_sensitivity conserved="false" units="dimensionless" description="">1.0</ECM_sensitivity>
+                <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
-                <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
+                <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
                 <migration_bias_norm conserved="false" units="" description="Don't mess with this.">1.0</migration_bias_norm>
+                <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
     </cell_definitions>
@@ -402,7 +404,7 @@
         <ECM_dy type="double" units="um" description="Length of ECM unit in y-direction">20</ECM_dy>
         <ECM_dz type="double" units="um" description="Length of ECM unit in z-direction">20</ECM_dz>
         <cell_motility_ECM_interaction_model_selector type="string" units="" description="follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis</cell_motility_ECM_interaction_model_selector>
-        <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">1</discrete_ECM_remodeling>
+        <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">0</discrete_ECM_remodeling>
         <link_anisotropy_and_bias type="int" units="" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0</link_anisotropy_and_bias>
         <ecm_update_model type="string" units="" description="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector">ecm_update_from_cell_motility_vector</ecm_update_model>
         <normalize_ECM_influenced_motility_vector type="bool" units="" description="Normalize follower motility vector">false</normalize_ECM_influenced_motility_vector>
