@@ -220,6 +220,7 @@
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <migration_bias_norm conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
             </custom_data>
         </cell_definition>
         <cell_definition name="leader cell" ID="1">
@@ -356,6 +357,7 @@
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <migration_bias_norm conserved="false" units="" description="Internal variable - keep set to 1.0">0.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
             </custom_data>
         </cell_definition>
     </cell_definitions>

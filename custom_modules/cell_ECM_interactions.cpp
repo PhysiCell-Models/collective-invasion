@@ -6,6 +6,8 @@ using namespace PhysiCell;
 extern ECM ecm;
 
 
+
+
 void copy_ECM_data_to_BioFVM( Cell* pCell, Phenotype& phenotype, double dt )
 {
 
@@ -483,4 +485,31 @@ void custom_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 	pCell->velocity += phenotype.motility.motility_vector; 
 	
 	return; 
+}
+
+void create_default_ECM_compatible_agent( void )
+{
+	initialize_default_cell_definition(); 
+	// cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
+	cell_defaults.functions.update_velocity = custom_update_cell_velocity;
+
+	cell_defaults.functions.custom_cell_rule = ECM_remodeling_function; 
+
+	// cell_defaults.functions.custom_cell_rule = NULL; 
+
+	cell_defaults.functions.update_phenotype = NULL; 
+
+	// 	cell_defaults.functions.cycle_model = Ki67_advanced; 
+	
+	// cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	// cell_defaults.functions.update_migration_bias = NULL; 
+	
+	// cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; // NULL; 
+	// cell_defaults.functions.custom_cell_rule = NULL; 
+	
+	// cell_defaults.functions.update_velocity = standard_update_cell_velocity;
+	// cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	// cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
 }

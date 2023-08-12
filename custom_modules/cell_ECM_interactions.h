@@ -18,3 +18,5 @@ void ECM_to_cell_interactions(Cell* pCell, Phenotype& phenotype, double dt);
 void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
 
 void custom_update_motility_vector( Cell* pCell, Phenotype& phenotype, double dt_  );
+
+void create_default_ECM_compatible_agent( void );
