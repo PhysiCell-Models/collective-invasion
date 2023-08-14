@@ -75,7 +75,7 @@
 // custom user modules 
 
 #include "./custom_modules/AMIGOS-invasion_uncoupled.h" 
-// #include "./custom_modules/AMIGOS-invasion.h" 
+#include "./custom_modules/cell_ECM_interactions.h" 
 // #include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
@@ -86,21 +86,12 @@ using namespace PhysiCell;
 
 // void ecm_update(void); // I think this from an old implentation. Noted and commented out 09.01.20
 
-// #define v1_4_cell_types
-#undef v1_4_cell_types
-
 void dump_leader_cell_info()
 {
     std::cout << "---- t= " << PhysiCell_globals.current_time  << std::endl;
     std::cout << "ID type adh rep     motility_vec     mig_bias      mig_bias_dir    \n";
     for( int i=0; i < all_cells->size() ; i++ )
     {
-#ifdef v1_4_cell_types
-        if ( (*all_cells)[i]->type == 1)
-#else
-        if ( (*all_cells)[i]->type == 0)   // if NOT doing v1_4_cell_types
-#endif
-        {
         std::cout << (*all_cells)[i]->ID << " : " << (*all_cells)[i]->type << " : " <<
             (*all_cells)[i]->phenotype.mechanics.cell_cell_adhesion_strength  << ", " <<
             (*all_cells)[i]->phenotype.mechanics.cell_cell_repulsion_strength  << ", " <<
@@ -115,7 +106,6 @@ void dump_leader_cell_info()
         std::cout<<"speed="<< (*all_cells)[i]->phenotype.motility.migration_speed << std::endl;
         std::cout<<"pos=("<< (*all_cells)[i]->position[0] <<", "<< (*all_cells)[i]->position[1] <<")\n";
         std::cout<<"vel=("<< (*all_cells)[i]->velocity[0] <<", "<< (*all_cells)[i]->velocity[1] <<")\n";
-        }
     }
 }
 void dump_cell_info()

@@ -67,139 +67,24 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
-extern Cell_Definition leader_cell; 
-extern Cell_Definition follower_cell; 
-
-// overall rules 
-
-void tumor_cell_phenotype_with_oncoprotein( Cell* pCell , Phenotype& phenotype , double dt ) ;// done 
 void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt ); // done 
-//void change_speed_ecm(Cell* pCell);
-
-// follower cell rules 
-
-void follower_cell_phenotype_model0( Cell* pCell , Phenotype& phenotype , double dt ); 
-
-// leader cell rules
-
-void leader_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt ); 
-
-void follower_cell_phenotype_model( Cell* pCell , Phenotype& phenotype , double dt ); 
-
-void leader_cell_motility_model0( Cell* pCell , Phenotype& phenotype , double dt ); 
-
-void switching_phenotype_model( Cell* pCell, Phenotype& phenotype, double dt ); 
 
 void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt );
 
 void reset_cell_position(void);
 
-class Options 
-{
- public: 
-	int model = 0; 	
-};
-
-// START ECM STUFF
-
-// class ECM_Cartesian_Mesh : public Cartesian_Mesh
-// {
-// 	public:
-// 	ECM_Cartesian_Mesh();
-
-
-// };
-
-// class ECM_Voxel : public Voxel
-// {
-// 	public:
-
-// 	ECM_Voxel();
-
-// 	double anisotropy;
-// 	double density;
-// 	std::vector<double> ecm_fiber_alignment;
-
-// };
-
-// class ECM
-// {
-// 	// so in theory, anythign that doens't need accessed outside of the class is private, to aid in debugging and not messing thigns up. Interesitng. 
-	
-// 	public:
-	
-// 	ECM_Voxel ecm_voxel;
-// 	ECM_Cartesian_Mesh ecm_mesh;
-// 	std::string spatial_units; 
-// 	std::string name; 
-	
-// 	std::vector<ECM_Voxel> ecm_voxels;
-
-
-
-// 	ECM();
-// 	ECM(std::string name);
-
-// 	void make_ecm_units (void);
-// 	void resize_ecm_units_from_ecm_mesh(void); // destroys previous ECM vector. New ECM_units are put in place and any previous initial configuration is lost
-// 	void initialize_ECM(void);
-
-// };
-
-// class ECM_options
-// {
-
-// 	private:
- 
-// 	public: 
-// 	ECM* pECM;
-// 	std::string name; 
-
-	
-
-// 	std::string spatial_units; 
-// 	double dx;
-// 	double dy; 
-// 	double dz; 
-
-// 	// Currently only used to specify FIBER orientation, but could be expanded in the future
-// 	std::string ecm_initial_configuration;
-
-// 	ECM_options(); // needs defined!!!
-// };
-
-// // extern ECM_options default_ecm_options; 
-// // extern ECM ecm;
-
-// END ECM STUFF
-
-
-// custom cell phenotype function to scale immunostimulatory factor with hypoxia 
-
-// set the tumor cell properties, then call the function 
-// to set up the tumor cells 
 void create_cell_types( void ); // done 
 void ECM_setup(double numvox);
 void setup_extracellular_matrix( void ); 
 void setup_tissue(void); // done 
-
-// set up the microenvironment to include the immunostimulatory factor 
 void setup_microenvironment( void );  // done 
-
 std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* );
-std::vector<std::string> ECM_anisotropy_coloring_function( Cell* );
-void ecm_update_from_cell(Cell* pCell , Phenotype& phenotype , double dt); // Not currently supporting anisotropy decreasing!! 06.17.19
 void ECM_informed_motility_update_w_chemotaxis ( Cell* pCell, Phenotype& phenotype, double dt );
 void ECM_informed_motility_update_model_w_memory ( Cell* pCell, Phenotype& phenotype, double dt ); // Uses previous migration bias direction
 void ECM_informed_motility_update_w_chemotaxis_w_variable_speed( Cell* pCell, Phenotype& phenotype, double dt ); // Sets speed based on fiber alignment. If chemo senstivitty set to 1, then cells will chemotax with speed varying strictly with alignemnt.
 void ecm_update_from_cell_motility_vector(Cell* pCell , Phenotype& phenotype , double dt);
 void ecm_update_from_cell_velocity_vector(Cell* pCell , Phenotype& phenotype , double dt);
-// void ECM_informed_motility_update_model_3 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous velocity vector
-// void ECM_informed_motility_update_model_4 ( Cell* pCell, Phenotype& phenotype, double dt ); // uses previous migration bias direction AND previous anisotropy
-void change_migration_bias_vector_ecm(Cell* pCell , Phenotype& phenotype , double dt);
 void run_biotransport( double t_max );
 void alter_cell_uptake_secretion_saturation ( void );
 void set_cell_motility_vectors(void); // Runs update_migration_bias for each cell present in a simulation
-void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern );
-void write_ECM_Data_matlab( std::string filename );
-double sign_function (double number);
+// void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern );

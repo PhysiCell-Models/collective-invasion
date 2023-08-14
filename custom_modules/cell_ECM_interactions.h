@@ -20,3 +20,6 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt );
 void custom_update_motility_vector( Cell* pCell, Phenotype& phenotype, double dt_  );
 
 void create_default_ECM_compatible_agent( void );
+
+void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern );
+void write_ECM_Data_matlab( std::string filename );

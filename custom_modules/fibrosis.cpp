@@ -83,22 +83,24 @@ void create_cell_types( void )
 	   
 	   This is a good place to set default functions. 
 	*/ 
-	
-	initialize_default_cell_definition(); 
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
-	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-	cell_defaults.functions.update_migration_bias = NULL; 
-	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
-	cell_defaults.functions.custom_cell_rule = NULL; 
-	cell_defaults.functions.contact_function = NULL; 
+	create_default_ECM_compatible_agent(); // in cell_ECM_interactions.cpp. Sets custom velocity function (cell-ECM motility interaction) and custom cell rule (ECM remodeling).
 	
-	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
-	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	// initialize_default_cell_definition(); 
+	// cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
+	
+	// cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	// cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-    cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
+	// cell_defaults.functions.update_migration_bias = NULL; 
+	// cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	// cell_defaults.functions.custom_cell_rule = NULL; 
+	// cell_defaults.functions.contact_function = NULL; 
+	
+	// cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	// cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+
+    // cell_defaults.phenotype.motility.migration_speed = parameters.doubles("default_cell_speed");  //rwh
 	
 	/*
 	   This parses the cell definitions in the XML config file. 
@@ -144,9 +146,9 @@ void create_cell_types( void )
         simple_chemotaxis = false;
     }
 
-	fibroblast->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; 
+	// fibroblast->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update; 
 	
-	fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
+	// fibroblast->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //fibroblast_ECM_informed_motility_update_w_chemotaxis;
 	
     fibroblast->functions.update_phenotype = NULL; // leader_cell_phenotype_model;
 
@@ -156,9 +158,9 @@ void create_cell_types( void )
 
     // dead_cell->functions.update_phenotype = NULL;// follower_cell_phenotype_model;
 
-	macrophage->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //ECM_based_cell_motility_update_including_chemotaxis;
+	// macrophage->functions.update_migration_bias = ECM_and_chemotaxis_based_cell_migration_update; //ECM_based_cell_motility_update_including_chemotaxis;
 
-	macrophage->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update;
+	// macrophage->functions.custom_cell_rule = combined_ECM_remodeling_and_speed_update;
 
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
@@ -573,12 +575,12 @@ double dot_product_ext_old( const std::vector<double>& v , const std::vector<dou
 	return out; 
 }
 
-void ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype, double dt)
-{
-	ECM_based_speed_update(pCell, phenotype, dt );
+// void ECM_remodeling_and_speed_update( Cell* pCell, Phenotype& phenotype, double dt)
+// {
+// 	ECM_based_speed_update(pCell, phenotype, dt );
 
-	ECM_remodeling_function(pCell, phenotype, dt);
-}
+// 	ECM_remodeling_function(pCell, phenotype, dt);
+// }
 
 double sign_function_old (double number)
 {
@@ -1210,278 +1212,278 @@ void update_adhesion( Cell* pCell, Phenotype& phenotype, double dt )
 // }
 
 
-void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern )
-{
-	double X_lower = M.mesh.bounding_box[0];
-	double X_upper = M.mesh.bounding_box[3];
+// void SVG_plot_custom( std::string filename , Microenvironment& M, double z_slice , double time, std::vector<std::string> (*cell_coloring_function)(Cell*), std::string line_pattern )
+// {
+// 	double X_lower = M.mesh.bounding_box[0];
+// 	double X_upper = M.mesh.bounding_box[3];
  
-	double Y_lower = M.mesh.bounding_box[1]; 
-	double Y_upper = M.mesh.bounding_box[4]; 
+// 	double Y_lower = M.mesh.bounding_box[1]; 
+// 	double Y_upper = M.mesh.bounding_box[4]; 
 
-	double plot_width = X_upper - X_lower; 
-	double plot_height = Y_upper - Y_lower; 
+// 	double plot_width = X_upper - X_lower; 
+// 	double plot_height = Y_upper - Y_lower; 
 
-	double font_size = 0.025 * plot_height; // PhysiCell_SVG_options.font_size; 
-	double top_margin = font_size*(.2+1+.2+.9+.5 ); 
+// 	double font_size = 0.025 * plot_height; // PhysiCell_SVG_options.font_size; 
+// 	double top_margin = font_size*(.2+1+.2+.9+.5 ); 
 
-	// open the file, write a basic "header"
-	std::ofstream os( filename , std::ios::out );
-	if( os.fail() )
-	{ 
-		std::cout << std::endl << "Error: Failed to open " << filename << " for SVG writing." << std::endl << std::endl; 
+// 	// open the file, write a basic "header"
+// 	std::ofstream os( filename , std::ios::out );
+// 	if( os.fail() )
+// 	{ 
+// 		std::cout << std::endl << "Error: Failed to open " << filename << " for SVG writing." << std::endl << std::endl; 
 
-		std::cout << std::endl << "Error: We're not writing data like we expect. " << std::endl
-		<< "Check to make sure your save directory exists. " << std::endl << std::endl
-		<< "I'm going to exit with a crash code of -1 now until " << std::endl 
-		<< "you fix your directory. Sorry!" << std::endl << std::endl; 
-		exit(-1); 
-	} 
+// 		std::cout << std::endl << "Error: We're not writing data like we expect. " << std::endl
+// 		<< "Check to make sure your save directory exists. " << std::endl << std::endl
+// 		<< "I'm going to exit with a crash code of -1 now until " << std::endl 
+// 		<< "you fix your directory. Sorry!" << std::endl << std::endl; 
+// 		exit(-1); 
+// 	} 
 	
-	Write_SVG_start( os, plot_width , plot_height + top_margin );
+// 	Write_SVG_start( os, plot_width , plot_height + top_margin );
 
-	// draw the background 
-	Write_SVG_rect( os , 0 , 0 , plot_width, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
+// 	// draw the background 
+// 	Write_SVG_rect( os , 0 , 0 , plot_width, plot_height + top_margin , 0.002 * plot_height , "white", "white" );
 	
-	// bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
-    //                    std::string stroke_color , std::string fill_color )
+// 	// bool Write_SVG_circle( std::ostream& os, double center_x, double center_y, double radius, double stroke_size, 
+//     //                    std::string stroke_color , std::string fill_color )
 
-	// write the simulation time to the top of the plot
+// 	// write the simulation time to the top of the plot
  
-	char* szString; 
-	szString = new char [1024]; 
+// 	char* szString; 
+// 	szString = new char [1024]; 
  
-	int total_cell_count = all_cells->size(); 
+// 	int total_cell_count = all_cells->size(); 
  
-	double temp_time = time; 
+// 	double temp_time = time; 
 
-	std::string time_label = formatted_minutes_to_DDHHMM( temp_time ); 
+// 	std::string time_label = formatted_minutes_to_DDHHMM( temp_time ); 
  
-	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str(), 
-		z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
-	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), 
-		font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
-	sprintf( szString , "%u agents" , total_cell_count ); 
-	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9), 
-		0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+// 	sprintf( szString , "Current time: %s, z = %3.2f %s", time_label.c_str(), 
+// 		z_slice , PhysiCell_SVG_options.simulation_space_units.c_str() ); 
+// 	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1), 
+// 		font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+// 	sprintf( szString , "%u agents" , total_cell_count ); 
+// 	Write_SVG_text( os, szString, font_size*0.5,  font_size*(.2+1+.2+.9), 
+// 		0.95*font_size, PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
 	
-	delete [] szString; 
+// 	delete [] szString; 
 
 	
-	// add an outer "g" for coordinate transforms 
+// 	// add an outer "g" for coordinate transforms 
 	
-	os << " <g id=\"tissue\" " << std::endl 
-	   << "    transform=\"translate(0," << plot_height+top_margin << ") scale(1,-1)\">" << std::endl; 
+// 	os << " <g id=\"tissue\" " << std::endl 
+// 	   << "    transform=\"translate(0," << plot_height+top_margin << ") scale(1,-1)\">" << std::endl; 
 	   
-	// prepare to do mesh-based plot (later)
+// 	// prepare to do mesh-based plot (later)
 	
-	double dx_stroma = M.mesh.dx; 
-	double dy_stroma = M.mesh.dy; 
+// 	double dx_stroma = M.mesh.dx; 
+// 	double dy_stroma = M.mesh.dy; 
 	
-	os << "  <g id=\"ECM\">" << std::endl; 
+// 	os << "  <g id=\"ECM\">" << std::endl; 
   
-	int ratio = 1; 
-	double voxel_size = dx_stroma / (double) ratio ; 
+// 	int ratio = 1; 
+// 	double voxel_size = dx_stroma / (double) ratio ; 
   
-	double half_voxel_size = voxel_size / 2.0; 
-	double normalizer = 78.539816339744831 / (voxel_size*voxel_size*voxel_size); 
+// 	double half_voxel_size = voxel_size / 2.0; 
+// 	double normalizer = 78.539816339744831 / (voxel_size*voxel_size*voxel_size); 
  
- // color in the background ECM
+//  // color in the background ECM
 
-	os << "  </g>" << std::endl; 
+// 	os << "  </g>" << std::endl; 
  
-	// plot intersecting cells 
-	os << "  <g id=\"cells\">" << std::endl; 
-	for( int i=0 ; i < total_cell_count ; i++ )
-	{
-		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
+// 	// plot intersecting cells 
+// 	os << "  <g id=\"cells\">" << std::endl; 
+// 	for( int i=0 ; i < total_cell_count ; i++ )
+// 	{
+// 		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
   
-		static std::vector<std::string> Colors; 
-		if( fabs( (pC->position)[2] - z_slice ) < pC->phenotype.geometry.radius )
-		{
-			double r = pC->phenotype.geometry.radius ; 
-			double rn = pC->phenotype.geometry.nuclear_radius ; 
-			double z = fabs( (pC->position)[2] - z_slice) ; 
+// 		static std::vector<std::string> Colors; 
+// 		if( fabs( (pC->position)[2] - z_slice ) < pC->phenotype.geometry.radius )
+// 		{
+// 			double r = pC->phenotype.geometry.radius ; 
+// 			double rn = pC->phenotype.geometry.nuclear_radius ; 
+// 			double z = fabs( (pC->position)[2] - z_slice) ; 
    
-			Colors = cell_coloring_function( pC ); 
+// 			Colors = cell_coloring_function( pC ); 
 
-			os << "   <g id=\"cell" << pC->ID << "\">" << std::endl; 
+// 			os << "   <g id=\"cell" << pC->ID << "\">" << std::endl; 
   
-			// figure out how much of the cell intersects with z = 0 
+// 			// figure out how much of the cell intersects with z = 0 
    
-			double plot_radius = sqrt( r*r - z*z ); 
+// 			double plot_radius = sqrt( r*r - z*z ); 
 
-			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
-				plot_radius , 0.5, Colors[1], Colors[0] ); 
+// 			Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
+// 				plot_radius , 0.5, Colors[1], Colors[0] ); 
 
-			// plot the nucleus if it, too intersects z = 0;
-			if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
-			{   
-				plot_radius = sqrt( rn*rn - z*z ); 
-			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
-					plot_radius, 0.5, Colors[3],Colors[2]); 
-			}					  
-			os << "   </g>" << std::endl;
-		}
-	}
-	os << "  </g>" << std::endl; 
+// 			// plot the nucleus if it, too intersects z = 0;
+// 			if( fabs(z) < rn && PhysiCell_SVG_options.plot_nuclei == true )
+// 			{   
+// 				plot_radius = sqrt( rn*rn - z*z ); 
+// 			 	Write_SVG_circle( os, (pC->position)[0]-X_lower, (pC->position)[1]-Y_lower, 
+// 					plot_radius, 0.5, Colors[3],Colors[2]); 
+// 			}					  
+// 			os << "   </g>" << std::endl;
+// 		}
+// 	}
+// 	os << "  </g>" << std::endl; 
 
-	// Plot guidelines the circle guides
+// 	// Plot guidelines the circle guides
 	
-	if (line_pattern == "concentric circles")
-	{
-		for (int i=0; i<plot_width/(2*parameters.doubles("ECM_dx")); i++)
-		{
-			double radius = plot_width/2 - (i *parameters.doubles("ECM_dx"));
-			// std::cout<<"Index "<<i<<std::endl;
-			// std::cout<<"Radius "<<radius<<std::endl;
-			Write_SVG_circle( os, plot_width/2, plot_height/2, radius, 0.5, "black" , "none" );
+// 	if (line_pattern == "concentric circles")
+// 	{
+// 		for (int i=0; i<plot_width/(2*parameters.doubles("ECM_dx")); i++)
+// 		{
+// 			double radius = plot_width/2 - (i *parameters.doubles("ECM_dx"));
+// 			// std::cout<<"Index "<<i<<std::endl;
+// 			// std::cout<<"Radius "<<radius<<std::endl;
+// 			Write_SVG_circle( os, plot_width/2, plot_height/2, radius, 0.5, "black" , "none" );
 
-		}
-	}
+// 		}
+// 	}
 
-	else if (line_pattern == "vertical lines")
-	{
-		for (int i=0; i<plot_width/parameters.doubles("ECM_dx"); i++)
-		{
-			double x_line_position = parameters.doubles("ECM_dx")*i;
-			// std::cout<<"Index "<<i<<std::endl;
-			// std::cout<<"X position "<<x_line_position<<std::endl;			
-			Write_SVG_line(os, x_line_position, 0, x_line_position, plot_height, 0.5, "black");
-			// bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-            //         std::string stroke_color )
-		}
-	}
+// 	else if (line_pattern == "vertical lines")
+// 	{
+// 		for (int i=0; i<plot_width/parameters.doubles("ECM_dx"); i++)
+// 		{
+// 			double x_line_position = parameters.doubles("ECM_dx")*i;
+// 			// std::cout<<"Index "<<i<<std::endl;
+// 			// std::cout<<"X position "<<x_line_position<<std::endl;			
+// 			Write_SVG_line(os, x_line_position, 0, x_line_position, plot_height, 0.5, "black");
+// 			// bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
+//             //         std::string stroke_color )
+// 		}
+// 	}
 
-	else if (line_pattern == "horizontal lines")
-	{
-		for (int i=0; i<plot_height/parameters.doubles("ECM_dy"); i++)
-		{
-			double y_line_position = parameters.doubles("ECM_dy")*i;
-			// std::cout<<"Index "<<i<<std::endl;
-			// std::cout<<"Y position "<<y_line_position<<std::endl;			
-			Write_SVG_line(os, 0, y_line_position, plot_width, y_line_position, 0.5, "black");
-			// bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
-            //         std::string stroke_color )
-		}
-	}
+// 	else if (line_pattern == "horizontal lines")
+// 	{
+// 		for (int i=0; i<plot_height/parameters.doubles("ECM_dy"); i++)
+// 		{
+// 			double y_line_position = parameters.doubles("ECM_dy")*i;
+// 			// std::cout<<"Index "<<i<<std::endl;
+// 			// std::cout<<"Y position "<<y_line_position<<std::endl;			
+// 			Write_SVG_line(os, 0, y_line_position, plot_width, y_line_position, 0.5, "black");
+// 			// bool Write_SVG_line( std::ostream& os , double start_x, double start_y, double end_x , double end_y, double thickness, 
+//             //         std::string stroke_color )
+// 		}
+// 	}
 
-	else if (line_pattern == "none") {} // Don't make lines!!!
+// 	else if (line_pattern == "none") {} // Don't make lines!!!
 
-	else if (line_pattern != "none" || "horizontal lines" || "vertical lines" || "concentric circles")
-	{
-		std::cout<<"Use of this custom SVG output function requires specifying \"none\" or a line pattern" <<std::endl;
-		std::cout<<"Halting: see inputs to custom SVG function \"SVG_plot_custom\"" << std::endl;
-		abort();
-		return;
+// 	else if (line_pattern != "none" || "horizontal lines" || "vertical lines" || "concentric circles")
+// 	{
+// 		std::cout<<"Use of this custom SVG output function requires specifying \"none\" or a line pattern" <<std::endl;
+// 		std::cout<<"Halting: see inputs to custom SVG function \"SVG_plot_custom\"" << std::endl;
+// 		abort();
+// 		return;
 
-	}
+// 	}
 
 	
-	// end of the <g ID="tissue">
-	os << " </g>" << std::endl; 
+// 	// end of the <g ID="tissue">
+// 	os << " </g>" << std::endl; 
  
-	// draw a scale bar
+// 	// draw a scale bar
  
-	double bar_margin = 0.025 * plot_height; 
-	double bar_height = 0.01 * plot_height; 
-	double bar_width = PhysiCell_SVG_options.length_bar; 
-	double bar_stroke_width = 0.001 * plot_height; 
+// 	double bar_margin = 0.025 * plot_height; 
+// 	double bar_height = 0.01 * plot_height; 
+// 	double bar_width = PhysiCell_SVG_options.length_bar; 
+// 	double bar_stroke_width = 0.001 * plot_height; 
 	
-	std::string bar_units = PhysiCell_SVG_options.simulation_space_units; 
-	// convert from micron to mm
-	double temp = bar_width;  
+// 	std::string bar_units = PhysiCell_SVG_options.simulation_space_units; 
+// 	// convert from micron to mm
+// 	double temp = bar_width;  
 
-	if( temp > 999 && std::strstr( bar_units.c_str() , PhysiCell_SVG_options.mu.c_str() )   )
-	{
-		temp /= 1000;
-		bar_units = "mm";
-	}
-	// convert from mm to cm 
-	if( temp > 9 && std::strcmp( bar_units.c_str() , "mm" ) == 0 )
-	{
-		temp /= 10; 
-		bar_units = "cm";
-	}
+// 	if( temp > 999 && std::strstr( bar_units.c_str() , PhysiCell_SVG_options.mu.c_str() )   )
+// 	{
+// 		temp /= 1000;
+// 		bar_units = "mm";
+// 	}
+// 	// convert from mm to cm 
+// 	if( temp > 9 && std::strcmp( bar_units.c_str() , "mm" ) == 0 )
+// 	{
+// 		temp /= 10; 
+// 		bar_units = "cm";
+// 	}
 	
-	szString = new char [1024];
-	sprintf( szString , "%u %s" , (int) round( temp ) , bar_units.c_str() );
+// 	szString = new char [1024];
+// 	sprintf( szString , "%u %s" , (int) round( temp ) , bar_units.c_str() );
  
-	Write_SVG_rect( os , plot_width - bar_margin - bar_width  , plot_height + top_margin - bar_margin - bar_height , 
-		bar_width , bar_height , 0.002 * plot_height , "rgb(255,255,255)", "rgb(0,0,0)" );
-	Write_SVG_text( os, szString , plot_width - bar_margin - bar_width + 0.25*font_size , 
-		plot_height + top_margin - bar_margin - bar_height - 0.25*font_size , 
-		font_size , PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() ); 
+// 	Write_SVG_rect( os , plot_width - bar_margin - bar_width  , plot_height + top_margin - bar_margin - bar_height , 
+// 		bar_width , bar_height , 0.002 * plot_height , "rgb(255,255,255)", "rgb(0,0,0)" );
+// 	Write_SVG_text( os, szString , plot_width - bar_margin - bar_width + 0.25*font_size , 
+// 		plot_height + top_margin - bar_margin - bar_height - 0.25*font_size , 
+// 		font_size , PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() ); 
 	
-	delete [] szString; 
+// 	delete [] szString; 
 
-	// // plot runtime 
-	// szString = new char [1024]; 
-	// RUNTIME_TOC(); 
-	// std::string formatted_stopwatch_value = format_stopwatch_value( runtime_stopwatch_value() );
-	// Write_SVG_text( os, formatted_stopwatch_value.c_str() , bar_margin , top_margin + plot_height - bar_margin , 0.75 * font_size , 
-	// 	PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
-	// delete [] szString; 
+// 	// // plot runtime 
+// 	// szString = new char [1024]; 
+// 	// RUNTIME_TOC(); 
+// 	// std::string formatted_stopwatch_value = format_stopwatch_value( runtime_stopwatch_value() );
+// 	// Write_SVG_text( os, formatted_stopwatch_value.c_str() , bar_margin , top_margin + plot_height - bar_margin , 0.75 * font_size , 
+// 	// 	PhysiCell_SVG_options.font_color.c_str() , PhysiCell_SVG_options.font.c_str() );
+// 	// delete [] szString; 
 
-	// draw a box around the plot window
-	Write_SVG_rect( os , 0 , top_margin, plot_width, plot_height , 0.002 * plot_height , "rgb(0,0,0)", "none" );
+// 	// draw a box around the plot window
+// 	Write_SVG_rect( os , 0 , top_margin, plot_width, plot_height , 0.002 * plot_height , "rgb(0,0,0)", "none" );
 	
-	// close the svg tag, close the file
-	Write_SVG_end( os ); 
-	os.close();
+// 	// close the svg tag, close the file
+// 	Write_SVG_end( os ); 
+// 	os.close();
  
-	return; 
-}
+// 	return; 
+// }
 
-void write_ECM_Data_matlab( std::string filename )
+// void write_ECM_Data_matlab( std::string filename )
 
-{
+// {
 
-    int number_of_data_entries = ecm.ecm_mesh.voxels.size();
+//     int number_of_data_entries = ecm.ecm_mesh.voxels.size();
 
-    int size_of_each_datum = 8;
+//     int size_of_each_datum = 8;
 
 	
-	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
-	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
+// 	// static int ECM_anisotropy_index = microenvironment.find_density_index( "ECM anisotropy" ); 
+// 	// static int ECM_density_index = microenvironment.find_density_index( "ECM" ); 
 
-    FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
+//     FILE* fp = write_matlab_header( size_of_each_datum, number_of_data_entries,  filename, "ECM_Data" );  // Note - the size of datum needs to correspond exaectly to the lines of output or there is an error upon importing.
 
-    for( int i=0; i < number_of_data_entries ; i++ )
+//     for( int i=0; i < number_of_data_entries ; i++ )
 
-    {
+//     {
 
-	    fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
+// 	    fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[0] ) , sizeof(double) , 1 , fp ); // 1
 
-        fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
+//         fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[1] ) , sizeof(double) , 1 , fp ); // 2
 
-        fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
+//         fwrite( (char*) &( ecm.ecm_mesh.voxels[i].center[2] ) , sizeof(double) , 1 , fp ); //3
 		
-		fwrite( (char*) &( ecm.ecm_voxels[i].anisotropy), sizeof(double) , 1 , fp ); // 4
+// 		fwrite( (char*) &( ecm.ecm_voxels[i].anisotropy), sizeof(double) , 1 , fp ); // 4
 	
-        fwrite( (char*) &( ecm.ecm_voxels[i].density), sizeof(double) , 1 , fp ); // 5
+//         fwrite( (char*) &( ecm.ecm_voxels[i].density), sizeof(double) , 1 , fp ); // 5
 
-        fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[0]), sizeof(double) , 1 , fp ); // 6
+//         fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[0]), sizeof(double) , 1 , fp ); // 6
 
-        fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[1]), sizeof(double) , 1 , fp ); // 7
+//         fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[1]), sizeof(double) , 1 , fp ); // 7
 
-        fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[2]), sizeof(double) , 1 , fp ); // 8
+//         fwrite( (char*) &( ecm.ecm_voxels[i].ecm_fiber_alignment[2]), sizeof(double) , 1 , fp ); // 8
 
-		// This will only work if the diffusion and ECM meshes are the same size. Commenting out for actualrunning. To do a direct comparison, leave them in and change length. Will have to change the vizualization to get this from the regular BioFVM outputs.
+// 		// This will only work if the diffusion and ECM meshes are the same size. Commenting out for actualrunning. To do a direct comparison, leave them in and change length. Will have to change the vizualization to get this from the regular BioFVM outputs.
 
-		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][0]), sizeof(double) , 1 , fp ); // 9
+// 		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][0]), sizeof(double) , 1 , fp ); // 9
 
-		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][1]), sizeof(double) , 1 , fp ); // 10
+// 		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][1]), sizeof(double) , 1 , fp ); // 10
 
-		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][2]), sizeof(double) , 1 , fp ); // 11
+// 		// fwrite( (char*) &( microenvironment.gradient_vector(i)[0][2]), sizeof(double) , 1 , fp ); // 11
 
-    }
-
-
-
-    fclose( fp );
+//     }
 
 
 
-    return;
+//     fclose( fp );
 
-}
+
+
+//     return;
+
+// }

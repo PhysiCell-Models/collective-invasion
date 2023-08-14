@@ -173,7 +173,7 @@
                 <motility>
                     <speed units="micron/min">0.5</speed>
                     <persistence_time units="min">10.0</persistence_time>
-                    <migration_bias units="dimensionless">0.0</migration_bias>
+                    <migration_bias units="dimensionless">0.5</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
@@ -246,10 +246,11 @@
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0.0</previous_anisotropy>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
-                <ECM_production_rate conserved="false" units="1/min" description="">0.001</ECM_production_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="">0.0001</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
-                <migration_bias_norm conserved="false" units="" description="Intenral variable - set to 1.0">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Internal variable - set to 1.0">1.0</migration_bias_norm>
+                <rules_based_speed_multiplier conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
         <cell_definition name="dead cell" ID="1">
@@ -399,7 +400,8 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.0</adhesion_change_threshold>
-                <migration_bias_norm conserved="false" units="" description="Intenral variable - set to 1.0">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Internal variable - set to 1.0">1.0</migration_bias_norm>
+                <rules_based_speed_multiplier conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
         <cell_definition name="macrophage" ID="2">
@@ -549,7 +551,8 @@
                 <ECM_production_rate conserved="false" units="1/min" description="">0.000</ECM_production_rate>
                 <link_anisotropy_and_bias conserved="false" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <adhesion_change_threshold conserved="false" units="dimensionless" description="Threshold for adhesion switch from default to 5.0">0.25</adhesion_change_threshold>
-                <migration_bias_norm conserved="false" units="" description="Intenral variable - set to 1.0">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Internal variable - set to 1.0">1.0</migration_bias_norm>
+                <rules_based_speed_multiplier conserved="false" units="" description="Internal variable - keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
     </cell_definitions>

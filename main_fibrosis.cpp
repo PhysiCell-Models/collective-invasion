@@ -71,6 +71,7 @@
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
+#include "./custom_modules/cell_ECM_interactions.h"
 
 // custom user modules 
 
