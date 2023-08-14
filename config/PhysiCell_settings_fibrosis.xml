@@ -1,0 +1,111 @@
+<PhysiCell_settings version="1.4.1">
+	<domain>
+		<x_min>-800</x_min>
+		<x_max>800</x_max>
+		<y_min>-800</y_min>
+		<y_max>800</y_max>
+		<z_min>-10</z_min>
+		<z_max>10</z_max>
+		<dx>20</dx>
+		<dy>20</dy>
+		<dz>20</dz>
+		<use_2D>true</use_2D>
+	</domain>
+	
+	<overall>
+		<max_time units="min">7200</max_time> 
+		<time_units>min</time_units>
+		<space_units>micron</space_units>
+	</overall>
+	
+	<parallel>
+		<omp_num_threads>8</omp_num_threads>
+	</parallel> 
+	
+	<save>
+		<folder>output</folder>  
+
+		<full_data>
+			<interval units="min">600</interval>
+			<enable>true</enable>
+		</full_data>
+		 
+		<SVG>
+			<interval units="min">600</interval>
+			<enable>true</enable>
+		</SVG>
+		
+		<legacy_data>
+			<enable>false</enable>
+		</legacy_data>
+	</save>
+	
+	<user_parameters>
+		<div_background type="divider" description="---ECM initialization parameters---"/>
+        <initial_anisotropy description="Initial ECM anisotropy" type="double" units="dimensionless">0.0</initial_anisotropy>
+		<initial_ECM_density description="Initial ECM density" type="double" units="dimensionless">0.5</initial_ECM_density>
+
+		<div_background type="divider" description="---Lesion initialization parameters---"/>
+		<cell_setup description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, circle_of_fibroblasts, or cells at left boundary/march" type="string">circle_of_fibroblasts</cell_setup>
+		<tumor_radius description="Initial cell lesion radius (lesion only)" type="double" units="microns">175</tumor_radius>
+		<initial_fibroblast_fraction description="Average percentage of fibroblasts initialized (lesion only)" type="double" units="dimensionless">0.00</initial_fibroblast_fraction>
+
+		<div_background type="divider" description="---Cell properties---"/>
+		
+		<div_background type="divider" description="-Both cell types-"/>
+		<oxygen_uptake description="Default cell oxygen uptake rate" type="double" units="mmHg/min">10</oxygen_uptake>
+		<default_cell_speed description="Base/maximum cell speed" type="double" units="microns/minute">0.5</default_cell_speed>
+		<default_persistence_time description="Cell directional persistence time" type="double" units="minutes">10.0</default_persistence_time>
+
+		<div_background type="divider" description="-Fibroblast type parameters-"/>
+		<fibroblast_adhesion description="Strength of fibroblasts\' cell-cell adhesion" type="double" units="micron/minute">5.0</fibroblast_adhesion>
+		<fibroblast_repulsion description="Strength of fibroblasts\' cell-cell repulsion" type="double" units="micron/minute">25.0</fibroblast_repulsion>
+		<inflam_sig_migration_bias_for_fibroblasts description="fibroblast chemotaxis bias" type="double" units="dimensionless">0.85</inflam_sig_migration_bias_for_fibroblasts>
+		<anisotropy_increase_rate description="Anisotropy rate of increase" type="double" units="1/min">0.004</anisotropy_increase_rate>
+		<fiber_realignment_rate description="Fiber rate of realignment" type="double" units="1/min">4.0</fiber_realignment_rate>
+		<default_ECM_density_target description="Cell ECM density target" type="double" units="dimenionless">0.5</default_ECM_density_target>
+		<default_ECM_production_rate description="Cell ECM production rate" type="double" units="dimenionless">0.001</default_ECM_production_rate>
+		<number_of_fibroblasts description="Number of fibroblasts to initialize" type="int">11</number_of_fibroblasts>
+
+		<div_background type="divider" description="-cancer cell type parameters-"/>
+   		<cancer_cell_adhesion description="Strength of cancer cells\' cell-cell adhesion" type="double" units="micron/minute">10.0</cancer_cell_adhesion>
+    	<cancer_cell_repulsion description="Strength of cancer cells\' cell-cell repulsion" type="double" units="micron/minute">25.0</cancer_cell_repulsion>
+		<default_chemotaxis_bias description="cancer chemotaxis bias" hidden="true" type="double" units="dimensionless">0.05</default_chemotaxis_bias>
+		<default_ECM_sensitivity description="cancer ECM orientation sensitivity" type="double" units="dimensionless">1.0</default_ECM_sensitivity>    	
+		<rho_L description="Minimum ECM density required for cell motility" type="double" units="dimensionless">0.0</rho_L>
+		<rho_H description="Maximum ECM density allowing cell motility" type="double" units="dimensionless">1.0</rho_H>
+		<rho_I description="Ideal ECM density cell motility" type="double" units="dimensionless">0.5</rho_I>
+		<default_hysteresis_bias description="Sensitivity to previous direction (hysteresis model only)" type="double" units="dimensionless">1.0</default_hysteresis_bias>
+		
+		<!-- Not used - should always be TRUE -->
+		<fibroblast_motility_mode hidden="true" type="bool" units="dimensionless">true</fibroblast_motility_mode>
+        <cancer_cell_motility_mode hidden="true" type="bool" units="dimensionless">false</cancer_cell_motility_mode>
+
+		<div_background type="divider" description="---Microenvironment initialization and other parameters---"/>
+		<chemotactic_substrate_decay_rate description="Oxygen decay rate" type="double" units="1/minutes">0.1</chemotactic_substrate_decay_rate>
+		<chemical_field_setup description="Starburst, vertical up, horizontal right, angle, or none" type="string">none</chemical_field_setup>
+		<angle_of_chemical_field_gradient description="Angle of chemical field gradient orientation, specified in degrees" type="double">45.0</angle_of_chemical_field_gradient>
+		<ECM_orientation_setup description="Random, horizontal, vertical, circular, starburst, hard_line, or split" type="string">random</ECM_orientation_setup>
+		
+		<!-- Set directly in Jupyter UI in Config basics tab -->
+		<ECM_dx hidden="true" description="Length of ECM unit in x-direction" type="double" units="um">20</ECM_dx>
+		<ECM_dy hidden="true" description="Length of ECM unit in y-direction" type="double" units="um">20</ECM_dy>
+		<ECM_dz hidden="true" description="Length of ECM unit in z-direction" type="double" units="um">20</ECM_dz>
+
+		<div_background type="divider" description="---Model Selection parameters---"/>
+		<cell_motility_ECM_interaction_model_selector description="cancer cell chemotaxis/no cancer cell hysteresis, cancer cell hysteresis/no cancer cell chemotaxis" type="string">cancer cell chemotaxis/no cancer cell hysteresis</cell_motility_ECM_interaction_model_selector>
+		<discrete_ECM_remodeling hidden="false" description="ECM remodeling: 1 = finite speed; 0 = instant" type="int">1</discrete_ECM_remodeling>
+		<link_anisotropy_and_bias hidden="false" description="Selects if chemotaxtic bias on cancer cells is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled" type="int">0</link_anisotropy_and_bias>
+		<ecm_update_model hidden="true" description="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector" type="string">ecm_update_from_cell_motility_vector</ecm_update_model>
+		<normalize_ECM_influenced_motility_vector hidden="false" description="Normalize cancer cell motility vector" type="bool">false</normalize_ECM_influenced_motility_vector>
+		<duration_of_uE_conditioning hidden="false" type="double" units="minutes">10</duration_of_uE_conditioning>
+		<freeze_uE_profile hidden="false" description="Use to freeze chemical and ECM fields" type="bool">false</freeze_uE_profile>
+		<unit_test_setup description="Sets parameters for testing: 1 for testing, 0 for typical simulation" type="int">0</unit_test_setup>
+		<march_unit_test_setup description="Testing set up: 1 for cell march, 0 for typical simulation" type="int">0</march_unit_test_setup>
+		<visual_guideline_pattern hidden="true" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles" type="string">none</visual_guideline_pattern>
+		
+		<enable_ecm_outputs hidden="true" type="bool">true</enable_ecm_outputs>
+		
+	</user_parameters>
+	
+</PhysiCell_settings>

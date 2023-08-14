@@ -1042,10 +1042,13 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 
 void add_BioFVM_to_open_xml_pugi( pugi::xml_document& xml_dom , std::string filename_base, double current_simulation_time , Microenvironment& M )
 {
+	
 	add_MultiCellDS_main_structure_to_open_xml_pugi( xml_dom ); 
+	
 	BioFVM_metadata.add_to_open_xml_pugi( current_simulation_time , xml_dom ); 
 
 	add_BioFVM_substrates_to_open_xml_pugi( xml_dom , filename_base, M  ); 
+
 	// add vessels (if there) 
 	// add basic agents (if there)
 	add_BioFVM_agents_to_open_xml_pugi( xml_dom , filename_base, M); 
@@ -1383,5 +1386,49 @@ void read_microenvironment_from_MultiCellDS_xml( Microenvironment& M_destination
 	std::cout << "done!" << std::endl; 
 	return; 
 } 
+
+bool read_microenvironment_from_matlab( std::string mat_filename )
+{
+	std::cout << std::endl << "Attempting to load the microenvironment from " << mat_filename << " ... " << std::endl; 
+
+	std::vector< std::vector<double> > mat = read_matlab( mat_filename ); 
+
+	// row 0 : x
+	// row 1 : y
+	// row 2 : z 
+	// row 3 : vol 
+	// row 4-n : substrate 
+	int num_rows = mat.size(); 
+	int num_cols = mat[0].size(); 
+
+	int number_of_mat_voxels = num_cols; 
+	int number_of_mat_substrates = num_rows - 3 -1; 
+
+	if( number_of_mat_substrates != microenvironment.number_of_densities() )
+	{
+		std::cout << "Error reading microenvironment from " << mat_filename << "! ";  
+		std::cout << "Expected " << microenvironment.number_of_densities() << " substrates but only detected "
+			<< number_of_mat_substrates << std::endl; 
+		return false; 
+	}
+
+	if( number_of_mat_voxels != microenvironment.number_of_voxels() )
+	{
+		std::cout << "Error reading microenvironment from " << mat_filename << "! ";  
+		std::cout << "Expected " << microenvironment.number_of_voxels() << " voxels but only detected "
+			<< number_of_mat_voxels << std::endl; 
+		return false; 
+	}
+
+	for( int n=0 ; n < number_of_mat_voxels ; n++ )
+	{
+		// std::cout << microenvironment.mesh.voxels[n].center << " vs " << mat[0][n] << " " << mat[1][n] << " " << mat[2][n] << std::endl; 	
+		for( int k=4; k < num_rows ; k++ )
+		{ microenvironment(n)[k-4] = mat[k][n]; }
+	}
+
+	std::cout << "done!" << std::endl << std::endl; 
+	return true; 
+}
 
 };

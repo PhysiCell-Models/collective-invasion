@@ -172,12 +172,28 @@ void operator/=( std::vector<double>& v1, const double& a )
 
 std::ostream& operator<<(std::ostream& os, const std::vector<double>& v )
 {
+ /*
  if( v.size() == 3 )
  {
   os << "x=\"" << v[0] << "\" y=\"" << v[1] << "\" z=\"" << v[2] << "\"" ; 
   return os; 
  }
+ */
 
+ for( unsigned int i=0; i < v.size(); i++ )
+ { os << v[i] << " " ; }
+ return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<int>& v )
+{
+ for( unsigned int i=0; i < v.size(); i++ )
+ { os << v[i] << " " ; }
+ return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v )
+{
  for( unsigned int i=0; i < v.size(); i++ )
  { os << v[i] << " " ; }
  return os; 
@@ -197,6 +213,22 @@ std::vector<double> normalize( std::vector<double>& v )
 
  for( unsigned int i=0; i < v.size(); i++ )
  { output[i] /= norm ; }
+
+ // If the norm is small, normalizing doens't make sense. 
+ // Just set the entire vector to zero. 
+ static bool I_warned_you = false; 
+ if( norm <= 1e-16 )
+ { 
+  if( I_warned_you == false )
+  {
+   std::cout << "Warning and FYI: Very small vector are normalized to 0 vector" << std::endl << std::endl; 
+   I_warned_you = true; 
+  }
+
+  for( unsigned int i=0; i < v.size(); i++ )
+  { output[i] = 0.0; }
+ }
+
  return output; 
 }
 
@@ -205,16 +237,28 @@ void normalize( std::vector<double>* v )
 {
  double norm = 1e-32; 
 
-//  (*v)[0] += 1e-32;
-//  (*v)[1] += 1e-32;
-// (*v)[2] += 1e-32;
-
  for( unsigned int i=0; i < v->size(); i++ )
- { norm += ( (*v)[i] * (*v)[i]); }
+ { norm += ( (*v)[i] * (*v)[i] ); }
  norm = sqrt( norm ); 
 
  for( unsigned int i=0; i < v->size(); i++ )
  { (*v)[i] /=  norm ; }
+
+ // If the norm is small, normalizing doens't make sense. 
+ // Just set the entire vector to zero. 
+ static bool I_warned_you = false; 
+ if( norm <= 1e-16 )
+ { 
+  if( I_warned_you == false )
+  {
+   std::cout << "Warning and FYI: Very small vectors are normalized to 0 vector" << std::endl << std::endl; 
+   I_warned_you = true; 
+  }
+
+  for( unsigned int i=0; i < v->size(); i++ )
+  { (*v)[i] = 0.0; }
+ }
+
  return; 
 }
 
@@ -453,5 +497,23 @@ void vector3_to_list( const std::vector<double>& vect , char*& buffer , char del
 	sprintf( buffer, "%.7e%c%.7e%c%.7e", vect[0] , delim, vect[1] , delim , vect[2] );
 	return; 
 }
+
+double dot_product( std::vector<double>& a , std::vector<double>& b )
+{
+	double out = 0.0; 
+	for( unsigned int i=0 ; i < a.size() ; i++ )
+	{ out += ( a[i] * b[i] ); }
+	return out; 
+}
+
+std::vector<double> cross_product( std::vector<double>& a , std::vector<double>& b )
+{
+	std::vector<double> out( 3, 0.0 ); 
+	out[0] = a[1]*b[2] - a[2]*b[1]; 
+	out[1] = a[2]*b[0] - a[0]*b[2];
+	out[2] = a[0]*b[1] - a[1]*b[0];
+
+	return out; 
+} 
 
 };

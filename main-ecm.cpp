@@ -75,7 +75,7 @@
 // custom user modules 
 
 #include "./custom_modules/AMIGOS-invasion_uncoupled.h" 
-// #include "./custom_modules/AMIGOS-invasion.h" 
+#include "./custom_modules/cell_ECM_interactions.h" 
 // #include "./custom_modules/ECM.h"
 	
 using namespace BioFVM;
@@ -85,6 +85,51 @@ using namespace PhysiCell;
 // set number of threads for OpenMP (parallel computing)
 
 // void ecm_update(void); // I think this from an old implentation. Noted and commented out 09.01.20
+
+void dump_leader_cell_info()
+{
+    std::cout << "---- t= " << PhysiCell_globals.current_time  << std::endl;
+    std::cout << "ID type adh rep     motility_vec     mig_bias      mig_bias_dir    \n";
+    for( int i=0; i < all_cells->size() ; i++ )
+    {
+        std::cout << (*all_cells)[i]->ID << " : " << (*all_cells)[i]->type << " : " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_adhesion_strength  << ", " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_repulsion_strength  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.motility_vector[0]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[1]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[2]  << "), " <<
+            (*all_cells)[i]->phenotype.motility.migration_bias  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.migration_bias_direction[0]  << ", "
+            << (*all_cells)[i]->phenotype.motility.migration_bias_direction[1]  << ") " <<std::endl;
+        std::cout<<"rmad= "<< (*all_cells)[i]->phenotype.mechanics.relative_maximum_adhesion_distance <<std::endl; 
+
+        std::cout<<"speed="<< (*all_cells)[i]->phenotype.motility.migration_speed << std::endl;
+        std::cout<<"pos=("<< (*all_cells)[i]->position[0] <<", "<< (*all_cells)[i]->position[1] <<")\n";
+        std::cout<<"vel=("<< (*all_cells)[i]->velocity[0] <<", "<< (*all_cells)[i]->velocity[1] <<")\n";
+    }
+}
+void dump_cell_info()
+{
+    std::cout << "---- t= " << PhysiCell_globals.current_time  << std::endl;
+    std::cout << "ID type adh rep     motility_vec     mig_bias      mig_bias_dir    \n";
+    for( int i=0; i < all_cells->size() ; i++ )
+    {
+        std::cout << (*all_cells)[i]->ID << " : " << (*all_cells)[i]->type << " : " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_adhesion_strength  << ", " <<
+            (*all_cells)[i]->phenotype.mechanics.cell_cell_repulsion_strength  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.motility_vector[0]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[1]  << ", " 
+            << (*all_cells)[i]->phenotype.motility.motility_vector[2]  << "), " <<
+            (*all_cells)[i]->phenotype.motility.migration_bias  << ", " <<
+            "(" << (*all_cells)[i]->phenotype.motility.migration_bias_direction[0]  << ", "
+            << (*all_cells)[i]->phenotype.motility.migration_bias_direction[1]  << ") " <<std::endl;
+        std::cout<<"rmad= "<< (*all_cells)[i]->phenotype.mechanics.relative_maximum_adhesion_distance <<std::endl; 
+
+        std::cout<<"speed="<< (*all_cells)[i]->phenotype.motility.migration_speed << std::endl;
+        std::cout<<"pos=("<< (*all_cells)[i]->position[0] <<", "<< (*all_cells)[i]->position[1] <<")\n";
+        std::cout<<"vel=("<< (*all_cells)[i]->velocity[0] <<", "<< (*all_cells)[i]->velocity[1] <<")\n";
+    }
+}
 
 
 int main( int argc, char* argv[] )
@@ -104,9 +149,10 @@ int main( int argc, char* argv[] )
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
-	// SeedRandom(0);
-	if( parameters.ints("unit_test_setup") == 1) 
-	{SeedRandom(0);}
+	SeedRandom(0);  //rwh do here, just once
+	// if( parameters.ints("unit_test_setup") == 1) 
+	// {SeedRandom(0);}
+
 	
 	// time setup 
 	std::string time_units = "min"; 
@@ -144,7 +190,7 @@ int main( int argc, char* argv[] )
 	
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
@@ -209,7 +255,7 @@ int main( int argc, char* argv[] )
 				{	
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
-					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+					save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 				}
 				if( parameters.bools("enable_ecm_outputs") == true)
 				{
@@ -230,11 +276,14 @@ int main( int argc, char* argv[] )
 					
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
+
+                    // dump_cell_info();  //rwh
+                    // dump_leader_cell_info();  //rwh
 				}
 			}
 
 			// Uncomment to run march test
- 			if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt && parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)	
+ 			if( fabs( PhysiCell_globals.current_time - reset_Cells_interval  ) <  0.1 * diffusion_dt && parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 1)	
 			{
 				if (enable_cell_resets == true )
 				{
@@ -282,7 +331,7 @@ int main( int argc, char* argv[] )
 	// save a final simulation snapshot 
 	
 	sprintf( filename , "%s/final" , PhysiCell_settings.folder.c_str() ); 
-	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+	save_PhysiCell_to_MultiCellDS_v2( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot_custom( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function, parameters.strings("visual_guideline_pattern") );

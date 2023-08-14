@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -77,9 +77,8 @@ namespace PhysiCell
 // standard cycle models: 
 
 extern Cycle_Model Ki67_advanced, Ki67_basic, live, flow_cytometry_cycle_model, flow_cytometry_separated_cycle_model, cycling_quiescent; 
-extern Cycle_Model apoptosis, necrosis, inert; 
+extern Cycle_Model apoptosis, necrosis; 
 extern Death_Parameters apoptosis_parameters, necrosis_parameters; 
-
 
 extern bool PhysiCell_standard_models_initialized; 
 extern bool PhysiCell_standard_death_models_initialized; 
@@ -104,11 +103,17 @@ bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, doubl
 // standard volume functions 
 
 void standard_volume_update_function( Cell* pCell, Phenotype& phenotype, double dt ); // done 
+void basic_volume_model( Cell* pCell, Phenotype& phenotype, double dt ); // done 
 
 // standard mechanics functions 
 
 void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt); // done 
-void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype phenotype, double dt );
+void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype& phenotype, double dt );
+
+// bounary avoidance functions 
+
+void standard_domain_edge_avoidance_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
+double distance_to_domain_edge(Cell* pCell, Phenotype& phenotype, double dt); 
 
 // other standard functions 
 
@@ -126,6 +131,25 @@ bool create_standard_cell_death_models( void ); // done
 bool create_standard_cycle_and_death_models( void ); // done 
 
 void initialize_default_cell_definition( void ); // done 
+
+void chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
+
+void standard_elastic_contact_function( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
+void standard_elastic_contact_function_confluent_rest_length( Cell* pC1, Phenotype& p1, Cell* pC2, Phenotype& p2 , double dt );
+void evaluate_interactions( Cell* pCell, Phenotype& phenotype, double dt );
+
+// new in 1.10.0 
+	
+// automated cell phagocytosis, attack, and fusion 
+void standard_cell_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt ); 
+void standard_cell_transformations( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void advanced_chemotaxis_function_normalized( Cell* pCell, Phenotype& phenotype , double dt ); 
+void advanced_chemotaxis_function( Cell* pCell, Phenotype& phenotype , double dt ); 
+
+void dynamic_attachments( Cell* pCell , Phenotype& phenotype, double dt ); 
+void dynamic_spring_attachments( Cell* pCell , Phenotype& phenotype, double dt ); 
+
 	
 };
 

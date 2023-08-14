@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2022, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -69,6 +69,7 @@
 #include <vector>
 #include <cstdio>
 #include <iostream>
+#include <cstring>
 
 namespace PhysiCell
 {
@@ -78,6 +79,7 @@ Variable::Variable()
 	name = "unnamed"; 
 	units = "dimensionless"; 
 	value = 0.0; 
+	conserved_quantity = false; 
 	return; 
 }
 
@@ -93,12 +95,19 @@ Vector_Variable::Vector_Variable()
 	name = "unnamed"; 
 	units = "dimensionless"; 
 	value.resize(3, 0.0 );
+	conserved_quantity = false; 
 	return; 
 }
 
 std::ostream& operator<<(std::ostream& os, const Vector_Variable& v)
 {
-	os << v.name << ": ";
+ 	os << v.name << ": ";
+	if( v.value.size() == 0 )
+	{ os << "[empty]"; return os; }
+/*
+	if( v.value.size() == 1 )
+	{ os << v.value[0] << " (" << v.units << ")"; return os;  }
+*/
 	for( int i=0; i < v.value.size()-1 ; i++ )
 	{ os << v.value[i] << ","; }
 	os << v.value[v.value.size()-1] << " (" << v.units << ")"; 
@@ -191,7 +200,11 @@ int Custom_Cell_Data::add_vector_variable( std::string name , std::vector<double
 
 int Custom_Cell_Data::find_variable_index( std::string name )
 {
-	return name_to_index_map[ name ]; 
+	// this should return -1 if not found, not zero 
+	auto out = name_to_index_map.find( name ); 
+	if( out != name_to_index_map.end() )
+	{ return out->second; }
+	return -1; 
 }
 
 /*
@@ -200,6 +213,20 @@ int Custom_Cell_Data::find_vector_variable_index( std::string name )
 	return vector_name_to_index_map[ name ]; 
 }
 */
+
+int Custom_Cell_Data::find_vector_variable_index( std::string name )
+{
+	int n = 0; 
+	while( n < vector_variables.size() )
+	{
+		if( std::strcmp( vector_variables[n].name.c_str() , name.c_str() ) == 0 )
+		{ return n; } 
+		n++; 
+	}
+	
+	return -1; 
+}
+
 
 double& Custom_Cell_Data::operator[](int i)
 {

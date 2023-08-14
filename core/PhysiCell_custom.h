@@ -85,6 +85,7 @@ class Variable
 	std::string name; 
 	double value; 
 	std::string units; 
+	bool conserved_quantity; 
 	
 	Variable(); 
 };
@@ -98,6 +99,7 @@ class Vector_Variable
 	std::string name; 
 	std::vector<double> value; 
 	std::string units; 
+	bool conserved_quantity; 
 	
 	Vector_Variable(); 
 };
@@ -122,7 +124,7 @@ class Custom_Cell_Data
 	int add_vector_variable( std::string name , std::vector<double>& value ); // done 
 
 	int find_variable_index( std::string name ); // done 
-//	int find_vector_variable_index( std::string name ); // done 
+	int find_vector_variable_index( std::string name ); // done 
 
 	// these access the scalar variables 
 	double& operator[]( int i ); // done

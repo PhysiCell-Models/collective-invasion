@@ -1,4 +1,5 @@
-VERSION := 1.4.1
+#VERSION := 1.4.1
+VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
 PROGRAM_NAME := AMIGOS-invasion
 
 # CC := g++
@@ -50,24 +51,38 @@ COMPILE_COMMAND := $(CC) $(CFLAGS)
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
 
-PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o 
+PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
+PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o \
+PhysiCell_signal_behavior.o PhysiCell_rules.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
-PhysiCell_pugixml.o PhysiCell_settings.o
+PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o
+PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o cell_ECM_interactions.o
+
+PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o cell_ECM_interactions.o
+
+PhysiCell_custom_module_OBJECT_3 := fibrosis.o extracellular_matrix.o cell_ECM_interactions.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
+LEADER_FOLLOWER_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+INVASIVE_SPHEROID_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECT_2)
+FIBROSIS_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECT_3)
 #compile the project 
 	
-all: main-ecm.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main-ecm.cpp 
+all: main-ecm.cpp $(LEADER_FOLLOWER_OBJECTS)
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(LEADER_FOLLOWER_OBJECTS) main-ecm.cpp 
+
+invasive_spheroid: main_invasive_spheroid.cpp $(INVASIVE_SPHEROID_OBJECTS)
+	$(COMPILE_COMMAND) -o invasive_spheroid $(INVASIVE_SPHEROID_OBJECTS) main_invasive_spheroid.cpp 
+
+fibrosis: main_fibrosis.cpp $(FIBROSIS_OBJECTS)
+	$(COMPILE_COMMAND) -o fibrosis $(FIBROSIS_OBJECTS) main_fibrosis.cpp 
 
 # PhysiCell core components	
 
@@ -92,6 +107,15 @@ PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp 
 	
+PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_constants.cpp 
+
+PhysiCell_signal_behavior.o: ./core/PhysiCell_signal_behavior.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_signal_behavior.cpp 
+
+PhysiCell_rules.o: ./core/PhysiCell_rules.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_rules.cpp 
+
 # BioFVM core components (needed by PhysiCell)
 	
 BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
@@ -143,14 +167,29 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
+
+PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 	
+	
+PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 	
 # user-defined PhysiCell modules
 
 extracellular_matrix.o: ./custom_modules/extracellular_matrix.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/extracellular_matrix.cpp
 
+cell_ECM_interactions.o: ./custom_modules/cell_ECM_interactions.cpp 
+	$(COMPILE_COMMAND) -c ./custom_modules/cell_ECM_interactions.cpp
+
 AMIGOS-invasion_uncoupled.o: ./custom_modules/AMIGOS-invasion_uncoupled.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion_uncoupled.cpp
+
+invasive_spheroid.o: ./custom_modules/invasive_spheroid.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/invasive_spheroid.cpp
+
+fibrosis.o: ./custom_modules/fibrosis.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/fibrosis.cpp
 
 # cleanup
 

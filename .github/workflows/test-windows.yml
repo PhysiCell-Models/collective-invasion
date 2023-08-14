@@ -24,7 +24,11 @@ jobs:
     - name: Build model
       run: |
         make
+        make invasive_spheroid
+        make fibrosis
         
     - name: Run model
       run: |
-        .\\AMIGOS-invasion
+        .\\AMIGOS-invasion config/simple_test2_random_1_D_circles.xml
+        .\\invasive_spheroid config/invasive_spheroid_update.xml
+        .\\fibrosis config/fibrosis.xml
