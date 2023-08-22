@@ -1392,7 +1392,25 @@ std::vector<std::string> AMIGOS_invasion_coloring_function( Cell* pCell )
 	{ 
 		output[0] = "blue"; 
 		output[2] = "blue"; 
-		return output; 
+		if(parameters.ints("unit_test_setup")==0)
+		{return output;}
+		
+		// Return red for 20% of followers if unit test is called for	
+
+		if( pCell->ID % 5 == 0)
+		{
+			output[0] = "red";
+        	output[2] = "red";
+        	return output;
+		}
+
+		// If doing unit testing AND cell not selected as marker cell, return blue. 
+		output[2] = "blue";	
+		output[0] = "blue";
+
+
+        return output;
+
 	} 
 
 	if( pCell->type == 1 )

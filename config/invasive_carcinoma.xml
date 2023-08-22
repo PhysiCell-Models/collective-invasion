@@ -3,8 +3,8 @@
     <cell_rules>
         <rulesets>
             <ruleset protocol="CBHG" version="2.0" format="csv" enabled="true">
-                <folder>config/</folder>
-                <filename>invasive_spheroid_chemoattractant_rules.csv</filename>
+                <folder>config</folder>
+                <filename>invasive_carcinoma_rules.csv</filename>
             </ruleset>
         </rulesets>
     </cell_rules>
@@ -36,7 +36,7 @@
     </parallel>
 
     <save>
-        <folder>invasive_spheroid_output</folder>
+        <folder>invasive_carcinoma_output</folder>
         <full_data>
             <interval units="min">60</interval>
             <enable>true</enable>
@@ -583,7 +583,7 @@
         <fiber_realignment_rate type="double" units="1/min" description="Fiber rate of realignment">4.0</fiber_realignment_rate>
         <default_ECM_density_target type="double" units="dimenionless" description="Cell ECM density target">0.5</default_ECM_density_target>
         <default_ECM_production_rate type="double" units="dimenionless" description="Cell ECM production rate">0.001</default_ECM_production_rate>
-        <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">11</number_of_fibroblasts>
+        <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">0</number_of_fibroblasts>
         <cancer_cell_adhesion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell adhesion">10.0</cancer_cell_adhesion>
         <cancer_cell_repulsion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell repulsion">25.0</cancer_cell_repulsion>
         <default_chemotaxis_bias type="double" units="dimensionless" description="Follower chemotaxis bias">0.05</default_chemotaxis_bias>

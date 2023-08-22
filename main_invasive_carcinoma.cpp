@@ -75,7 +75,7 @@
 
 // custom user modules 
 
-#include "./custom_modules/invasive_spheroid.h" 
+#include "./custom_modules/invasive_carcinoma.h" 
 // #include "./custom_modules/AMIGOS-invasion.h" 
 // #include "./custom_modules/ECM.h"
 	
@@ -94,8 +94,13 @@ int main( int argc, char* argv[] )
 	// load and parse settings file(s)
  
 	bool XML_status = false; 
+	char copy_command [1024]; 
 	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	{ 
+		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	
+	}
 	else
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )

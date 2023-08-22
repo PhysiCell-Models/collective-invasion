@@ -38,11 +38,11 @@
     <save>
         <folder>simple_test1</folder>
         <full_data>
-            <interval units="min">60</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">60</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
         </SVG>
         <legacy_data>

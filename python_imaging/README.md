@@ -13,8 +13,10 @@ sys.path.append(r'../python_imaging')
 *  `image_processing_script.py`: Generic example plotter. Outputs and shows a plot of the diffusing substrate and overlays cell positions. Loads frame 100. 
 * `partial_history_2_level_contour_movie.py`: Generates of movie with each frame a recent portion of cell positional histories and anisotropy with 2 contour color levels (used for cases of instant ECM remodeling) as well as current cell positions and ECM fiber element orientations.
 * `partial_history_2_level_contour_still.py`: Plots a recent portion of cell positional histories and anisotropy with 2 contour color levels (used for cases of instant ECM remodeling) as well as current cell positions and ECM fiber element orientations.
-* `partial_history_multilevel_contour_movie.py`: Plots a recent portion of cell positional histories and anisotropy with multiple contour color levels as well as current cell positions and ECM fiber element orientations.
-* `partial_history_multilevel_contour_still.py`: Generates of movie with each frame a recent portion of cell positional histories and anisotropy with multiple contour color levels as well as current cell positions and ECM fiber element orientations.
+* `partial_history_multilevel_contour_still.py`: Plots a recent portion of cell positional histories and anisotropy with multiple contour color levels as well as current cell positions and ECM fiber element orientations.
+* `partial_history_multilevel_contour_movie.py`: Generates of movie with each frame a recent portion of cell positional histories and anisotropy with multiple contour color levels as well as current cell positions and ECM fiber element orientations.
+* `simple_test_movies_cells_only.py` : Plots cells and cell positional histories, making every 10 cell red for visualization purposes. Prodcuces movie.
+* `simple_test_stills_cells_only.py` : Plots cells and cell positional histories, making every 10 cell red for visualization purposes. 
 
 
 Basic scripts. Original basis for integrated plotter in `image_processing_for_physicell.py`. Included as basic original examples. Place scripts in `output` or other directory at same level or alter path assignment. 

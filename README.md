@@ -72,7 +72,10 @@ PhysiCell can be run in a distributed fashion across a team using DAPT: Distribu
 ## Some key makefile rules
 
 ```
-make                    : compiles the ECM Modeling code
+make                    : compiles the simple test codes
+make                    : compiles the leader-follower model
+make fibrosis           : compiles the fibrosis model
+make invasive_carcinoma : compiles the invasive carcinoma model
 make clean              : removes all .o files and the executable, so that the next `make` recompiles the entire project 
 make data-cleanup       : clears out all simulation data
 make data-cleanup-all   : clears out all simulation data (*.xml, *.svg, *.pov, Output/*, SVG/*)

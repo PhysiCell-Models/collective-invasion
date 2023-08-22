@@ -18,11 +18,11 @@ jobs:
     - name: Build model
       run: |
         make PHYSICELL_CPP=g++-11
-        make invasive_spheroid PHYSICELL_CPP=g++-11
+        make invasive_carcinoma PHYSICELL_CPP=g++-11
         make fibrosis PHYSICELL_CPP=g++-11
         
     - name: Run model
       run: |
         ./AMIGOS-invasion config/simple_test2_random_1_D_circles.xml
-        ./invasive_spheroid config/invasive_spheroid_update.xml
+        ./invasive_carcinoma config/invasive_carcinoma.xml
         ./fibrosis config/fibrosis.xml

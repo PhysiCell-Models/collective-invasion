@@ -376,7 +376,7 @@
         <ECM_dy type="double" units="um" description="Length of ECM unit in y-direction">20</ECM_dy>
         <ECM_dz type="double" units="um" description="Length of ECM unit in z-direction">20</ECM_dz>
         <ECM_orientation_setup type="string" units="" description="Random, horizontal, vertical, circular, starburst, or split">split</ECM_orientation_setup>
-        <unit_test_setup type="int" units="" description="Sets parameters for testing: 1 for testing, 0 for typical simulation">0</unit_test_setup>
+        <unit_test_setup type="int" units="" description="Produces 20% red cells (only for cell types 0 and 1)">1</unit_test_setup>
         <march_unit_test_setup type="int" units="" description="Testing set up: 1 for cell march, 0 for typical simulation">0</march_unit_test_setup>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">1.0</initial_anisotropy>
         <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>

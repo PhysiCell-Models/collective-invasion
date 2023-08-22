@@ -62,7 +62,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 PhysiCell_custom_module_OBJECTS := AMIGOS-invasion_uncoupled.o extracellular_matrix.o cell_ECM_interactions.o
 
-PhysiCell_custom_module_OBJECT_2 := invasive_spheroid.o extracellular_matrix.o cell_ECM_interactions.o
+PhysiCell_custom_module_OBJECT_2 := invasive_carcinoma.o extracellular_matrix.o cell_ECM_interactions.o
 
 PhysiCell_custom_module_OBJECT_3 := fibrosis.o extracellular_matrix.o cell_ECM_interactions.o
 
@@ -78,8 +78,8 @@ FIBROSIS_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECT_3)
 all: main-ecm.cpp $(LEADER_FOLLOWER_OBJECTS)
 	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(LEADER_FOLLOWER_OBJECTS) main-ecm.cpp 
 
-invasive_spheroid: main_invasive_spheroid.cpp $(INVASIVE_SPHEROID_OBJECTS)
-	$(COMPILE_COMMAND) -o invasive_spheroid $(INVASIVE_SPHEROID_OBJECTS) main_invasive_spheroid.cpp 
+invasive_carcinoma: main_invasive_carcinoma.cpp $(INVASIVE_SPHEROID_OBJECTS)
+	$(COMPILE_COMMAND) -o invasive_carcinoma $(INVASIVE_SPHEROID_OBJECTS) main_invasive_carcinoma.cpp 
 
 fibrosis: main_fibrosis.cpp $(FIBROSIS_OBJECTS)
 	$(COMPILE_COMMAND) -o fibrosis $(FIBROSIS_OBJECTS) main_fibrosis.cpp 
@@ -185,8 +185,8 @@ cell_ECM_interactions.o: ./custom_modules/cell_ECM_interactions.cpp
 AMIGOS-invasion_uncoupled.o: ./custom_modules/AMIGOS-invasion_uncoupled.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/AMIGOS-invasion_uncoupled.cpp
 
-invasive_spheroid.o: ./custom_modules/invasive_spheroid.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/invasive_spheroid.cpp
+invasive_carcinoma.o: ./custom_modules/invasive_carcinoma.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/invasive_carcinoma.cpp
 
 fibrosis.o: ./custom_modules/fibrosis.cpp
 	$(COMPILE_COMMAND) -c ./custom_modules/fibrosis.cpp
@@ -245,7 +245,7 @@ zip-data:
 	mv *.zip data_archives/
 
 zip-source:
-	zip -r latest-data.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* python_imaging/* modules/* output/*.m
+	zip -r latest-data.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* python_imaging/*.py modules/* output/*.m
 	cp latest-data.zip $$(date +%b_%d_%Y_%H%M).zip
 	cp latest-data.zip VERSION_$(VERSION).zip 
 	mv *.zip data_archives/

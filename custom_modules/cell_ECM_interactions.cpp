@@ -109,6 +109,7 @@ void custom_update_motility_vector(Cell* pCell, Phenotype& phenotype, double dt_
 			phenotype.motility.migration_bias_direction *= a; // motility = bias*bias_vector 
 			double one_minus_anistropy = 1.0 - a;
 			axpy( &(phenotype.motility.migration_bias_direction), one_minus_anistropy, randvec ); // motility = (1-bias)*randvec + bias*bias_vector
+			
 		}
 
 		else if (pCell->custom_data[link_anisotropy_and_bias_index] > 0.5) // no ints/bools in custom data - must be double - so use 0.5 instead of 1
