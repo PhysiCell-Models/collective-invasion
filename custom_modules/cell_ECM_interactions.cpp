@@ -86,6 +86,13 @@ void custom_update_motility_vector(Cell* pCell, Phenotype& phenotype, double dt_
 			std::exit(-1);   
 		}
 
+		static int ECM_sensitivity_index = pCell->custom_data.find_variable_index( "ECM_sensitivity");
+		if (ECM_sensitivity_index < 0) 
+		{
+			std::cout << "        static int ECM_sensitivity_index = " <<ECM_sensitivity_index << std::endl;
+			std::exit(-1);   
+		}
+
 		std::vector<double> randvec(3,0.0);
 		if( phenotype.motility.restrict_to_2D == true )
 		{ randvec = UniformOnUnitCircle(); }
@@ -102,14 +109,18 @@ void custom_update_motility_vector(Cell* pCell, Phenotype& phenotype, double dt_
 		{
 			// sample ECM 
 			std::vector<double> cell_position = pCell->position;
+			double s = pCell->custom_data[ECM_sensitivity_index]; 
 			int nearest_ecm_voxel_index = ecm.ecm_mesh.nearest_voxel_index( cell_position );   
 			double ECM_density = ecm.ecm_voxels[nearest_ecm_voxel_index].density; 
 			double a = ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy; 
 
+			phenotype.motility.migration_bias_direction *= s; // motility = bias*bias_vector 
 			phenotype.motility.migration_bias_direction *= a; // motility = bias*bias_vector 
-			double one_minus_anistropy = 1.0 - a;
-			axpy( &(phenotype.motility.migration_bias_direction), one_minus_anistropy, randvec ); // motility = (1-bias)*randvec + bias*bias_vector
-			
+			double one_minus_anistropy_s = 1.0 - a*s;
+			axpy( &(phenotype.motility.migration_bias_direction), one_minus_anistropy_s, randvec ); // motility = bias*bias_vector + (1-bias)*randvec 
+			// y = y + a*x 
+			// void axpy( std::vector<double>* y, double& a , std::vector<double>& x );
+			// std::cout<<"ECM_density = "<<ECM_density<<std::endl;
 		}
 
 		else if (pCell->custom_data[link_anisotropy_and_bias_index] > 0.5) // no ints/bools in custom data - must be double - so use 0.5 instead of 1
@@ -404,18 +415,29 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 			if (norm(phenotype.motility.motility_vector) == 0)
 			{std::cout<<"Motility vector norm = 0"<<std::endl;}
 
-			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
+			// Test for lack of realignment parameters (non-remodeling cells)
+			if (pCell->custom_data[Cell_anistoropy_rate_of_increase_index] < 0.001 ||pCell->custom_data[Cell_fiber_realignment_rate_index] < 0.001 )
+			{
+				// std::cout<<"pass code"<<std::endl;
+			}
+			
+			// if not a non-remodeling cell, then realign
+			else
+			{// Is this correct???? - using the motility vector (below)
+				ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
 
-			normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment));
+				normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment));
 
-			if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
-			{std::cout<<"ECM orientation vector norm = 0"<<std::endl;}
+				if (norm(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment) == 0)
+				{std::cout<<"ECM orientation vector norm = 0"<<std::endl;}
 
+				ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
+			}
 			// End Cell-ECM Fiber realingment
 
 			// Cell-ECM Anisotropy Modification
 
-			ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = 1;
+			
 
 			// End cell-ECM Anisotropy Modification
 		}
