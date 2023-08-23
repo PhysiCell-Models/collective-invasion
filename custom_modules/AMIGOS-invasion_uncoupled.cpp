@@ -620,7 +620,6 @@ void setup_tissue( void )
 				else 
 				{pC = create_cell( *follower_cell );}
 				pC->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
-				std::cout<<"Fuck this"<<std::endl;
 				n = n + 20.0;
 			}
 			std::cout<<"Cell's placed at left boundary for march test 000"<<std::endl;

@@ -35,7 +35,7 @@ movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
 
 mf = PhysiCellPlotter()
 
-mf.produce_movie(save_name='adh_0_repulsion_0_speed_10_20_20_ECM_with_write_05', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
+mf.produce_movie(save_name='two_contour_movie', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #

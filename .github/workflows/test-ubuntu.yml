@@ -25,5 +25,6 @@ jobs:
     - name: Run model
       run: |
         ./AMIGOS-invasion config/simple_test2_random_1_D_circles.xml
-        ./invasive_carcinoma config/invasive_carcinoma.xml
-        ./fibrosis config/fibrosis.xml
+        ./AMIGOS-invasion config/leader_follower_model_test.xml
+        ./invasive_carcinoma config/invasive_carcinoma_test.xml
+        ./fibrosis config/fibrosis_test.xml

@@ -33,7 +33,7 @@ image_list_for_figure5a = [60, 160]
 number_of_samples = 12
 for number in image_list_for_figure5a:
     starting_index = number-number_of_samples + 1
-    mf.generic_plotter(starting_index=starting_index, number_of_samples=number_of_samples, options=options_for_figure5a, file_name='Figure_5a' + str(number))
+    mf.generic_plotter(starting_index=starting_index, number_of_samples=number_of_samples, options=options_for_figure5a, file_name='two_contour_still_' + str(number))
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #
