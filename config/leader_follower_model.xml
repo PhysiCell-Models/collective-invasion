@@ -44,6 +44,11 @@
         <SVG>
             <interval units="min">60</interval>
             <enable>true</enable>
+            <plot_substrate enabled="false" limits="false">
+                <substrate>oxygen</substrate>
+                <min_conc />
+                <max_conc />
+            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>
@@ -220,7 +225,7 @@
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
-                <migration_bias_norm conserved="false" units="" description="Don't mess with this.">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Do not mess with this.">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
@@ -358,7 +363,7 @@
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
-                <migration_bias_norm conserved="false" units="" description="Don't mess with this.">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Do not mess with this.">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>

@@ -218,6 +218,14 @@ void ECM_to_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt )
 	// ****** Make linear combination of random biased migration (motility_vector) and ECM orientation following. ********//
 	// ******************************************************************************************************//
 	
+	if (pCell->custom_data[ECM_sensitivity_index] < 0.0001)
+	{
+		// if ECM_sensitivity is very low, then the migration bias vector is used as the motility vector
+		phenotype.motility.motility_vector = phenotype.motility.migration_bias_direction;
+	}
+
+	else{
+	
 	std::vector<double> d_motility = {0,0,0};
 
 	d_motility = phenotype.motility.migration_bias_direction; 
@@ -225,13 +233,68 @@ void ECM_to_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt )
 	normalize( &d_motility ); 
 
 	// to determine direction along f, find part of d_choice that is perpendicular to f; 
-	std::vector<double> d_perp = d_motility - dot_product_ext(d_motility,f)*f; 
+	std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 
+
+	double d_perp_early_dot_f = dot_product(d_perp,f);
+
+	if (pCell->type_name == "leader cell")
+	{
+		// std::cout<<"d_perp_early = "<<d_perp<<std::endl;
+	}
+	double c_1_early = dot_product( d_motility , d_perp );
 	
 	normalize( &d_perp ); 
-	
+	if(fabs(dot_product(d_perp,f)) > 0.000001)
+	{
+		std::cout<<"d_perp_early * f = "<<d_perp_early_dot_f<<std::endl;
+		std::cout<<"d_perp * f = "<<dot_product(d_perp,f)<<std::endl;
+		if (pCell->type_name == "leader cell")
+		{
+			std::cout<<"Leader cell"<<std::endl;
+		}
+		else
+		{
+			std::cout<<"Follower cell"<<std::endl;
+		}
+	}
+	// if (pCell->type_name == "leader cell")
+	// {
+		// std::cout<<"d_perp = "<<d_perp<<std::endl;
+	// }
 	// find constants to span d_choice with d_perp and f
-	double c_1 = dot_product_ext( d_motility , d_perp ); 
-	double c_2 = dot_product_ext( d_motility, f ); 
+
+	// double c_1 = 0.0 ;
+	
+	// if(c_1_early < 0.00001)
+	// {
+	// 	if (pCell->type_name == "leader cell")
+	// 	{
+		
+		
+	// 	// std::cout<<"in c_1_early conditional  "<<std::endl;
+	// 	}
+	// 	// std::cout<<"c_1_early = "<<c_1_early<<std::endl;
+	// 	c_1 = 0.0;
+	// }
+
+	// else
+
+	// if(pCell->custom_data[ECM_sensitivity_index] < 0.0000000000000001 )
+	// {
+	// 	c_1 = 0.0;
+	// }
+
+	// else
+
+	// {
+	// 	c_1 = dot_product_ext( d_motility , d_perp ); 
+		// if (pCell->type_name == "leader cell")
+		// {
+		// 	// std::cout<<"early section - c_1 = "<<c_1<<std::endl;
+		// }
+	// }
+	double c_1 = dot_product( d_motility , d_perp ); 
+	double c_2 = dot_product( d_motility, f ); 
 
 	// calculate bias away from directed motitility - combination of sensitity to ECM and anisotropy
 	double gamma = pCell->custom_data[ECM_sensitivity_index] * a; // at low values, directed motility vector is recoved. At high values, fiber direction vector is recovered.
@@ -246,10 +309,80 @@ void ECM_to_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt )
 	else  
 	{
 		pCell->custom_data[migration_bias_norm_index] = norm( phenotype.motility.motility_vector);
+		
+		if (pCell->type_name == "leader cell")
+		{
+		if (pCell->custom_data[migration_bias_norm_index] > 1.0001)
+			{
+				std::cout<<"Migration bias norm > 1.0 "<<std::endl;
+				std::cout<<pCell->custom_data[migration_bias_norm_index] << std::endl;
+				std::cout<<"d_perp * f = "<<dot_product(d_perp,f)<<std::endl;
+				// abort();
+
+				std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
+
+				std::cout<<"ECM density: " << ECM_density <<std::endl;
+
+				std::cout<<"anisotropy = "<<a<<std::endl;
+
+				std::cout<<"gamma = "<< gamma <<std::endl;
+
+				std::cout<<"c_1 "<<c_1<<std::endl;
+
+				std::cout<<"c_1_early "<<c_1_early<<std::endl;
+
+				std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+
+				std::cout<<"c_2 "<<c_2<<std::endl;
+
+				std::cout<<"c_2*f "<<c_2*f<<std::endl;
+
+				std::cout<<"d_motility "<<d_motility<<std::endl;
+
+				std::cout<<"motility vector "<<phenotype.motility.motility_vector<<std::endl;
+
+				// std::cout<<"base speed: "<<get_single_base_behavior( pCD, "migration speed" )<<" speed: "<< pCell->phenotype.motility.migration_speed <<std::endl;
+			}
+
+			if (pCell->custom_data[migration_bias_norm_index] < 0.9999)
+			{
+				
+
+				std::cout<<"Migration bias norm < 1.0 "<<std::endl;
+				std::cout<<pCell->custom_data[migration_bias_norm_index] << std::endl;
+				std::cout<<"cell: " << pCell->type_name << " " << pCell->ID <<std::endl;
+				std::cout<<"d_perp * f = "<<dot_product(d_perp,f)<<std::endl;
+				// abort();
+
+				
+
+				// std::cout<<"ECM density: " << ECM_density <<std::endl;
+
+				std::cout<<"anisotropy = "<<a<<std::endl;
+
+				std::cout<<"gamma = "<< gamma <<std::endl;
+
+				std::cout<<"c_1 "<<c_1<<std::endl;
+				
+				std::cout<<"c_2 "<<c_2<<std::endl;
+
+				std::cout<<"c_1_early "<<c_1_early<<std::endl;
+
+				std::cout<<"(1.0-gamma)*c_1*d_perp "<<(1.0-gamma)*c_1*d_perp<<std::endl;
+
+				std::cout<<"c_2*f "<<c_2*f<<std::endl;
+
+				std::cout<<"d_motility "<<d_motility<<std::endl;
+
+				std::cout<<"motility vector "<<phenotype.motility.motility_vector<<std::endl;
+
+				// std::cout<<"base speed: "<<get_single_base_behavior( pCD, "migration speed" )<<" speed: "<< pCell->phenotype.motility.migration_speed <<std::endl;
+			}
+		}
 	}
 
 	normalize( &(phenotype.motility.motility_vector) ); 
-
+	}
 	/****************************************END new migration direction update****************************************/
 
 	/*********************************************Begin speed update***************************************************/
@@ -416,14 +549,16 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 			{std::cout<<"Motility vector norm = 0"<<std::endl;}
 
 			// Test for lack of realignment parameters (non-remodeling cells)
-			if (pCell->custom_data[Cell_anistoropy_rate_of_increase_index] < 0.001 ||pCell->custom_data[Cell_fiber_realignment_rate_index] < 0.001 )
+			if (pCell->custom_data[Cell_anistoropy_rate_of_increase_index] < 0.00001 ||pCell->custom_data[Cell_fiber_realignment_rate_index] < 0.00001 )
 			{
+				// std::cout<<"VERY LOW RATE CELLS REMODELING - ARE YOU SURE YOU WNAT TO DO THIS?"<<std::endl;
 				// std::cout<<"pass code"<<std::endl;
 			}
 			
 			// if not a non-remodeling cell, then realign
 			else
 			{// Is this correct???? - using the motility vector (below)
+
 				ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
 
 				normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment));
