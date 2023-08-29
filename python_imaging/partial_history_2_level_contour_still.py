@@ -28,7 +28,9 @@ options_for_figure5a = {"output_plot" : True,
 
 mf = PhysiCellPlotter()
 
-image_list_for_figure5a = [60, 160]
+# in future, could iterate over input arguments to make this more general
+image_list_for_figure5a = [int(sys.argv[1]), int(sys.argv[2])]
+
 
 number_of_samples = 12
 for number in image_list_for_figure5a:

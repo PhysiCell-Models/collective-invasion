@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">14400.0</max_time>
+        <max_time units="min">14400</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -36,7 +36,7 @@
     </parallel>
 
     <save>
-        <folder>leader_follower</folder>
+        <folder>adh_10_replusion_25_speed_050</folder>
         <full_data>
             <interval units="min">30</interval>
             <enable>true</enable>
@@ -225,7 +225,7 @@
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
-                <migration_bias_norm conserved="false" units="" description="Do not mess with this.">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Don't mess with this.">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
@@ -363,7 +363,7 @@
                 <Fiber_realignment_rate conserved="false" units="1/min" description="">0.0</Fiber_realignment_rate>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
-                <migration_bias_norm conserved="false" units="" description="Do not mess with this.">1.0</migration_bias_norm>
+                <migration_bias_norm conserved="false" units="" description="Don't mess with this.">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
@@ -409,7 +409,7 @@
         <ECM_dy type="double" units="um" description="Length of ECM unit in y-direction">20</ECM_dy>
         <ECM_dz type="double" units="um" description="Length of ECM unit in z-direction">20</ECM_dz>
         <cell_motility_ECM_interaction_model_selector type="string" units="" description="follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis</cell_motility_ECM_interaction_model_selector>
-        <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">1</discrete_ECM_remodeling>
+        <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">0</discrete_ECM_remodeling>
         <link_anisotropy_and_bias type="int" units="" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0</link_anisotropy_and_bias>
         <ecm_update_model type="string" units="" description="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector">ecm_update_from_cell_motility_vector</ecm_update_model>
         <normalize_ECM_influenced_motility_vector type="bool" units="" description="Normalize follower motility vector">false</normalize_ECM_influenced_motility_vector>

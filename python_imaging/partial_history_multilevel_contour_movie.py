@@ -35,7 +35,7 @@ movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
 
 mf = PhysiCellPlotter()
 
-mf.produce_movie(save_name='1parameter_set_21_20_20_ECM_with_chemotaxsis_revised_05_leaders_increased_realignment_2', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
+mf.produce_movie(save_name='multi_color_movie', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #
