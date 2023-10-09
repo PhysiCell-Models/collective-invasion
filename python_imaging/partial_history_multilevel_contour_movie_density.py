@@ -4,19 +4,19 @@ sys.path.append(r'../python_imaging')
 
 from image_processing_for_physicell import *
 
-options_for_figure5c = {}
+options_for_figure4_movie = {}
 
-options_for_figure5c = {"output_plot" : True,
+options_for_figure4_movie = {"output_plot" : True,
                        "show_plot" : False,
-                       "produce_for_panel" : True,
+                       "produce_for_panel" : False,
                         "plot_ECM_anisotropy" : True,
-                        "plot_ECM_density" : False,
                         "plot_ECM_orientation" : True,
                         "retrieve_ECM_data": True,
                         "load_full_physicell_data" : True,
                         "plot_cells_from_SVG" : True,
                         "load_SVG_data": True,
                         'plot_cells_from_physicell_data': False,
+                        "produce_for_movie" : True,
                         "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 1.0,
                                            'number_of_levels': 25,
@@ -25,26 +25,17 @@ options_for_figure5c = {"output_plot" : True,
                                            },
                        }
 
-#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting ... 
+movie_options_for_figure_4 = {}
+
+movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
+                            'INCLUDE_FULL_HISTORY': False
+                            }
+
+#### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting .
 
 mf = PhysiCellPlotter()
 
-# in future, could iterate over input arguments to make this more general
-image_list_for_figure5c = [int(sys.argv[1]), int(sys.argv[2])]
-
-# 3rd argument is for plotting ECM density or anisotropy - but prior scripts that use ONLY 2 arguments will still work
-if (len(sys.argv) > 3):
-    if (sys.argv[3] == "plot_density"):
-        options_for_figure5c["plot_ECM_density"] = True
-        options_for_figure5c["plot_ECM_anisotropy"] = False
-    # else, you get anisotropy
-    
-number_of_samples = 12
-for number in image_list_for_figure5c:
-    starting_index = number-number_of_samples + 1
-    mf.generic_plotter(starting_index=starting_index, number_of_samples=number_of_samples, options=options_for_figure5c, file_name='multi_contour_still_' + str(number))
-
-mf.create_separate_colorbar(contour_options = options_for_figure5c["contour_options"])
+mf.produce_movie(save_name='multi_color_movie', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
 #

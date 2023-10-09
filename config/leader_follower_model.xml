@@ -38,11 +38,11 @@
     <save>
         <folder>leader_follower</folder>
         <full_data>
-            <interval units="min">30</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">30</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
             <plot_substrate enabled="false" limits="false">
                 <substrate>oxygen</substrate>

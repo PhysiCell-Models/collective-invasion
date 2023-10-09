@@ -9,15 +9,15 @@ options_for_figure5c = {}
 options_for_figure5c = {"output_plot" : True,
                        "show_plot" : False,
                        "produce_for_panel" : True,
-                        "plot_ECM_anisotropy" : True,
-                        "plot_ECM_density" : False,
+                        "plot_ECM_anisotropy" : False,
+                        "plot_ECM_density" : True,
                         "plot_ECM_orientation" : True,
                         "retrieve_ECM_data": True,
                         "load_full_physicell_data" : True,
                         "plot_cells_from_SVG" : True,
                         "load_SVG_data": True,
                         'plot_cells_from_physicell_data': False,
-                        "contour_options" : {'lowest_contour': 1e-14, ### I woud like this to be cleaner - but it does work!!!
+                        "contour_options" : {'lowest_contour': 0.5, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 1.0,
                                            'number_of_levels': 25,
                                            'color_map_name': 'Reds',
@@ -33,10 +33,15 @@ mf = PhysiCellPlotter()
 image_list_for_figure5c = [int(sys.argv[1]), int(sys.argv[2])]
 
 # 3rd argument is for plotting ECM density or anisotropy - but prior scripts that use ONLY 2 arguments will still work
+# if (len(sys.argv) > 3):
+#     if (sys.argv[3] == "plot_density"):
+#         options_for_figure5c["plot_ECM_density"] = True
+#         options_for_figure5c["plot_ECM_anisotropy"] = False
+    # else, you get anisotropy
+
 if (len(sys.argv) > 3):
-    if (sys.argv[3] == "plot_density"):
-        options_for_figure5c["plot_ECM_density"] = True
-        options_for_figure5c["plot_ECM_anisotropy"] = False
+    options_for_figure5c["contour_options"]["lowest_contour"] = float(sys.argv[3])
+    options_for_figure5c["contour_options"]["highest_contour"] = float(sys.argv[4])
     # else, you get anisotropy
     
 number_of_samples = 12

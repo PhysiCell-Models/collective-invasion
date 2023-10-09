@@ -44,6 +44,11 @@
         <SVG>
             <interval units="min">60</interval>
             <enable>true</enable>
+            <plot_substrate enabled="false" limits="false">
+                <substrate>inflammatory_signal</substrate>
+                <min_conc />
+                <max_conc />
+            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>

@@ -70,6 +70,7 @@ class PhysiCellPlotter():
                        "retrieve_first_chemical_field_data" : False, # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
                        "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
+                        "plot_ECM_density" : False, # Calls contour plotter with density as input
                         'plot_chemical_field': False, # Calls contour plotter with chemical field as input
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
@@ -122,7 +123,7 @@ class PhysiCellPlotter():
 
         """
         
-        self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
+#rwh - decreasing memory usage      self.fig, self.ax = plt.subplots(figsize=(self.figsize_width_svg, self.figsize_height_svg))
 
         if options is None:
             options = {"output_plot": True,
@@ -133,6 +134,7 @@ class PhysiCellPlotter():
                        "retrieve_first_chemical_field_data" : False, # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
                        "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
+                       "plot_ECM_density" : False, # Calls contour plotter with density as input
                        'plot_chemical_field' : False,
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
@@ -156,7 +158,7 @@ class PhysiCellPlotter():
         if options["load_SVG_data"] is True:
             cell_positions, cell_attributes, title_str, plot_x_extend, plot_y_extend = self.load_cell_positions_from_SVG(
             starting_index, sample_step_interval, number_of_samples)
-            print('Stil need to get input_path for SVGs working!!!')
+            print('Still need to get input_path for SVGs working!!!')
 
         if options["load_SVG_data"] is False:
             endpoint = starting_index + sample_step_interval * number_of_samples - 1
@@ -204,6 +206,9 @@ class PhysiCellPlotter():
         if options['plot_ECM_anisotropy'] is True:
             self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_anisotropy, contour_options=options["contour_options"], options=options)
 
+        if options['plot_ECM_density'] is True:
+            self.create_contour_plot(x_mesh=xx_ecm, y_mesh=yy_ecm, data_to_contour=ECM_density, contour_options=options["contour_options"], options=options)
+
         if options['plot_ECM_orientation'] is True:
             self.create_quiver_plot(scaling_values=ECM_anisotropy, x_mesh=xx_ecm, y_mesh=yy_ecm, x_orientation=ECM_x_orientation, y_orientation=ECM_y_orientation, quiver_options=options['quiver_options'])
             # Would be greato to pass kwargs here to teh plotting function, but can do that later ... I think maybe I can do some default behavior here??
@@ -216,6 +221,10 @@ class PhysiCellPlotter():
             self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
 
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, output_path, options)
+
+        #rwh - decreasing memory usage
+        del self.mcds.data
+        del self.mcds
 
     def plot_cells_from_physicell_data(self):
         cell_df = self.mcds.get_cell_df()
@@ -387,11 +396,14 @@ class PhysiCellPlotter():
             # self.fig.clf()
             # self.fig.clear()
 
-            plt.savefig(output_folder + file_name + '.png', dpi=256)
+            # plt.savefig(output_folder + file_name + '.png', dpi=256)
+            self.fig.savefig(output_folder + file_name + '.png', dpi=256)  #rwh
 
-            plt.clf()
-            plt.cla()
-            plt.close()
+            #rwh
+            self.ax.cla() # JPM - I wonder if we should also clear the figure?
+            # plt.clf()
+            # plt.cla()
+            # plt.close()
             print('hello')
 
         if show_plot is True:
@@ -933,7 +945,7 @@ class PhysiCellPlotter():
         return fig
     
     ########################################################################################################################
-    ########################################################################################################################
+    ################### ALL BELOW IS OLD CODE - KEPT AS REFERENCE #####################################################################
     ########################################################################################################################
     
     def plot_cells_and_uE_for_movie (starting_index: int, sample_step_interval: int, number_of_samples: int, naming_index: int, options=None ):

@@ -234,7 +234,7 @@ void ECM_to_cell_interactions( Cell* pCell, Phenotype& phenotype, double dt )
 
 		// to determine direction along f, find part of d_choice that is perpendicular to f; 
 		
-		// There are rare times where there is trouble with the accuracy of the approximation in one or both of the following lines - needs polished in the future. 
+		// There are rare times where there istrouble with the accuracy of the approximation in one or both of the following lines - needs polished in the future. 
 		std::vector<double> d_perp = d_motility - dot_product(d_motility,f)*f; 	
 		normalize( &d_perp );
 
