@@ -1,15 +1,49 @@
 import sys
+import argparse
+# defined command line options
+# this also generates --help and error handling
+
 import matplotlib.pyplot as plt
 sys.path.append(r'../python_imaging')
 
 from image_processing_for_physicell import *
+
+CLI=argparse.ArgumentParser()
+CLI.add_argument(
+  "--snapshot_IDs",  # name on the CLI - drop the `--` for positional/required parameters
+  nargs="*",  # 0 or more values expected => creates a list
+  type=int,
+  default=[15],  # default if nothing is provided
+)
+
+# CLI=argparse.ArgumentParser()
+# CLI.add_argument(
+#   "plot_orientations",  # name on the CLI - drop the `--` for positional/required parameters
+# #   nargs="*",  # 0 or more values expected => creates a list
+#   type=bool,
+#   default=True  # default if nothing is provided
+# )
+
+
+CLI.add_argument(
+  "--contour_range",  # name on the CLI - drop the `--` for positional/required parameters
+  nargs="*",  # 0 or more values expected => creates a list
+  type=float,
+  default=[0.0, 1.0],  # default if nothing is provided
+)
+
+# parse the command line
+args = CLI.parse_args()
+# access CLI options
+print(args.snapshot_IDs)
+print(args.contour_range)
 
 options_for_figure5c = {}
 
 options_for_figure5c = {"output_plot" : True,
                        "show_plot" : False,
                        "produce_for_panel" : True,
-                        "plot_ECM_anisotropy" : False,
+                        "plot_ECM_anisotropy" : True,
                         "plot_ECM_density" : True,
                         "plot_ECM_orientation" : True,
                         "retrieve_ECM_data": True,
@@ -20,8 +54,9 @@ options_for_figure5c = {"output_plot" : True,
                         "contour_options" : {'lowest_contour': 0.5, ### I woud like this to be cleaner - but it does work!!!
                                            'upper_contour': 1.0,
                                            'number_of_levels': 25,
-                                           'color_map_name': 'Reds',
-                                           'color_bar': False
+                                           'color_map_name': 'YlOrRd',
+                                           'color_bar': False,
+                                           'alpha': 0.5
                                            },
                        }
 
@@ -30,7 +65,7 @@ options_for_figure5c = {"output_plot" : True,
 mf = PhysiCellPlotter()
 
 # in future, could iterate over input arguments to make this more general
-image_list_for_figure5c = [int(sys.argv[1]), int(sys.argv[2])]
+# image_list_for_figure5c = [args.snapshot_IDs]
 
 # 3rd argument is for plotting ECM density or anisotropy - but prior scripts that use ONLY 2 arguments will still work
 # if (len(sys.argv) > 3):
@@ -39,15 +74,24 @@ image_list_for_figure5c = [int(sys.argv[1]), int(sys.argv[2])]
 #         options_for_figure5c["plot_ECM_anisotropy"] = False
     # else, you get anisotropy
 
-if (len(sys.argv) > 3):
-    options_for_figure5c["contour_options"]["lowest_contour"] = float(sys.argv[3])
-    options_for_figure5c["contour_options"]["highest_contour"] = float(sys.argv[4])
-    # else, you get anisotropy
+# if (len(sys.argv) > 3):
+options_for_figure5c["contour_options"]["lowest_contour"] = args.contour_range[0]
+options_for_figure5c["contour_options"]["highest_contour"] = args.contour_range[1]
+
+# options_for_figure5c["plot_ECM_orientation"] = args.plot_orientations
     
-number_of_samples = 12
-for number in image_list_for_figure5c:
-    starting_index = number-number_of_samples + 1
-    mf.generic_plotter(starting_index=starting_index, number_of_samples=number_of_samples, options=options_for_figure5c, file_name='multi_contour_still_' + str(number))
+trail_length = 8
+for snapshot_ID in args.snapshot_IDs:
+    if (snapshot_ID - trail_length + 1 < 0):
+        starting_index = 0
+        modified_trail_length = snapshot_ID + 1 
+        print("WARNING: trail length is too long for this snapshot ID")
+        print(snapshot_ID)
+        print(trail_length)
+    else:
+        starting_index = snapshot_ID-trail_length + 1
+        modified_trail_length = trail_length
+    mf.generic_plotter(starting_index=starting_index, number_of_samples=modified_trail_length, options=options_for_figure5c, file_name='multi_contour_still_' + str(snapshot_ID))
 
 mf.create_separate_colorbar(contour_options = options_for_figure5c["contour_options"])
 
