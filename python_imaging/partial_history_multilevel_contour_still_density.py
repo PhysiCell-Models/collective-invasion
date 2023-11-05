@@ -92,7 +92,7 @@ for snapshot_ID in args.snapshot_IDs:
         starting_index = snapshot_ID-trail_length + 1
         modified_trail_length = trail_length
     mf.generic_plotter(starting_index=starting_index, number_of_samples=modified_trail_length, options=options_for_figure5c, file_name='multi_contour_still_' + str(snapshot_ID))
-
+# trail_length must be at least 1!!!!!!!!
 mf.create_separate_colorbar(contour_options = options_for_figure5c["contour_options"])
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)

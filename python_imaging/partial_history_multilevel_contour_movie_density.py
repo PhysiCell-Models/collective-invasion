@@ -34,7 +34,7 @@ movie_options_for_figure_4 = {'INCLUDE_ALL_SVGs': True,
 #### Right now, if you don't have None or the full contour and quiver options, it will break in the plotting .
 
 mf = PhysiCellPlotter()
-
+# trail_length must be at least 1!!!!!!!!
 mf.produce_movie(save_name='multi_color_movie', trail_length=15, movie_options=movie_options_for_figure_4, image_options=options_for_figure4_movie)
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)

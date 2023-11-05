@@ -263,10 +263,13 @@ class PhysiCellPlotter():
             # self.fig.show()
         else:
 
+            if 'alpha' not in contour_options.keys():
+                contour_options['alpha'] = 1.0     
+
             # Make levels for contours
             contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], contour_options['number_of_levels'])
 
-            cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing)
+            cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing, alpha=contour_options['alpha'])
 
             if contour_options['color_bar'] is True:
                 divider = make_axes_locatable(self.ax)
@@ -285,6 +288,9 @@ class PhysiCellPlotter():
         print('Working - gives continous colorbar instead of discrete - could fix possibly but not sure how to match N')
 
         if contour_options is not None:
+            if 'alpha' not in contour_options.keys():
+                contour_options['alpha'] = 1.0   
+
             contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'],
                                           contour_options['number_of_levels'])
             # cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing)

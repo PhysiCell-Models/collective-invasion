@@ -456,6 +456,7 @@ void setup_tissue( void )
 	{
 		if(parameters.strings("cell_setup") == "single")
 		{
+			// pC = create_cell( *follower_cell );
 			pC = create_cell( *leader_cell );
 			pC->assign_position(0.0, 0.0, 0.0);
 		}

@@ -43,7 +43,7 @@ number_of_samples = 12
 for number in image_list_for_figure5c:
     starting_index = number-number_of_samples + 1
     mf.generic_plotter(starting_index=starting_index, number_of_samples=number_of_samples, options=options_for_figure5c, file_name='multi_contour_still_' + str(number))
-
+# trail_length must be at least 1!!!!!!!!
 mf.create_separate_colorbar(contour_options = options_for_figure5c["contour_options"])
 
 # generic_plotter (start, intervnal, finish, save_filename, data_path, save_path, options)
