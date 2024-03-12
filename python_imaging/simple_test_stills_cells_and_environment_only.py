@@ -24,15 +24,13 @@ options_for_figure2d = {"output_plot" : True,
 #### is a better/more robust way to do it (kwargs???, lots of "trapping"??) but this will be handled later ... and I can ask Randy etc
 ### What is up with scaling - hum ...
 
-# oof - I got different results on the two runs when I did and didn't scale by anistoropy ... yikes! How do I manage that!!
-
 mf = PhysiCellPlotter()
 
 mf.generic_plotter(starting_index=0, number_of_samples=1, options=options_for_figure2d, file_name='still_initial_step')
 
-image_list_for_figure2c = []
-
-image_list_for_figure2d = [150, 417]
+image_list_for_figure2d = []
+image_list_for_figure2d = [int(sys.argv[1]), int(sys.argv[2])]
+# image_list_for_figure2d = [150, 417]
 
 options_for_figure2d['plot_ECM_orientation'] = False
 options_for_figure2d['retrieve_ECM_data'] = False

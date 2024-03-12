@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">14400</max_time>
+        <max_time units="min">7200</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -38,11 +38,11 @@
     <save>
         <folder>adh_10_replusion_25_speed_080</folder>
         <full_data>
-            <interval units="min">30</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">30</interval>
+            <interval units="min">6</interval>
             <enable>true</enable>
             <plot_substrate enabled="false" limits="false">
                 <substrate>oxygen</substrate>

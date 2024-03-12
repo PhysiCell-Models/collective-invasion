@@ -223,9 +223,10 @@ class PhysiCellPlotter():
 
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, output_path, options)
 
-        #rwh - decreasing memory usage
-        del self.mcds.data
-        del self.mcds
+        #rwh - decreasing memory usage - BUT causes errors in stills if you invoke it twice in row (AttributeError: 'PhysiCellPlotter' object has no attribute 'mcds'
+        # in the generic plotting ojbect in for exampl - simple_test_stills_cells_and_environment_only)... hum ... #jpm
+        # del self.mcds.data
+        # del self.mcds
 
     def plot_cells_from_physicell_data(self):
         cell_df = self.mcds.get_cell_df()
