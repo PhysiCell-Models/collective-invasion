@@ -79,35 +79,13 @@ In addition to the standard PhysiCell outputs, our model outputs an ECM specific
 
 This data can be visualized using the README and scripts in [python_imaging](python_imaging/). We provide general image production through a general template script [image_processing_script.py](python_imaging/image_processing_script.py) which accesses the *PhysiCellPlotter* class in the module *Image processing for PhysiCell* in [image_processing_for_physicell.py](python_imaging/image_processing_for_physicell.py). For image production settings optimzied for the default parameter settings, see [partial_history_multilevel_contour_still.py](python_imaging/partial_history_multilevel_contour_still.py) and [partial_history_multilevel_contour_movie.py](python_imaging/partial_history_multilevel_contour_movie.py). This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing oxygen (in red) and a quiver plots showing cell movement history. Note that we do our best to ensure that all code and scripts in `python_imaging` work without alteration and as expected - and please consider it to be a preliminary release that is not guanteed to work and that may change in the future. 
 
+## Future work
 
-### ECM and leader-follower models and emergent results
-
-
-The collective invasion models uses two different cell types: leader cells and follower cells. Leader cells move up chemotactic gradients and signal their paths by remodeling the ECM. Follower cells alter their motility in response to signals in the ECM as well as chemotaxing when on remodeled ECM and move randomly otherwise. The coupling of ECM signal generating phenotype with ECM signal reading phenotype enables collective behavior (both stigmery and collective invasion) in a range of parameter values. The model and results are explained in depth in [2](#references). See [3](#references) and [4](#references) for a partial biological background. 
-
-In our example, leader cells are endowed with ECM modification abilities while follower cells "read" the ECM with accompanying changes in cell motility. Instantiating both cell phenotypes in one simulation and altering the rates of ECM modification and ratios of cell speed to cell-cell adhesion produce a range of multicellular behaviors - including stigmergy, collective invasion, uncoupled behavior of the two populations, or a homestatis like pattern. 
-
-
-
-## Settings and exploring the collective invasion model
-
-Many model settings can be edited in the [PhysiCell_settings.xml](config/PhysiCell_settings.xml).  While you don't have to edit this file you can get different behavior by changing the settings in the file.  
-
-You can follow these suggestions to familiarize yourself with the model.
-
-1) Run this model using the default parameters. This will be produce the right hand side of the figure at the beginning of this README (Figure 5 of Reference [2]). 
-
-2) Change anisotropy_increase_rate to 0.001 and fiber_realignment_rate to 1. This will decrease the collective behavior - eliminating collective invasion and leaving many followers in the center of the domain.
-
-3) Change discrete_ECM_remodeling to 0. Note now the ECM is instantly remodeled - generating strong, clear signals for followers to read (view the anisotropy field). This will recover behavior similar to the default parameters and produce the left side of the figure included above.
-
-4) Change default_cell_speed to 1.0 and then 0.25 - producing stigmergy and a non-changing morphology.
-
-5) Now, you can enjoy yourself changing other parameters and creating new responses.
-
-Note that code does not need recompiled in between parameter changes; the executable will parse the changes to the xml. 
-
-
+- Remove deprecated user_parameters from all model files and code base. 
+- Add "Exploration of leader-follower collective migration model" into README (using previous, but currently out of date material). 
+    - Could include several model walk throughs by video
+    - Could include more in depth context for the leader-follower collective migration
+    - Could include more on the ECM model details (again out of date material is available for updating)
 
 ## Running PhysiCell simulations across a team
 
@@ -132,7 +110,7 @@ See makefile for additional rules.
 
 ## Acknowledgements
 
-This work was funded in part by a joint (AMIGOS) JKTGF and BCRF grant. Thank you Margherita Botticelli for many productive conversations on the cell-ECM interaction code.
+This work was funded in part by a joint (AMIGOS) JKTGF and BCRF grant. We thank Margherita Botticelli for many productive conversations on the cell-ECM interaction code.
 
 ## References
 
@@ -149,32 +127,3 @@ modeling with extracellular matrix. bioRxiv 2022.11.21.514608; doi: [https://doi
 
 
 **Latest PhysiCell info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
- 
-
-
-## Brief detailed description of ECM model and cell-ECM interactions
-
-
-As mentioned above, the ECM model has three components: `anisotropy` (average local fiber-fiber alignment correlation), `fiber orientation` (average orientation of the fibers), and `density` (average relative volume fraction of ECM fibers). We place an array of ECM elements to spatially model the ECM in a tissue.
-
-- `Density` (a scalar ranging from 0-1) volume fraction of fibers, which represents the average local  fiber density (range 0 - 1). Zero refers to completely fluid  filled and one to completely packed with  fibers without void space
-- `Orientation` (numerically given as a unit vector) represents the overall (average) fiber orientation
-- `Anisotropy` (0-1) average local  ber- ber alignment correlation (range 0 - 1). At zero, there is no correlation and at one, locally there is complete fiber-to-fiber correlation. 
-
-
-_ECM impacts cell migration_:
-- Fiber orientation provides directional cues.
-- Anisotropy gives a strength of directional cue: high anisotropy increases an ECM element's influence on direction of cell migration.
-- Density influences cell speed: too little ECM, cells have nothing to attach to; too much, cells cannot pass.
-
-_Cell migration and movement impact microstructure_:
-- Direction of cell migration reorients an ECM elements's orientation.
-- Cell-ECM element contact increases ECM anisotropy proportional to cell speed.
-- Cells remodel ECM density towards a target value.
-
-This model is motivated by findings in the developmental, disease, and tumor biology literature as well as inspired by previous modeling e orts [1, 8, 9, 53, 61]. The cell-ECM interactions are specified at the cellular level, enabling a variety of cell-ECM interactions, in particular changes in cell motility and ECM remodeling capabilities [6, 9, 61]. Additionally, ECM variables can be used to impact other cellular behaviors such as proliferation and death. Finally, we note and will demonstrate that these features can be integrated with others such as sensitivity to chemical cues and cell-cell adhesion to obtain an even richer range of cell behaviors.
-
-
-
-
-An `anisotropy` value closer to 0 means the fibers are less aligned, producing little signal, and values closer to 1 indicatd highly aligned fibers that produce a strong signal. `Density` influences cell speed as the cell gets stuck if the fibers are too thick and if the fibers are too sparse then the cells have nothing to "grab".  The `fiber orientation` influences the motility vector of the cells and the amount of influence is controlled by the `anisotropy`. ECM modifying cells can align the fibers in the direction of their movement (changing `fiber orientation`), increase the `anisotropy` in proportion to the cell's speed, and modify `density` up or down to a target density. 

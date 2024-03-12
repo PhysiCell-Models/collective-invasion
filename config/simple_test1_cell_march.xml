@@ -44,6 +44,11 @@
         <SVG>
             <interval units="min">6</interval>
             <enable>true</enable>
+            <plot_substrate enabled="false" limits="false">
+                <substrate>oxygen</substrate>
+                <min_conc />
+                <max_conc />
+            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>
@@ -147,8 +152,6 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">0.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">0.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
@@ -284,8 +287,6 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">0.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">0.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
@@ -394,11 +395,11 @@
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
         <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">1</discrete_ECM_remodeling>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">100</tumor_radius>
-        <follower_repulsion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell repulsion">25.0</follower_repulsion>
-        <leader_repulsion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell repulsion">25.0</leader_repulsion>
-        <follower_adhesion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell adhesion">10.0</follower_adhesion>
-        <leader_adhesion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell adhesion">10.0</leader_adhesion>
+        <follower_repulsion type="double" units="micron/minute" description="Deprecated">25.0</follower_repulsion>
+        <leader_repulsion type="double" units="micron/minute" description="Deprecated">25.0</leader_repulsion>
+        <follower_adhesion type="double" units="micron/minute" description="Deprecated">10.0</follower_adhesion>
+        <leader_adhesion type="double" units="micron/minute" description="Deprecated">10.0</leader_adhesion>
         <initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized (lesion only)">0.95</initial_leader_cell_fraction>
-        <oxygen_migration_bias_for_leaders type="double" units="dimensionless" description="Leader chemotaxis bias">0.95</oxygen_migration_bias_for_leaders>
+        <oxygen_migration_bias_for_leaders type="double" units="dimensionless" description="Deprecated">0.95</oxygen_migration_bias_for_leaders>
     </user_parameters>
 </PhysiCell_settings>

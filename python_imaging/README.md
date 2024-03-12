@@ -26,3 +26,7 @@ Basic scripts. Original basis for integrated plotter in `image_processing_for_ph
 * `cell_track_plotter.py`: Plots still of cells and cell positional histories. 
 * `cell_tracker_movie.py`: Generates a movie of cells and cell positional histories.
 * `finished-combined-plot.py`: Generates a layered plot combining cell positions and multiple aspcts of the microenvironment. 
+
+## Future work 
+
+Future work in python_imaging includes changes from pyMCDS based-parsing to [pcdl-based](https://github.com/PhysiCell-Tools/python-loader) data handling and reading. 
