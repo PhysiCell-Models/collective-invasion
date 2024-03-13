@@ -4,7 +4,7 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
-void copy_ECM_data_to_BioFVM( Cell* pCell, Phenotype& phenotype, double dt );
+void copy_ECM_data_to_BioFVM( void);
 
 double dot_product_ext( const std::vector<double>& v , const std::vector<double>& w );
 
