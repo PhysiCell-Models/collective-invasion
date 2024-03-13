@@ -68,7 +68,7 @@ class ECM_options
 };
 
 
-void copy_ECM_data_to_BioFVM( void );
+// void copy_ECM_data_to_BioFVM( void );
 
 // extern ECM_options default_ecm_options; 
 // extern ECM ecm;

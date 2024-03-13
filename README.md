@@ -1,73 +1,121 @@
-# Collective invasion and extracellular matrix modeling in an cell-based modeling framework
+# A simple framework for agent-based modeling with extracellular matrix
 
-### A model of collective invasion based on multicellular communication mediated through a novel extracellular matrix (ECM) model implemented in PhysiCell.
+<!-- ### A simple framework for agent-based modeling with extracellular matrix -->
 
-## Overview
-<p align="center"><img alt="NA" src="https://github.com/PhysiCell-Models/collective-invasion/raw/master/Figure-5_Collective_migration_is_robust.png" style="width: 400px; height: 300px;" /></a></p>
+## Framework overview
+<p align="center"><img alt="NA" src="https://github.com/PhysiCell-Models/collective-invasion/raw/master/ECM_framework_schematic.png" style="width: 400px; height: 300px;" /></a></p>
 
-The ECM model has three components: `anisotropy` (agreement of alignment), `fiber orientation` (overall orientation of the fibers), and `density` (relative volume filling of ECM fibers).  The collective invasion models uses two different cell types: leader cells and follower cells. Leader cells move up chemotactic gradients and signal their paths by remodeling the ECM. Follower cells alter their motility in response to signals in the ECM as well as chemotaxing when on remodeled ECM and move randomly otherwise. The coupling of ECM signal generating phenotype with ECM signal reading phenotype enables collective behavior (both stigmery and collective invasion) in a range of parameter values. The model and results are explained in depth in [2](#references). See [3](#references) and [4](#references) for a partial biological background. 
+In this framework [[1](#references)] for modeling the ECM and cell-ECM interactions, we divide the ECM into volumetric elements that track local ECM density, alignment, and overall anisotropy (local microstructure). Individual cell agents can locally remodel each of these properties, while these properties can in turn influence cell behavior including changes in migration speed, chemotactic response, ECM contact guidance, proliferation, death, secretion, and differentiation. It is implemented as an extension of the open source package PhysiCell [[2]](#references) and can readily be used to incorporate local ECM effects into agent-based models, in particular through PhysiCell rules [[3]](#references). 
 
-The cell and ECM models are built using [PhysiCell](https://github.com/MathCancer/PhysiCell) v 1.4.1, an open source cell-based, multicellular 3-D modeling framework written in C++.  If you are not already familiar with PhysiCell please start by reviewing it (see [1](#references) and [Install](#install) section below) prior to diving deeply into the modeling code here.  
+For additional details and background on the components of this framework, see [[1](#references)]
 
-A cloud-based, executable version of this model is available at [nanoHUB](https://nanohub.org/tools/physicellecm). A free login is required to access this resource. 
+## Overview of repository structure and key files
 
-### ECM and leader-follower models and emergent results
+### ECM and cell-ECM core files
 
-The ECM is conceived of as being composed of a set of small ECM units, the properties of which can be described by 3 components representing the average value of each component over the small unit. These ECM components impact the motility of ECM sensitive cells and in turn can be altered by cells. 
+All the examples use the same core source code files. These are the core of the framework and its extension to PhysiCell. They are:
 
-- `Density` (a scalar ranging from 0-1) represents how much overall fiber is present relative to how much space is available to be filled with fibers
-- `Fiber orientation` (numerically given as a unit vector) represents the overall (mean) fiber orientations
-- `Anisotropy` (0-1) represents how aligned the ECM fibers. 
+- `extracellular_matrix.h/extracellular_matrix.cpp`
+    - Contains the ECM element and ECM mesh class definitions and other initilization routine
+- `cell_ECM_interactions.h/cell_ECM_matrix.cpp`
+    - Contains functions for the bidirectional cell-ECM interactions, generating a default ECM compatible agent, and custom output routines
 
-An `anisotropy` value closer to 0 means the fibers are less aligned, producing little signal, and values closer to 1 indicatd highly aligned fibers that produce a strong signal. `Density` influences cell speed as the cell gets stuck if the fibers are too thick and if the fibers are too sparse then the cells have nothing to "grab".  The `fiber orientation` influences the motility vector of the cells and the amount of influence is controlled by the `anisotropy`. ECM modifying cells can align the fibers in the direction of their movement (changing `fiber orientation`), increase the `anisotropy` in proportion to the cell's speed, and modify `density` up or down to a target density. 
+These files are currently located in `custom_modules`. 
 
-In our example, leader cells are endowed with ECM modification abilities while follower cells "read" the ECM with accompanying changes in cell motility. Instantiating both cell phenotypes in one simulation and altering the rates of ECM modification and ratios of cell speed to cell-cell adhesion produce a range of multicellular behaviors - including stigmergy, collective invasion, uncoupled behavior of the two populations, or a homestatis like pattern. 
+### Model files
 
-The models and computational experiments were conceived of and developed by John Metzcar, Ben Duggan, Brandon Fischer, Matthew Murphy and Paul Macklin.  Significant help was provided by Randy Heiland and the overall AMIGOS Team. Work was funded by a joint (AMIGOS) JKTGF and BCRF grant.
+There are three example models, several variants of the leader-follower model, and simple test models. See the below `Compling and running sample models` below for details on those models. 
 
-## Installing PhysiCell
+There is one makefile for all compilation. It is located in the `root`. 
 
-PhysiCell has a small number of dependencies. Before trying to run the code, you should ensure that your computer can run PhysiCell. Read the PhysiCell [Quick Start Guide](https://github.com/MathCancer/PhysiCell/blob/master/documentation/Quickstart.md) to begin working with PhysiCell and ensure that your system has the proper dependencies installed or follow the [Mac install](https://www.youtube.com/watch?v=Sq9nfKS5U0E&list=PL1fyIV-yPAYzzOVxfGsL90a5KTTh8gSW2&index=2) or [Windows install](https://www.youtube.com/watch?v=hIP4JUrViRA) videos. Note that the videos include more than is required to run the ECM and collective invasion models. Following the install videos through around the half way point of each video is sufficient. SBML and the PhysiCell Model Builder are not required. Python, Matplotlib and other basic Python packages are required to produce visualizations behind the SVGs produced by core PhysiCell. 
+Each base model has a main_XXX.cpp (in `root`), custom source code (in `custom_code`), and one to several additional model specficifcation files in `config` - always including an XML-based model config file and sometimes including PhysiCell rules and initial cell position files (both .csv's). The config directory also contains special XML-bassed model files for testing and making stochastic replicates. 
 
-Additional install support (and otherwise) can be found be generating an issue at [SourceForge](https://sourceforge.net/projects/physicell/) or on the [PhysiCell Slack workspace](https://join.slack.com/t/physicellcomm-sf93727/shared_invite/zt-qj1av6yd-yVeer8VkQaNDjDz7fF00jA). 
 
-Note that we recommend downloading the model [release](https://github.com/MathCancer/AMIGOS-invasion/releases). However, you could download or clone the main branch for the most up to date, stable version of the code.
+## Using the framework
 
-## How to run
+The cell-ECM interaction framework is built as an extension to [PhysiCell](https://github.com/MathCancer/PhysiCell) v 1.12, an open source cell-based, multicellular 3-D modeling framework written in C++. If you are not already familiar with PhysiCell we suggest begining by reviewing it (see [2](#references)). Note, that the ECM framework stands alone - coming with all necessary source code to compile and execute the sample models and develop new models. However, as the ECM framework is a direct extension of PhysiCell, we suggest using the PhysiCell install guides for your system - with current guides [here](https://github.com/physicell-training/ws2023/blob/main/agenda.md) and more generally at the [PhysiCell training repository](https://github.com/physicell-training). 
 
-This model runs similarly to most other PhysiCell projects, however, there are some differences that are noted below.  
+### Compiling and running sample models
 
-After navigating to the root directory, run `make`.  This will compile the PhysiCell code and create an executable named `AMIGOS-invasion`.  If you have issues compiling or running the code, begin by consulting the PhysiCell [Quick Start Guide](https://github.com/MathCancer/PhysiCell/blob/master/documentation/Quickstart.md) and other documentation.
+There are 3 main sample models as well as a series of simple tests. Listed below are instructions for making and running each model and its variants, grouped by which executable is required. 
 
-Please submit issues specific to the collective invasion and ECM models as an [issue](https://github.com/PhysiCell-Models/collective-invasion/issues) on this repo.
+#### _Simple tests_:
 
-## Settings and exploring the collective invasion model
+`make` - compiles the AMIGOS-invasion executable
 
-Many model settings can be edited in the [PhysiCell_settings.xml](config/PhysiCell_settings.xml).  While you don't have to edit this file you can get different behavior by changing the settings in the file.  
+The following output directories will need made to run the simulations below: `simple_test0`, `simple_test1`, `simple_test3`, and `simple_test4`. `simple_test2` is already in the repository.
 
-You can follow these suggestions to familiarize yourself with the model.
+Simple tests - demonstrating the main cell-ECM interactions as one way (either ECM remodeling or ECM following) experiments:
 
-1) Run this model using the default parameters. This will be produce the right hand side of the figure at the beginning of this README (Figure 5 of Reference [2]). 
+- `./AMIGOS-invasion config/simple_test0_straight_ECM.xml` - ECM following: random 1-D motion along vertically oriented ECM
+- `./AMIGOS-invasion config/simple_test1_cell_march.xml` - ECM remodeling: realignment of randomly oriented fiber orientations (Figure 2a from [[1](#references)])
+- `./AMIGOS-invasion config/simple_test2_random_1_D_circles.xml` - ECM following: random 1-D motion along circularly oriented ECM (Figure 2b from [[1](#references)])
+- `./AMIGOS-invasion config/simple_test3_directed_circular_motion.xml` - ECM following: combining a second direction, a chemotactic gradient, with ECM following on circularly oriented ECM (Figure 2c from [[1](#references)])
+- `./AMIGOS-invasion config/simple_test4_split_ECM.xml` - ECM following: combining a second direction, a chemotactic gradient, with ECM following on split, diagnoally oriented ECM (SM Figure 3 from [[1](#references)])
 
-2) Change anisotropy_increase_rate to 0.001 and fiber_realignment_rate to 1. This will decrease the collective behavior - eliminating collective invasion and leaving many followers in the center of the domain.
+#### _Wound headling and fibrosis model_:
 
-3) Change discrete_ECM_remodeling to 0. Note now the ECM is instantly remodeled - generating strong, clear signals for followers to read (view the anisotropy field). This will recover behavior similar to the default parameters and produce the left side of the figure included above.
+`make fibrosis` - compiles fibrosis executable
 
-4) Change default_cell_speed to 1.0 and then 0.25 - producing stigmergy and a non-changing morphology.
+- `./fibrosis config/fibrosis.xml` - simulated tissue insult is cleared by macrophages, which recruit fibroblasts that increase ECM density in the presence of macrophages, leading to hyperdense ECM that is relatively impenetrable cells surrounding a region of relatively less dense ECM where the tissue insult occurred (Figure 3 from [[1](#references)]).
 
-5) Now, you can enjoy yourself changing other parameters and creating new responses.
+Output will go to `fibrosis_test`
 
-Note that code does not need recompiled in between parameter changes; the executable will parse the changes to the xml. 
+#### _Basement membrane degradation and stromal invasion_:
+
+`make invasive_carcinoma` - compiles invasive carcinoma executable
+
+- `./invasive_carcinoma config/invasive_carcinoma.xml` - simulation of basement membrane degradation by tumor recruited fibroblasts, leading to invasion of stroma by previously _in situ_ tumor (Figure 4 from [[1](#references)]).
+
+Output will go to `invasive_carcinoma_output`
+
+#### _Leader-follower and collective migration model_:
+
+`make` - compiles the AMIGOS-invasion executable
+
+The following output directories will need made to run the simulations below: `adh_0_repulsion_0_speed_10_no_reading`, `adh_0_repulsion_0_speed_10_no_writing`, `adh_0_repulsion_0_speed_10`, `adh_10_replusion_25_speed_080`, `adh_10_replusion_25_speed_050`, `adh_10_replusion_25_speed_010`, and `leader_follower_decreased_remodeling`. `leader_follower` is already in the repository. 
+
+- `./AMIGOS-invasion writing_only.xml`- No contact guidance in the follower cell population - notably lacks outward migration of fiber following cells ("followers") (Figure 5a from [[1](#references)])
+- `./AMIGOS-invasion reading_only.xml` - No production of directional cues in ECM for followers to follow - notably lacks outward migration of fiber following cells (Figure 5b from [[1](#references)])
+- `./AMIGOS-invasion writing_and_reading.xml` - Enables the two cell populations (leader and follower), with leaders producing paths in the ECM that followers follow (stigmergy) (Figure 5c from [[1](#references)])
+- `./AMIGOS-invasion leader_follower_instant_speed_080.xml` - Produces stigmery (Figure 6a from [[1](#references)])
+- `./AMIGOS-invasion leader_follower_instant_speed_050.xml` - Produces leader-follower collective migration (Figure 6b from [[1](#references)])
+- `./AMIGOS-invasion leader_follower_instant_speed_010.xml` - Produces no change in cell arrangement/pattern (Figure 6c from [[1](#references)])
+- `./AMIGOS-invasion leader_follower_model.xml` - Demonstrates leader-follower collective migration, even in the case of non-instant ECM remodeling (Figure 7b from [[1](#references)])
+- `./AMIGOS-invasion leader_follower_model_decreased_remodeling_rates.xml` - Demonstrates that leader-follower collective migration is relatively senstive to remodeling rate parameters (SM Figure 4b from [[1](#references)])
+
+### Running through the Studio
+
+All the above models (and in general any PhysiCell model) can be run via the PhysiCell Studio ([User Guide](https://github.com/PhysiCell-Tools/Studio-Guide/blob/main/README.md) and reference [[4]](#references)). 
+
+Briefly, to run an ECM-based model AND enable visualization of the ECM variables (anisotropy, density, and orientation), use the following pattern to start the Studio:
+
+`python path_to_studio_directory/studio_ecm.py -e [executable_name] -c [config/config_file_name]`
+
+This assumes you are invoking python in the same directory as the executable and that your config file is in `config`. Note that in the command above, we use `studio_ecm.py` NOT `studio.py`. Using `studio_ecm.py` will add built-in ECM field visualization to the Studio. However, this is not an officially supported feature of the Studio, so it may at some point be deprecated without notice. We will attempt to maintain compatiability. 
+
+Note that the ECM-based models are modifiable in the regular version of the studio, but the  ECM visualization is not. Please see the PhysiCell Studio Guide and preprint for general information and details on the Studio.
+
+### nanoHUB
+
+A cloud-based, executable version of the leader-follower model is available at [nanoHUB](https://nanohub.org/tools/physicellecm). A free login is required to access this resource. 
+
 
 ## ECM Specific Outputs
 
 In addition to the standard PhysiCell outputs, our model outputs an ECM specific MATLAB file at each save time.  The file is saved to the `output` folder with the form `outputxxxxxxxx_ECM.mat` where `xxxxxxxx` is the _i_ th simulation output.  The MATLAB file contains one array named `ECM_Data` with each column representing a voxel (indexed using voxel id) and rows representing the x, y, and z voxel coordinates, ECM anisotropy, ECM density, and fiber orientation x, y, and z components.  
 
-This data can be visualized using the scripts in [python_imaging](python_imaging/). We provide general image production through a general template script [image_processing_script.py](python_imaging/image_processing_script.py) which accesses the *PhysiCellPlotter* class in the module *Image processing for PhysiCell* in [image_processing_for_physicell.py](python_imaging/image_processing_for_physicell.py). For image production settings optimzied for the default parameter settings, see [partial_history_multilevel_contour_still.py](python_imaging/partial_history_multilevel_contour_still.py) and [partial_history_multilevel_contour_movie.py](python_imaging/partial_history_multilevel_contour_movie.py). This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing oxygen (in red) and a quiver plots showing cell movement history.
+ECM anisotropy and density can also be output to non-diffusing fields through the function `copy_ECM_data_to_BioFVM` in `cell_ECM_interactions.cpp`. Currently, this is enabled by uncommenting the line `// copy_ECM_data_to_BioFVM();` in each models main file. Note that to use this feature, the model needs to have the fields `ECM_anisotropy` and `ECM_density` in the model config file (xml file) and the ECM element size has to match the diffusion voxel size. These fields can be added to any model config file through the Studio - make a new field, change the field name to match the above exactly and accept the defaults (0 for everything). Do this twice. 
+
+## ECM visualization
+
+This data can be visualized using the README and scripts in [python_imaging](python_imaging/). We provide general image production through a general template script [image_processing_script.py](python_imaging/image_processing_script.py) which accesses the *PhysiCellPlotter* class in the module *Image processing for PhysiCell* in [image_processing_for_physicell.py](python_imaging/image_processing_for_physicell.py). For image production settings optimzied for the default parameter settings, see [partial_history_multilevel_contour_still.py](python_imaging/partial_history_multilevel_contour_still.py) and [partial_history_multilevel_contour_movie.py](python_imaging/partial_history_multilevel_contour_movie.py). This script will make an overlaying composite plot of cells (leaders are blue and followers are yellow), a contour plot showing oxygen (in red) and a quiver plots showing cell movement history. Note that we do our best to ensure that all code and scripts in `python_imaging` work without alteration and as expected - and please consider it to be a preliminary release that is not guanteed to work and that may change in the future. 
+
+For rapid visualization, the Studio can be used - in either regular or ECM mode. Note that if ECM anisotropy and density are output to the standard microenvironment outputs, they can visualized with regular version of the Studio. 
 
 ## Running PhysiCell simulations across a team
 
-PhysiCell can be run in a distributed fashion across a team using DAPT: Distributed Automated Parameter Testing [5]. See the coder [here](https://github.com/BenSDuggan/DAPT) including a [detailed PhysiCell example](https://github.com/PhysiCell-Tools/DAPT-example).
+PhysiCell can be run in a distributed fashion across a team using DAPT: Distributed Automated Parameter Testing [5]. See the code [here](https://github.com/BenSDuggan/DAPT) including a [detailed PhysiCell example](https://github.com/PhysiCell-Tools/DAPT-example).
 
 ## Some key makefile rules
 
@@ -85,18 +133,35 @@ make zip-source         : compresses all files required to reproduce simulation 
 
 See makefile for additional rules. 
 
+## Future work
+
+- Remove deprecated user_parameters from all model files and code base. 
+- Add "Exploration of leader-follower collective migration model" into README (using previous, but currently out of date material). 
+    - Could include several model walk throughs by video
+    - Could include more in depth context for the leader-follower collective migration
+    - Could include more on the ECM model details (again out of date material is available for updating)
+- Review optimal way to include `copy_ECM_data_to_BioFVM`
+    - Will possibly add an XML parameter for this
+    - Will review possibly calling at mechanics or phenotype time step (currently being called at diffusion time step)
+- Additonal future work is included in [[1](#references)]
+
+## Acknowledgements
+
+This work was funded in part by a joint (AMIGOS) JKTGF and BCRF grant. We thank Margherita Botticelli for many productive conversations on the cell-ECM interaction code.
+
 ## References
 
-[1] Ghaffarizadeh, A, Heiland, R, Friedman, SH, Mumenthaler, SM, and Macklin, P. PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. DOI: [10.1371/journal.pcbi.1005991](https://dx.doi.org/10.1371/journal.pcbi.1005991)
+[1] Metzcar, J., Duggan, B.S., Fischer, B., Murphy, M., Heiland, R., Macklin, P, 2024. A simple framework for agent-based modeling with extracellular matrix. bioRxiv 2022.11.21.514608; https://doi.org/10.1101/2022.11.21.514608
 
-[2] Metzcar, J, Duggan, BS, Fischer, B, Murphy, M, Macklin, P. A novel model of multicellular communication through extracellular matrix microstructure. bioRxiv 2022.11.21.514608; doi: [https://doi.org/10.1101/2022.11.21.514608](https://doi.org/10.1101/2022.11.21.514608)
+[2] Ghaffarizadeh, A., Heiland, R., Friedman, S.H., Mumenthaler, S.M., and Macklin, P. PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellular Systems, PLoS Comput. Biol. 14(2): e1005991, 2018. https://dx.doi.org/10.1371/journal.pcbi.1005991
 
-[3] Cheung KJ, Gabrielson E, Werb Z, Ewald AJ. Collective invasion in breast cancer requires a conserved basal epithelial program. Cell 2013; 155(7):1639-51. [10.1016/j.cell.2013.11.029](10.1016/j.cell.2013.11.029)
+[3] Johnson, J.A.I., Stein-O’Brien, G.L., Booth, M., Heiland, R., Kurtoglu, F., Bergman, D.R., Bucher, E., Deshpande, A., Forjaz, A., Getz, M., Godet, I., Lyman, M., Metzcar, J., Mitchell, J., Raddatz, A., Rocha, H., Solorzano, J., Sundus, A., Wang, Y., Gilkes, D., Kagohara, L.T., Kiemen, A.L., Thompson, E.D., Wirtz, D., Wu, P.-H., Zaidi, N., Zheng, L., Zimmerman, J.W., Jaffee, E.M., Chang, Y.H., Coussens, L.M., Gray, J.W., Heiser, L.M., Fertig, E.J., Macklin, P.. Digitize your Biology! Modeling multicellular systems through interpretable cell behavior. bioRxiv, 2023. https://doi.org/10.1101/2023.09.17.557982
 
-[4] Nguyen-Ngoc KV\*, Cheung KJ*, Brenot A, Shamir ER, Gray RS, Hines WC, Yaswen P, Werb Z, Ewald AJ. The ECM microenvironment regulates collective migration and local dissemination in normal and malignant mammary epithelium. Proceedings of the National Academy of Science 2012; [10.1073/pnas.1212834109](10.1073/pnas.1212834109) *Co-First Authors. PMCID: PMC3465416
 
-[5] Duggan, BS, Metzcar, J, and Macklin, P (2021). DAPT: A package enabling distributed automated parameter testing. Gigabyte 2021, 1–10. [10.46471/gigabyte.22](10.46471/gigabyte.22).
+[4] Heiland, R., Bergman, D., Lyons, B., Cass, J., Rocha, H.L., Ruscone, M., Noël, V., Macklin, P.. PhysiCell Studio: a graphical tool to make agent-based modeling more accessible. bioRxiv, 2023 https://doi.org/10.1101/2023.10.24.563727
+
+[5] Duggan, B.S., Metzcar, J., and Macklin, P. DAPT: A package enabling distributed automated parameter testing. Gigabyte 2021, 1–10, 2021. https://doi.org/10.46471/gigabyte.22
+
 
 
 **Latest PhysiCell info:**  follow [@PhysiCell](https://twitter.com/PhysiCell) on Twitter (http://twitter.com/PhysiCell)
- 

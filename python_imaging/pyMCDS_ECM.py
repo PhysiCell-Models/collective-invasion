@@ -207,7 +207,7 @@ class pyMCDS:
             a plane of voxel centers in the z-axis.
         Returns
         -------
-        conc_arr : array (np.float) shape=[nx_voxels, ny_voxels, nz_voxels]
+        conc_arr : array (float) shape=[nx_voxels, ny_voxels, nz_voxels]
             Contains the concentration of the specified chemical in each voxel.
             The array spatially maps to a meshgrid of the voxel centers.
         """
@@ -530,7 +530,7 @@ class pyMCDS:
             a plane of voxel centers in the z-axis.
         Returns
         -------
-        conc_arr : array (np.float) shape=[nx_voxels, ny_voxels, nz_voxels]
+        conc_arr : array (float) shape=[nx_voxels, ny_voxels, nz_voxels]
             Contains the quantitity of interest at each voxel.
             The array spatially maps to a meshgrid of the voxel centers.
         """
@@ -603,15 +603,15 @@ class pyMCDS:
         # while we're at it, find the mesh
         coord_str = mesh_node.find('x_coordinates').text
         delimiter = mesh_node.find('x_coordinates').get('delimiter')
-        x_coords = np.array(coord_str.split(delimiter), dtype=np.float)
+        x_coords = np.array(coord_str.split(delimiter), dtype=float)
 
         coord_str = mesh_node.find('y_coordinates').text
         delimiter = mesh_node.find('y_coordinates').get('delimiter')
-        y_coords = np.array(coord_str.split(delimiter), dtype=np.float)
+        y_coords = np.array(coord_str.split(delimiter), dtype=float)
 
         coord_str = mesh_node.find('z_coordinates').text
         delimiter = mesh_node.find('z_coordinates').get('delimiter')
-        z_coords = np.array(coord_str.split(delimiter), dtype=np.float)
+        z_coords = np.array(coord_str.split(delimiter), dtype=float)
 
         # reshape into a mesh grid
         xx, yy, zz = np.meshgrid(x_coords, y_coords, z_coords)
@@ -766,8 +766,8 @@ class pyMCDS:
         # print(self.data['ecm']['mesh']['y_coordinates'])
         # print(self.data['ecm']['mesh']['z_coordinates'])
         # if flat == False:
-        #     # x_coords = np.array(ecm_arr[0,:], dtype=np.float) #I need something like what is in load_ecm - I wish I oculd just explore the structure ... 
-        #     # y_coords = np.array(ecm_arr[1,:], dtype=np.float)
+        #     # x_coords = np.array(ecm_arr[0,:], dtype=float) #I need something like what is in load_ecm - I wish I oculd just explore the structure ... 
+        #     # y_coords = np.array(ecm_arr[1,:], dtype=float)
         #     x_coords, y_coords = np.unique(ecm_arr[0,:]), np.unique(ecm_arr[1,:])#, np.unique(zz)
         #     # ecm_arr[1,:]
         #     print('Shape of x_coords')

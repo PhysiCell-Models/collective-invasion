@@ -8,7 +8,7 @@ extern ECM ecm;
 
 
 
-void copy_ECM_data_to_BioFVM( Cell* pCell, Phenotype& phenotype, double dt )
+void copy_ECM_data_to_BioFVM( void )
 {
 
 
@@ -25,12 +25,20 @@ void copy_ECM_data_to_BioFVM( Cell* pCell, Phenotype& phenotype, double dt )
 	if (ECM_anisotropy_index < 0) 
     {
         std::cout << "        static int ECM_anisotropy_index = " <<ECM_anisotropy_index << std::endl;
+		std::cout << "        ADD ECM_anisotropy field to your simulation!!!" << std::endl;
+		std::cout << "        This feature only works with ECM_anisotropy field added to your simulation. Set decay and diffusion constant to 0" << std::endl;
+		std::cout << "        AND match ECM element size to the diffusion voxel size!!!" << std::endl;
+		std::cout << "        Halting!!!!!!" << std::endl;
         std::exit(-1);   
     }
 	static int ECM_density_index = BioFVM::microenvironment.find_density_index( "ECM_density" ); 
 	if (ECM_density_index < 0) 
     {
         std::cout << "        static int ECM_density_index = " <<ECM_density_index << std::endl;
+		std::cout << "        ADD ECM_density field to your simulation!!!" << std::endl;
+		std::cout << "        This feature only works with ECM_density field added to your simulation. Set decay and diffusion constant to 0!!!" << std::endl;
+		std::cout << "        AND match ECM element size to the diffusion voxel size!!!" << std::endl;
+		std::cout << "        Halting!!!!!!" << std::endl;
         std::exit(-1);   
     }
     for( int n=0; n < number_of_voxels ; n++ )
