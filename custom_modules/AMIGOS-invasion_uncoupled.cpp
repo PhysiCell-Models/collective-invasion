@@ -305,7 +305,7 @@ void setup_extracellular_matrix( void )
 		// For random 2-D initalization 
 		if(parameters.strings( "ECM_orientation_setup") == "random")
 		{
-			double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+			double theta = 6.2831853071795864769252867665590 * UniformRandom(); 
 			ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
 		}
 		// for starburst initialization 

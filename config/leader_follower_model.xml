@@ -415,5 +415,6 @@
         <march_unit_test_setup type="int" units="" description="Testing set up: 1 for cell march, 0 for typical simulation">0</march_unit_test_setup>
         <visual_guideline_pattern type="string" units="" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles">none</visual_guideline_pattern>
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
+        <random_seed type="int" units="" description="">0</random_seed>
     </user_parameters>
 </PhysiCell_settings>

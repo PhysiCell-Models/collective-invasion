@@ -153,9 +153,9 @@ int main( int argc, char* argv[] )
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
-	SeedRandom(0);  //rwh do here, just once
-	// if( parameters.ints("unit_test_setup") == 1) 
-	// {SeedRandom(0);}
+	SeedRandom(parameters.ints("random_seed"));  //rwh do here, just once
+	if( parameters.ints("unit_test_setup") == 1) 
+		{SeedRandom(0);}
 
 	
 	// time setup 

@@ -405,7 +405,7 @@ void alter_cell_uptake_secretion_saturation ( void )
 void setup_tissue( void )
 {	
 	// Setting seed so cells always start with same initial configuration
-	SeedRandom(0);
+	SeedRandom(parameters.ints("random_seed"));
 	static Cell_Definition* fibroblast = find_cell_definition("fibroblast");	
 	static Cell_Definition* dead_cell = find_cell_definition("dead cell");	
 	static Cell_Definition* macrophage = find_cell_definition("macrophage");
