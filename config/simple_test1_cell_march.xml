@@ -36,7 +36,7 @@
     </parallel>
 
     <save>
-        <folder>simple_test1</folder>
+        <folder>output</folder>
         <full_data>
             <interval units="min">6</interval>
             <enable>true</enable>
@@ -401,5 +401,7 @@
         <leader_adhesion type="double" units="micron/minute" description="Deprecated">10.0</leader_adhesion>
         <initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized (lesion only)">0.95</initial_leader_cell_fraction>
         <oxygen_migration_bias_for_leaders type="double" units="dimensionless" description="Deprecated">0.95</oxygen_migration_bias_for_leaders>
+        <constant_cell_influx type="bool" units="NA" description="Setting for releasing cells in to the domain at -y">False</constant_cell_influx>
+        <cell_influx_interval type="double" units="minutes" description="INterval for releasing new cells into the domain">240</cell_influx_interval>
     </user_parameters>
 </PhysiCell_settings>
