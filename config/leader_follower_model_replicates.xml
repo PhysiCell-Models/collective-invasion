@@ -44,6 +44,11 @@
         <SVG>
             <interval units="min">1440</interval>
             <enable>true</enable>
+            <plot_substrate enabled="false" limits="false">
+                <substrate>oxygen</substrate>
+                <min_conc />
+                <max_conc />
+            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>
@@ -147,8 +152,6 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
@@ -285,8 +288,6 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">4.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">10.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
@@ -414,5 +415,8 @@
         <march_unit_test_setup type="int" units="" description="Testing set up: 1 for cell march, 0 for typical simulation">0</march_unit_test_setup>
         <visual_guideline_pattern type="string" units="" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles">none</visual_guideline_pattern>
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
+        <constant_cell_influx type="bool" units="NA" description="Setting for releasing cells in to the domain at -y">False</constant_cell_influx>
+        <cell_influx_interval type="double" units="minutes" description="INterval for releasing new cells into the domain">240</cell_influx_interval>
+        <random_seed type="int" units="dimensionless" description="">0</random_seed>
     </user_parameters>
 </PhysiCell_settings>
