@@ -177,6 +177,7 @@ int main( int argc, char* argv[] )
 	
 	create_cell_types();
 	setup_tissue();
+	
 	// ECM_setup(microenvironment.number_of_voxels());
  
 	/* Users typically start modifying here. START USERMODS */ 
@@ -222,7 +223,7 @@ int main( int argc, char* argv[] )
 	set_cell_motility_vectors(); // Required for instant writing and unit test. To make all simulations have similar initial conditions, requiring it for all simulations at this time 05.27.22
 	// }
 	// set the performance timers 
-
+	
 	BioFVM::RUNTIME_TIC();
 	BioFVM::TIC();
 	
@@ -231,6 +232,14 @@ int main( int argc, char* argv[] )
 	//variables for March Project
 	double reset_Cells_interval = 1960.0; // for a 1000 by 1000 um computational domain (use 980.0 for speed = 1.0. Doulbe it for speed equals 0.5. )
 	bool enable_cell_resets = true;
+
+	// variables for Painter inspired study
+	double cell_influx_interval = 0.0;
+
+	if( parameters.bools("constant_cell_influx") == true )
+	{
+  		cell_influx_interval = parameters.doubles("cell_influx_interval"); // execute special code here. 
+	}
 
 	// main loop 
 	if( PhysiCell_settings.enable_legacy_saves == true )
@@ -296,7 +305,20 @@ int main( int argc, char* argv[] )
 				}
 				
 			}
-		
+
+			// Painter inpsired study
+			if( parameters.bools("constant_cell_influx") == true )
+			{
+				if( fabs( PhysiCell_globals.current_time - cell_influx_interval  ) <  0.1 * diffusion_dt && parameters.bools("constant_cell_influx") == true)	// just did testing with this. Shouldn't need second clause, but electing to not redo testing at this time. JPM
+				{
+
+					generate_cells_at_boundary();
+					cell_influx_interval += parameters.doubles("cell_influx_interval");
+					std::cout<<"cell influx at t= "<<PhysiCell_globals.current_time<<std::endl;
+					std::cout<<"cell influx interval= "<<cell_influx_interval<<std::endl;
+					
+				}
+			}
 			// update the microenvironment
 
 			// if(parameters.bools("freeze_uE_profile")==true)
