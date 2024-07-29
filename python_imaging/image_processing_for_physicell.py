@@ -12,6 +12,7 @@ import matplotlib.colorbar as colorbar
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.patches import Circle
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 import distutils.util
 
@@ -70,14 +71,15 @@ class PhysiCellPlotter():
                        "retrieve_chemical_field_data" : [False, 'oxygen'], # Gets first chemical field from pyMCDS object. Eventually will probably want multiple sets of options - like "load this field" etc - maybe need an options class??
                        "retrieve_ECM_data": False, # Gets ECM data from pyMCDS object
                        "plot_ECM_anisotropy" : False, # Calls contour plotter with anisotropy as input
-                        "plot_ECM_density" : False, # Calls contour plotter with density as input
-                        'plot_chemical_field': False, # Calls contour plotter with chemical field as input
+                       "plot_ECM_density" : False, # Calls contour plotter with density as input
+                       'plot_chemical_field': False, # Calls contour plotter with chemical field as input
                        "plot_ECM_orientation" : False, # calls quiver plotter with orientation as input
                        "plot_cells_from_SVG" : True, # plots cell positions and colors using data from SVGs
                        "plot_cells_from_physicell_data": False, # plots cell positions from pyMCDS --> will need more options if I want to specify colors ... currently set up to read color from SVG data
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
                         "produce_for_movie" : False,
                         "contour_options": None,
+                        "histogram_options": None,
                         "quiver_options": None}
 
     def generic_plotter(self, starting_index: int = 0, sample_step_interval: int = 1, number_of_samples: int = 120,
@@ -142,6 +144,7 @@ class PhysiCellPlotter():
                        ####### Cell tracks are always plotted when calling plot_cells_from_svg - to not plot tracks - make the number of samples = 1 ...
                        "produce_for_movie" : False,
                        "contour_options": None,
+                       "histogram_options": None,
                        "quiver_options": None}
         else:
             for key in self.default_options.keys():
@@ -200,6 +203,10 @@ class PhysiCellPlotter():
         #                       levels=contour_spacing)
 
         # if contour_options['color_bar'] is True:
+        
+        if options['plot_cell_histogram'] is True:
+            self.create_density_histogram(histogram_options=options['histogram_options'])
+
         if options['plot_chemical_field'] is True:
             self.create_contour_plot(x_mesh=xx, y_mesh=yy, data_to_contour=plane_oxy,
                                      contour_options=options["contour_options"], options=options)
@@ -219,7 +226,7 @@ class PhysiCellPlotter():
             self.plot_cells_from_physicell_data()
 
         if options['plot_cells_from_SVG'] is True:
-            self.create_cell_layer_from_SVG(cell_positions, cell_attributes)
+            self.create_cell_layer_from_SVG(cell_positions, cell_attributes, options)
 
         self.plot_figure(title_str, plot_x_extend, plot_y_extend, file_name, output_path, options)
 
@@ -284,6 +291,142 @@ class PhysiCellPlotter():
                     tick_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], 5)
                     cb = self.fig.colorbar(cs, cax=cax, format='%.2f', ticks=tick_spacing)
                     cb.ax.tick_params(labelsize=20)
+
+    def create_density_histogram(self, histogram_options=None, options: dict=None):
+        
+        # hisotogram options - not using options. 
+        if histogram_options is None:
+            num_bins = 40
+            vmax = 100
+            alpha_value = 1.0
+            make_inset = True
+        else:
+            num_bins = histogram_options['num_bins']
+            vmax = histogram_options['vmax']
+            alpha_value = histogram_options['alpha_value']
+            make_inset = histogram_options['make_inset']
+            # if 'alpha' not in contour_options.keys():
+            #     contour_options['alpha'] = 1.0    
+
+        y_positions = self.mcds.data['discrete_cells']['position_y']
+
+        # Create a 1D histogram of the y-positions, ensuring the range spans -500 to 500
+        hist, bin_edges = np.histogram(y_positions, bins=num_bins, range=(-500, 500)) ## not automatic
+
+        # Print the histogram counts
+        print("Histogram counts for each bin:")
+        for i, count in enumerate(hist):
+            print(f"Bin {i+1}: {count} counts")
+
+        # Define the width of each bar spanning the x-axis
+        bar_width = 600  # Spanning the entire x-axis ## note automatic
+
+        # Normalize the histogram values to use with the colormap
+        norm = mplc.Normalize(vmin=0, vmax=vmax)
+
+        # Create colormaps
+        main_cmap = plt.get_cmap('gist_yarg')
+        inset_cmap = plt.get_cmap('Reds')
+
+        # Alpha value for the rectangles
+        alpha_value = 1.0
+        # alpha_value_inset = 0.6
+
+        # Plot the histogram as bars spanning the x-axis
+        # fig, ax = plt.subplots(figsize=(10, 6))
+        for i in range(len(hist)):
+            color = main_cmap(norm(hist[i]))
+            self.ax.add_patch(plt.Rectangle((-bar_width / 2, bin_edges[i]), 
+                                    bar_width, 
+                                    bin_edges[i+1] - bin_edges[i], 
+                                    color=color, 
+                                    alpha=alpha_value,
+                                    edgecolor='none', 
+                                    linewidth=0))
+
+        # Add a color bar
+
+        # original - will commit then remove. 
+        # sm = plt.cm.ScalarMappable(cmap=main_cmap, norm=norm)
+        # sm.set_array([])
+        
+        # # needed to not have a series of inset color bars
+        # # divider = make_axes_locatable(self.ax)
+        # # cax = divider.append_axes("right", size="5%", pad=0.10)
+        # cbar = plt.colorbar(sm, ax=self.ax)
+        # cbar.set_alpha(alpha_value)
+        # cbar.set_label('Cell counts')
+        # cbar.draw_all()
+
+        # else:
+
+        # if 'alpha' not in contour_options.keys():
+        #     contour_options['alpha'] = 1.0     
+
+        # # Make levels for contours
+        # contour_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], contour_options['number_of_levels'])
+
+        # cs = self.ax.contourf(x_mesh, y_mesh, data_to_contour, cmap=contour_options['color_map_name'], levels=contour_spacing, alpha=contour_options['alpha'])
+
+        if histogram_options['color_bar'] is True:
+            sm = plt.cm.ScalarMappable(cmap=main_cmap, norm=norm)
+            sm.set_array([])
+            divider = make_axes_locatable(self.ax)
+            cax = divider.append_axes("right", size="5%", pad=0.10)
+            # other fancy things you can do with colorbars - https://stackoverflow.com/questions/16595138/standalone-colorbar-matplotlib
+            # Add in for panel as needed using options. Currently not using general options in this function. 
+            # if options is None:
+            #     cbar = self.fig.colorbar(sm, cax=cax, format='%.3f')
+            # elif options['produce_for_panel'] is False:
+            cbar = self.fig.colorbar(sm, cax=cax, format='%.0f')
+            cbar.set_alpha(alpha_value)
+            cbar.set_label('Cell counts')
+            # else:
+            #     tick_spacing = np.linspace(contour_options['lowest_contour'], contour_options['upper_contour'], 5)
+            #     cbar = self.fig.colorbar(sm, cax=cax, format='%.2f', ticks=tick_spacing)
+            #     cbar.ax.tick_params(labelsize=20)
+
+        # # Add an inset with the same plot but with a red colormap
+        # inset_ax = inset_axes(self.ax, width="30%", height="30%", loc="upper right")
+
+        # for i in range(len(hist)):
+        #     color = inset_cmap(norm(hist[i]))
+        #     inset_ax.add_patch(plt.Rectangle((-bar_width / 2, bin_edges[i]), 
+        #                                     bar_width, 
+        #                                     bin_edges[i+1] - bin_edges[i], 
+        #                                     color=color, 
+        #                                     alpha=alpha_value_inset,
+        #                                     edgecolor='none', 
+        #                                     linewidth=0))
+
+        if make_inset:
+                
+            # Add an inset for the density plot
+            # inset_ax = inset_axes(self.ax, width="50%", height="10%", loc="upper right"  )
+            inset_ax = inset_axes(self.ax, width="93%", height="19%",   bbox_to_anchor=(0.46, .48, .52, .52), bbox_transform=self.ax.transAxes )
+            #  bbox_to_anchor=(0.6, 0.6, 0.4, 0.4), bbox_transform=self.ax.transAxes 
+            # Plot the histogram values as a curve
+            bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+            inset_ax.plot(bin_centers, hist, color='red')
+
+
+            # Calculate the cumulative sum and find the 95th percentile value
+            cumulative_counts = np.cumsum(hist)
+            
+            total_count = cumulative_counts[-1]
+            percentile_95 = np.searchsorted(cumulative_counts, 0.95 * total_count)
+
+            # Add a horizontal line at 95% of total count
+            inset_ax.axvline(x=bin_centers[percentile_95], color='blue', linestyle='--')
+
+            # Set the same y-axis limits for the inset
+            inset_ax.set_xlim(-500, 500)
+            # inset_ax.set_xlim(0, inset_ax.get_xlim()[1])
+            inset_ax.set_ylim(0, vmax)  
+
+            # Remove inset axes labels and ticks for clarity    
+            # inset_ax.set_xticks([])
+            # inset_ax.set_yticks([])
 
     def create_separate_colorbar(self, file_name='just_colorbar', output_folder: str= '', contour_options: dict=None):
         print('Working - gives continous colorbar instead of discrete - could fix possibly but not sure how to match N')
@@ -533,10 +676,10 @@ class PhysiCellPlotter():
                         #### Assumes 100% of difference in SVG width and height is due to top margin of the SVG!!!!!!
                         # print('Reading SVG - Assumes 100% of difference in SVG width and height is due to top margin of the SVG!!!!!!')
                         plot_x_extend = float(child.attrib['width'])
-                        top_margin_size = abs(float(child.attrib['height']) - float(child.attrib['width']))
+                        top_margin_size = abs(float(child.attrib['height']) - float(child.attrib['width'])) # This only works is the SVG is square
 
-                        #### Remove the padding placed into the SVG to determine the true y extend
-                        plot_y_extend = float(child.attrib['height']) - top_margin_size
+                        #### Remove the padding placed into the SVG to determine the true y extend ---> hard coding to 70!!!
+                        plot_y_extend = float(child.attrib['height']) - 70
     
                         #### Find the coordinate transform amounts
                         y_coordinate_transform = plot_y_extend / 2
@@ -626,9 +769,18 @@ class PhysiCellPlotter():
 
             return d, d_attributes, title_str, plot_x_extend, plot_y_extend
 
-    def create_cell_layer_from_SVG(self, cell_positions: dict, cell_attributes: dict):
+    def create_cell_layer_from_SVG(self, cell_positions: dict, cell_attributes: dict, options: dict=None):
         d = cell_positions
         d_attributes = cell_attributes
+
+        if options is None:
+            alpha=0.7
+        elif 'cell_alpha' in options.keys():
+            alpha = options['cell_alpha']
+        else:
+            alpha=0.7
+
+        print(alpha)
 
         ####################################################################################################################
         ####################################        Plot cell tracks and other options              ########################
@@ -670,7 +822,7 @@ class PhysiCellPlotter():
                 #     plot_df = cell_df[cell_df['cell_type'] == ct]
                 #     for j in plot_df.index:
                 circ = Circle((x[-1], y[-1]),
-                                      radius=8.41271, color=d_attributes[key], alpha=0.7)
+                                      radius=8.41271, color=d_attributes[key], alpha=alpha)
                         # for a blue circle with a black edge
                         # circ = Circle((plot_df.loc[j, 'position_x'], plot_df.loc[j, 'position_y']),
                         #                radius=plot_df.loc[j, 'radius'], alpha=0.7, edgecolor='black')
@@ -682,7 +834,7 @@ class PhysiCellPlotter():
                 y = d[key][1]
                 #### Plot final cell position. MAY NOT TAKE RGB VALUES!!!
                 circ = Circle((x, y),
-                              radius=8.41271, color=d_attributes[key], alpha=0.7)
+                              radius=8.41271, color=d_attributes[key], alpha=alpha)
                 self.ax.add_artist(circ)
                 # self.ax.scatter(x, y, s=85.0, c=d_attributes[key], alpha=0.7)
                 # plt.scatter(x, y, s=3.5, c=)
