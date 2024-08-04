@@ -572,27 +572,27 @@
         <cell_setup type="string" units="" description="single, random, lesion, cells at y = 0, circle of cells, invasive_spheroid, or cells at left boundary/march">invasive_spheroid</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">250</tumor_radius>
         <initial_fibroblast_fraction type="double" units="dimensionless" description="Average percentage of fibroblasts initialized (lesion only)">0.0</initial_fibroblast_fraction>
-        <oxygen_uptake type="double" units="mmHg/min" description="Default cell oxygen uptake rate">10</oxygen_uptake>
-        <default_cell_speed type="double" units="microns/minute" description="Base/maximum cell speed">0.5</default_cell_speed>
-        <default_persistence_time type="double" units="minutes" description="Cell directional persistence time">10.0</default_persistence_time>
-        <fibroblast_adhesion type="double" units="micron/minute" description="Strength of fibroblast cells\' cell-cell adhesion">10.0</fibroblast_adhesion>
-        <fibroblast_repulsion type="double" units="micron/minute" description="Strength of fibroblast cells\' cell-cell repulsion">25.0</fibroblast_repulsion>
-        <inflam_sig_migration_bias_for_fibroblasts type="double" units="dimensionless" description="fibroblast chemotaxis bias">0.95</inflam_sig_migration_bias_for_fibroblasts>
-        <anisotropy_increase_rate type="double" units="1/min" description="Anisotropy rate of increase">0.004</anisotropy_increase_rate>
-        <fiber_realignment_rate type="double" units="1/min" description="Fiber rate of realignment">4.0</fiber_realignment_rate>
-        <default_ECM_density_target type="double" units="dimenionless" description="Cell ECM density target">0.5</default_ECM_density_target>
-        <default_ECM_production_rate type="double" units="dimenionless" description="Cell ECM production rate">0.001</default_ECM_production_rate>
+        <oxygen_uptake type="double" units="mmHg/min" description="Deprecated">10</oxygen_uptake>
+        <default_cell_speed type="double" units="microns/minute" description="Deprecated">0.5</default_cell_speed>
+        <default_persistence_time type="double" units="minutes" description="Deprecated">10.0</default_persistence_time>
+        <fibroblast_adhesion type="double" units="micron/minute" description="Deprecated">10.0</fibroblast_adhesion>
+        <fibroblast_repulsion type="double" units="micron/minute" description="Deprecated">25.0</fibroblast_repulsion>
+        <inflam_sig_migration_bias_for_fibroblasts type="double" units="dimensionless" description="Deprecated">0.95</inflam_sig_migration_bias_for_fibroblasts>
+        <anisotropy_increase_rate type="double" units="1/min" description="Deprecated">0.004</anisotropy_increase_rate>
+        <fiber_realignment_rate type="double" units="1/min" description="Deprecated">4.0</fiber_realignment_rate>
+        <default_ECM_density_target type="double" units="dimenionless" description="Deprecated">0.5</default_ECM_density_target>
+        <default_ECM_production_rate type="double" units="dimenionless" description="Deprecated">0.001</default_ECM_production_rate>
         <number_of_fibroblasts type="int" units="" description="Number of fibroblasts to initialize">0</number_of_fibroblasts>
-        <cancer_cell_adhesion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell adhesion">10.0</cancer_cell_adhesion>
-        <cancer_cell_repulsion type="double" units="micron/minute" description="Strength of follower cells\' cell-cell repulsion">25.0</cancer_cell_repulsion>
-        <default_chemotaxis_bias type="double" units="dimensionless" description="Follower chemotaxis bias">0.05</default_chemotaxis_bias>
-        <default_ECM_sensitivity type="double" units="dimensionless" description="Follower ECM orientation sensitivity">1.0</default_ECM_sensitivity>
-        <rho_L type="double" units="dimensionless" description="Minimum ECM density required for cell motility">0.0</rho_L>
-        <rho_H type="double" units="dimensionless" description="Maximum ECM density allowing cell motility">1.0</rho_H>
-        <rho_I type="double" units="dimensionless" description="Ideal ECM density cell motility">0.5</rho_I>
-        <default_hysteresis_bias type="double" units="dimensionless" description="Sensitivity to previous direction (hysteresis model only)">1.0</default_hysteresis_bias>
-        <fibroblast_motility_mode type="bool" units="dimensionless" description="">true</fibroblast_motility_mode>
-        <cancer_cell_motility_mode type="bool" units="dimensionless" description="">true</cancer_cell_motility_mode>
+        <cancer_cell_adhesion type="double" units="micron/minute" description="Deprecated">10.0</cancer_cell_adhesion>
+        <cancer_cell_repulsion type="double" units="micron/minute" description="Deprecated">25.0</cancer_cell_repulsion>
+        <default_chemotaxis_bias type="double" units="dimensionless" description="Deprecated">0.05</default_chemotaxis_bias>
+        <default_ECM_sensitivity type="double" units="dimensionless" description="Deprecated">1.0</default_ECM_sensitivity>
+        <rho_L type="double" units="dimensionless" description="Deprecated">0.0</rho_L>
+        <rho_H type="double" units="dimensionless" description="Deprecated">1.0</rho_H>
+        <rho_I type="double" units="dimensionless" description="Deprecated">0.5</rho_I>
+        <default_hysteresis_bias type="double" units="dimensionless" description="Deprecated">1.0</default_hysteresis_bias>
+        <fibroblast_motility_mode type="bool" units="dimensionless" description="Deprecated">true</fibroblast_motility_mode>
+        <cancer_cell_motility_mode type="bool" units="dimensionless" description="Deprecated">true</cancer_cell_motility_mode>
         <chemotactic_substrate_decay_rate type="double" units="1/minutes" description="Oxygen decay rate">0.1</chemotactic_substrate_decay_rate>
         <chemical_field_setup type="string" units="" description="Starburst, vertical up, horizontal right, angle, or none">none</chemical_field_setup>
         <angle_of_chemical_field_gradient type="double" units="" description="Angle of chemical field gradient orientation, specified in degrees">45.0</angle_of_chemical_field_gradient>
