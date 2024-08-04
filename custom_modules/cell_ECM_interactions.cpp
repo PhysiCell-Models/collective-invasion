@@ -401,6 +401,8 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 				ECM_orientation = -1.0 * ECM_orientation;
 			}
 			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; 
+			// Note that its theoretically possible for cells to write to the same voxel at the same time, possibly causing a segmentation fault. 
+			// This would be more likely to occur in a very densely packed region of cells.
 			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
 		}
 
@@ -414,6 +416,8 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 
 		double r_anisotropy = r_a0 * migration_speed;
 
+		// Note that its theoretically possible for cells to write to the same voxel at the same time, possibly causing a segmentation fault. 
+		// This would be more likely to occur in a very densely packed region of cells.
 		ecm.ecm_voxels[nearest_ecm_voxel_index].anisotropy = anisotropy + r_anisotropy * dt  * (1- anisotropy);
 
 		// END Cell-ECM Anisotropy Modification
@@ -441,7 +445,8 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 			// if a remodeling cell, then realign
 			else
 			{
-
+				// Note that its theoretically possible for cells to write to the same voxel at the same time, possibly causing a segmentation fault. 
+				// This would be more likely to occur in a very densely packed region of cells.
 				ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = phenotype.motility.motility_vector;
 
 				normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment));

@@ -415,5 +415,8 @@
         <march_unit_test_setup type="int" units="" description="Testing set up: 1 for cell march, 0 for typical simulation">0</march_unit_test_setup>
         <visual_guideline_pattern type="string" units="" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles">none</visual_guideline_pattern>
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
+        <constant_cell_influx type="bool" units="NA" description="Setting for releasing cells in to the domain at -y">False</constant_cell_influx>
+        <cell_influx_interval type="double" units="minutes" description="Interval for releasing new cells into the domain">240</cell_influx_interval>
+        <random_seed type="int" units="dimensionless" description="">0</random_seed>
     </user_parameters>
 </PhysiCell_settings>

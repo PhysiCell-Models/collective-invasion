@@ -305,7 +305,7 @@ void setup_extracellular_matrix( void )
 		// For random 2-D initalization 
 		if(parameters.strings( "ECM_orientation_setup") == "random")
 		{
-			double theta = 6.2831853071795864769252867665590 * uniform_random(); 
+			double theta = 6.2831853071795864769252867665590 * UniformRandom(); 
 			ecm.ecm_voxels[n].ecm_fiber_alignment = {cos(theta), sin(theta), 0.0};
 		}
 		// for starburst initialization 
@@ -338,7 +338,7 @@ void setup_extracellular_matrix( void )
 		else if(parameters.strings( "ECM_orientation_setup") == "split")
 		{
 			std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
-			normalize( &position ); 
+			// normalize( &position ); // pretty sure I shouldn't normalize this - unless I really NEED a unit vector. The position itself isn't actuall normal. 
 
 			if(position[1]<=0)
 			{
@@ -351,6 +351,30 @@ void setup_extracellular_matrix( void )
 				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);				
 			}
 		}
+
+		else if(parameters.strings( "ECM_orientation_setup") == "mixed") // for Painter mixed simulation
+		{
+			std::vector<double> position = ecm.ecm_mesh.voxels[n].center; 
+
+			std::cout<<"position[0] = "<<position[0]<<std::endl;
+
+			if(position[0]<=-100)
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1,0,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
+			}
+			else if(position[0]>=100)
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 1,0,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);
+			}
+			else
+			{
+				ecm.ecm_voxels[n].ecm_fiber_alignment =  { 0,1,0}; // oriented out (perpindeicular to concentric circles)
+				normalize(&ecm.ecm_voxels[n].ecm_fiber_alignment);				
+			}
+		}
+
 		else
 		{
 			std::cout<<"WARNING: NO ECM ORIENTATION SPECIFIED. FIX THIS!!!"<<std::endl;
@@ -609,11 +633,13 @@ void setup_tissue( void )
 		}
 
 		/******************************************Line of cells at x = left boundary + 10 initialization***************************************/
-		else if(parameters.strings("cell_setup") == "cells at left boundary/march")
+		else if(parameters.strings("cell_setup") == "cells at left boundary/march") // THIS IS SKIPPED IF 	
+		// else if (parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 1) - SEE BELOW
 		{
 			
-			int n = default_microenvironment_options.X_range[0] + 10.0; 
-			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+			int n = default_microenvironment_options.Y_range[0] + 5.0; 
+			
+			while( n <= default_microenvironment_options.Y_range[1] - 10.0 )
 			{
 				if (parameters.ints("march_unit_test_setup") == 1)
 				{pC = create_cell( *leader_cell );}
@@ -623,8 +649,24 @@ void setup_tissue( void )
 				pC->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
 				n = n + 20.0;
 			}
-			std::cout<<"Cell's placed at left boundary for march test 000"<<std::endl;
+			std::cout<<"Cell's placed at left boundary"<<std::endl;
 		}
+
+		/******************************************Line of cells at y = lower boundary + 10 initialization***************************************/
+		else if(parameters.strings("cell_setup") == "cells at lower boundary")
+		{
+			
+			int n = default_microenvironment_options.X_range[0] + 10.0; 
+			while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+			{
+				Cell* pC = create_cell( *follower_cell );
+				pC->assign_position( n, default_microenvironment_options.Y_range[0] + 10.0 , 0.0 );
+				n = n + 20.0;
+			}
+
+			std::cout<<"Cell placed at low boundary"<<std::endl;
+		}
+
 
 		else
 		{
@@ -638,8 +680,8 @@ void setup_tissue( void )
 	// else if (parameters.ints("unit_test_setup") == 1 && parameters.ints("march_unit_test_setup") == 1)
 	else if (parameters.ints("unit_test_setup") == 0 && parameters.ints("march_unit_test_setup") == 1)
 	{
-		int n = default_microenvironment_options.X_range[0] + 5.0; 
-		while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+		int n = default_microenvironment_options.Y_range[0] + 5.0; 
+		while( n <= default_microenvironment_options.Y_range[1] - 10.0 )
 		{
 			pC = create_cell( *leader_cell ); 
 			pC->assign_position( default_microenvironment_options.X_range[0] + 10.0 , n , 0.0 );
@@ -1342,9 +1384,27 @@ void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , do
 	return;
 }
 
-void reset_cell_position( void ) // for cell mark/ECM change test
+void generate_cells_at_boundary(void)
 {
-	int n = default_microenvironment_options.X_range[0] + 5.0;
+	static Cell_Definition* follower_cell = find_cell_definition("follower cell");	
+
+	// to prevent cells from always being place in the same horizontal line, we will add a random number to the y position
+
+	int n = default_microenvironment_options.X_range[0] + 10.0; 
+	while( n <= default_microenvironment_options.X_range[1] - 10.0 )
+	{
+		Cell* pC = create_cell( *follower_cell );
+		double random = UniformRandom() * 5.0;
+		pC->assign_position( n, default_microenvironment_options.Y_range[0] + 10.0 + random , 0.0 );
+		n = n + 20.0;
+	}
+
+	std::cout<<"Cell's placed at low boundary"<<std::endl;
+}
+
+void reset_cell_position( void ) // for cell mark/ECM change test ONLY VALIDE/TESTED FOR 500 by 500 domain
+{
+	int n = default_microenvironment_options.Y_range[0] + 5.0;
 
 	std::cout<<1<<std::endl;
 

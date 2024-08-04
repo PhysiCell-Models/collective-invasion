@@ -10,8 +10,8 @@
     </cell_rules>
 
     <domain>
-        <x_min>-500</x_min>
-        <x_max>500</x_max>
+        <x_min>-300</x_min>
+        <x_max>300</x_max>
         <y_min>-500</y_min>
         <y_max>500</y_max>
         <z_min>-10</z_min>
@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">2500</max_time>
+        <max_time units="min">7200.0</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -32,17 +32,17 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>1</omp_num_threads>
+        <omp_num_threads>6</omp_num_threads>
     </parallel>
 
     <save>
-        <folder>simple_test3</folder>
+        <folder>simple_tests_Painter_orthgonal</folder>
         <full_data>
-            <interval units="min">6</interval>
+            <interval units="min">12</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">6</interval>
+            <interval units="min">12</interval>
             <enable>true</enable>
             <plot_substrate enabled="false" limits="false">
                 <substrate>oxygen</substrate>
@@ -57,7 +57,7 @@
 
     <options>
         <legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-        <virtual_wall_at_domain_edge>false</virtual_wall_at_domain_edge>
+        <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
         <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
     </options>
 
@@ -68,14 +68,14 @@
                 <decay_rate units="1/min">.1</decay_rate>
             </physical_parameter_set>
             <initial_condition units="mmHg">0</initial_condition>
-            <Dirichlet_boundary_condition units="mmHg" enabled="True">0</Dirichlet_boundary_condition>
+            <Dirichlet_boundary_condition units="mmHg" enabled="False">38</Dirichlet_boundary_condition>
             <Dirichlet_options>
-                <boundary_value ID="xmin" enabled="False">0</boundary_value>
-                <boundary_value ID="xmax" enabled="True">38</boundary_value>
-                <boundary_value ID="ymin" enabled="False">0</boundary_value>
-                <boundary_value ID="ymax" enabled="False">0</boundary_value>
-                <boundary_value ID="zmin" enabled="False">0</boundary_value>
-                <boundary_value ID="zmax" enabled="False">0</boundary_value>
+                <boundary_value ID="xmin" enabled="False">38</boundary_value>
+                <boundary_value ID="xmax" enabled="False">38</boundary_value>
+                <boundary_value ID="ymin" enabled="False">38</boundary_value>
+                <boundary_value ID="ymax" enabled="False">38</boundary_value>
+                <boundary_value ID="zmin" enabled="False">38</boundary_value>
+                <boundary_value ID="zmax" enabled="False">38</boundary_value>
             </Dirichlet_options>
         </variable>
         <options>
@@ -141,8 +141,8 @@
                     <relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
                 </volume>
                 <mechanics>
-                    <cell_cell_adhesion_strength units="micron/min">0.0</cell_cell_adhesion_strength>
-                    <cell_cell_repulsion_strength units="micron/min">0.0</cell_cell_repulsion_strength>
+                    <cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
+                    <cell_cell_repulsion_strength units="micron/min">25.0</cell_cell_repulsion_strength>
                     <relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
                     <cell_adhesion_affinities>
                         <cell_adhesion_affinity name="follower cell">1</cell_adhesion_affinity>
@@ -157,9 +157,9 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">1</speed>
+                    <speed units="micron/min">1.25</speed>
                     <persistence_time units="min">10</persistence_time>
-                    <migration_bias units="dimensionless">1.0</migration_bias>
+                    <migration_bias units="dimensionless">0.0</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
@@ -216,14 +216,14 @@
                 <ECM_sensitivity conserved="false" units="dimensionless" description="Sensitivity to ECM orientation">1.0</ECM_sensitivity>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="base sensivity to previous cell direction - history bias, used in hystersis model">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="Used in hystersis model to start simulations">0</previous_anisotropy>
-                <chemotaxis_bias conserved="false" units="dimensionless" description="Chemotaxis bias for ECM following type cells">1.0</chemotaxis_bias>
+                <chemotaxis_bias conserved="false" units="dimensionless" description="Chemotaxis bias for ECM following type cells">0.0</chemotaxis_bias>
                 <target_ECM_density conserved="false" units="dimensionless" description="Cell ECM density target">0.5</target_ECM_density>
                 <Anisotropy_increase_rate conserved="false" units="1/min" description="Anisotropy rate of increase">0.000</Anisotropy_increase_rate>
                 <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">0.0</Fiber_realignment_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="Rate of ECM production">0.0</ECM_production_rate>
+                <migration_bias_norm conserved="false" units="" description="Internal variable. Keep set to 1.0">1.0</migration_bias_norm>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
-                <migration_bias_norm conserved="false" units="" description="Don't mess with this!!!! ">1.0</migration_bias_norm>
-                <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
-                <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
+                <rules_based_speed_multiplier conserved="false" units="" description="Keep at 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
         <cell_definition name="leader cell" ID="1">
@@ -292,9 +292,9 @@
                     <detachment_rate units="1/min">0.0</detachment_rate>
                 </mechanics>
                 <motility>
-                    <speed units="micron/min">1</speed>
-                    <persistence_time units="min">1</persistence_time>
-                    <migration_bias units="dimensionless">.5</migration_bias>
+                    <speed units="micron/min">0.5</speed>
+                    <persistence_time units="min">10</persistence_time>
+                    <migration_bias units="dimensionless">1.0</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
@@ -347,18 +347,18 @@
                 <min_ECM_motility_density conserved="false" units="dimensionless" description="Minimum ECM density required for cell motility">0.0</min_ECM_motility_density>
                 <max_ECM_motility_density conserved="false" units="dimensionless" description="Maximum ECM density allowing cell motility">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="Ideal ECM density cell motility">0.5</ideal_ECM_motility_density>
-                <max_speed conserved="false" units="micron/min" description="Unknown ... ">1</max_speed>
+                <max_speed conserved="false" units="micron/min" description="Unknown ... ">0.5</max_speed>
                 <ECM_sensitivity conserved="false" units="dimensionless" description="Sensitivity to ECM orientation">1.0</ECM_sensitivity>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="base sensivity to previous cell direction - history bias, used in hystersis model">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="Used in hystersis model to start simulations">0</previous_anisotropy>
                 <chemotaxis_bias conserved="false" units="dimensionless" description="Chemotaxis bias for ECM following type cells">1.0</chemotaxis_bias>
-                <target_ECM_density conserved="false" units="dimensionless" description="Cell ECM density target">0.5</target_ECM_density>
-                <Anisotropy_increase_rate conserved="false" units="1/min" description="Anisotropy rate of increase">0.000</Anisotropy_increase_rate>
-                <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">0.0</Fiber_realignment_rate>
+                <target_ECM_density conserved="false" units="dimensionless" description="Cell ECM density target">1.0</target_ECM_density>
+                <Anisotropy_increase_rate conserved="false" units="1/min" description="Anisotropy rate of increase">0.00</Anisotropy_increase_rate>
+                <Fiber_realignment_rate conserved="false" units="1/min" description="Fiber rate of realignment">0</Fiber_realignment_rate>
+                <ECM_production_rate conserved="false" units="1/min" description="Rate of ECM production">0.0</ECM_production_rate>
+                <migration_bias_norm conserved="false" units="" description="Internal variable. Keep set to 1.0">1.0</migration_bias_norm>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
-                <migration_bias_norm conserved="false" units="" description="Don't mess with this!!!! ">1.0</migration_bias_norm>
-                <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
-                <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
+                <rules_based_speed_multiplier conserved="false" units="" description="Keep at 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
         </cell_definition>
     </cell_definitions>
@@ -371,13 +371,13 @@
     </initial_conditions>
 
     <user_parameters>
-        <random_seed type="int" units="dimensionless" description="">0</random_seed>
+        <random_seed type="int" units="dimensionless" description="">100000</random_seed>
         <number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">5</number_of_cells>
         <ECM_dx type="double" units="um" description="Length of ECM unit in x-direction">20</ECM_dx>
         <ECM_dy type="double" units="um" description="Length of ECM unit in y-direction">20</ECM_dy>
         <ECM_dz type="double" units="um" description="Length of ECM unit in z-direction">20</ECM_dz>
-        <ECM_orientation_setup type="string" units="" description="Random, horizontal, vertical, circular, starburst, or split">circular</ECM_orientation_setup>
-        <unit_test_setup type="int" units="" description="Produces 20% red cells for viz">1</unit_test_setup>
+        <ECM_orientation_setup type="string" units="" description="random, horizontal, vertical, circular, starburst, or split">vertical</ECM_orientation_setup>
+        <unit_test_setup type="int" units="" description="Sets parameters for testing: 1 for testing, 0 for typical simulation">0</unit_test_setup>
         <march_unit_test_setup type="int" units="" description="Testing set up: 1 for cell march, 0 for typical simulation">0</march_unit_test_setup>
         <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">1.0</initial_anisotropy>
         <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
@@ -385,7 +385,7 @@
         <ecm_update_model type="string" units="" description="Specifies ECM reorientation model: ecm_update_from_cell_motility_vector or ecm_update_from_cell_velocity_vector">ecm_update_from_cell_motility_vector</ecm_update_model>
         <cell_motility_ECM_interaction_model_selector type="string" units="" description="REDO Specifies the cell-ECM interaction model: follower chemotaxis/no follower hysteresis, follower hysteresis/no follower chemotaxis">follower chemotaxis/no follower hysteresis</cell_motility_ECM_interaction_model_selector>
         <duration_of_uE_conditioning type="double" units="minutes" description="">10</duration_of_uE_conditioning>
-        <cell_setup type="string" units="" description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march">circle of cells</cell_setup>
+        <cell_setup type="string" units="" description="Specifies the initial cell setup: single, random, lesion, cells at y = 0, circle of cells, cells at lower boundary, or cells at left boundary/march">cells at lower boundary</cell_setup>
         <chemical_field_setup type="string" units="" description="Specifies the chemotatic field gradient orientation: starburst, vertical up, horizontal right, angle, or none">none</chemical_field_setup>
         <angle_of_chemical_field_gradient type="double" units="" description="Angle of chemical field gradient orientation, specified in degrees">45.0</angle_of_chemical_field_gradient>
         <visual_guideline_pattern type="string" units="" description="Specifies pattern of line overlay: none, horizontal lines, vertical lines, or concentric circles">none</visual_guideline_pattern>
@@ -394,7 +394,14 @@
         <normalize_ECM_influenced_motility_vector type="bool" units="" description="Normalize follower motility vector">false</normalize_ECM_influenced_motility_vector>
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
         <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">1</discrete_ECM_remodeling>
-        <constant_cell_influx type="bool" units="NA" description="Setting for releasing cells in to the domain at -y">False</constant_cell_influx>
+        <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">100</tumor_radius>
+        <follower_repulsion type="double" units="micron/minute" description="Deprecated">25.0</follower_repulsion>
+        <leader_repulsion type="double" units="micron/minute" description="Deprecated">25.0</leader_repulsion>
+        <follower_adhesion type="double" units="micron/minute" description="Deprecated">10.0</follower_adhesion>
+        <leader_adhesion type="double" units="micron/minute" description="Deprecated">10.0</leader_adhesion>
+        <initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized (lesion only)">0.95</initial_leader_cell_fraction>
+        <oxygen_migration_bias_for_leaders type="double" units="dimensionless" description="Deprecated">0.95</oxygen_migration_bias_for_leaders>
+        <constant_cell_influx type="bool" units="NA" description="Setting for releasing cells in to the domain at -y">True</constant_cell_influx>
         <cell_influx_interval type="double" units="minutes" description="INterval for releasing new cells into the domain">240</cell_influx_interval>
     </user_parameters>
 </PhysiCell_settings>

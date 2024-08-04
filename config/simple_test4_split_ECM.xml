@@ -44,6 +44,11 @@
         <SVG>
             <interval units="min">6</interval>
             <enable>true</enable>
+            <plot_substrate enabled="false" limits="false">
+                <substrate>oxygen</substrate>
+                <min_conc />
+                <max_conc />
+            </plot_substrate>
         </SVG>
         <legacy_data>
             <enable>false</enable>
@@ -147,8 +152,6 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">0.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">0.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
@@ -284,8 +287,6 @@
                         <set_relative_equilibrium_distance enabled="false" units="dimensionless">1.8</set_relative_equilibrium_distance>
                         <set_absolute_equilibrium_distance enabled="false" units="micron">15.12</set_absolute_equilibrium_distance>
                     </options>
-                    <cell_BM_adhesion_strength units="micron/min">0.0</cell_BM_adhesion_strength>
-                    <cell_BM_repulsion_strength units="micron/min">0.0</cell_BM_repulsion_strength>
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
@@ -393,5 +394,7 @@
         <normalize_ECM_influenced_motility_vector type="bool" units="" description="Normalize follower motility vector">false</normalize_ECM_influenced_motility_vector>
         <enable_ecm_outputs type="bool" units="" description="">true</enable_ecm_outputs>
         <discrete_ECM_remodeling type="int" units="" description="ECM remodeling: 1 = finite speed; 0 = instant">1</discrete_ECM_remodeling>
+        <constant_cell_influx type="bool" units="NA" description="Setting for releasing cells in to the domain at -y">False</constant_cell_influx>
+        <cell_influx_interval type="double" units="minutes" description="INterval for releasing new cells into the domain">240</cell_influx_interval>
     </user_parameters>
 </PhysiCell_settings>

@@ -610,5 +610,6 @@
         <link_anisotropy_and_bias type="int" units="" description="Selects if chemotaxtic bias on is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">0</link_anisotropy_and_bias>
         <heterogeneous_invasive_spheroid type="bool" units="" description="false - two values for density; true - three values">false</heterogeneous_invasive_spheroid>
         <reduce_adhesion_on_groomed_matrix type="bool" units="" description="false - cancer_cell adhesion is constant; true- adhesion decreases when anisotropy is above threshold">false</reduce_adhesion_on_groomed_matrix>
+        <random_seed type="int" units="dimensionless" description="">0</random_seed>
     </user_parameters>
 </PhysiCell_settings>

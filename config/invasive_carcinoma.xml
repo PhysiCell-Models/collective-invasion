@@ -614,5 +614,6 @@
         <heterogeneous_invasive_spheroid type="bool" units="" description="false - two values for density; true - three values">false</heterogeneous_invasive_spheroid>
         <reduce_adhesion_on_groomed_matrix type="bool" units="" description="false - cancer_cell adhesion is constant; true- adhesion decreases when anisotropy is above threshold">true</reduce_adhesion_on_groomed_matrix>
         <basement_membrane_location type="double" units="" description="">0</basement_membrane_location>
+        <random_seed type="int" units="dimensionless" description="">0</random_seed>
     </user_parameters>
 </PhysiCell_settings>

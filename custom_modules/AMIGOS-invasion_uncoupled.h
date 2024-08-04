@@ -72,6 +72,7 @@ void chemotaxis_oxygen( Cell* pCell , Phenotype& phenotype , double dt ); // don
 void rightward_deterministic_cell_march (Cell* pCell , Phenotype& phenotype , double dt );
 
 void reset_cell_position(void);
+void generate_cells_at_boundary(void);
 
 void create_cell_types( void ); // done 
 void ECM_setup(double numvox);
