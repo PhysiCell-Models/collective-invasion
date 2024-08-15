@@ -1,10 +1,10 @@
-import numpy as np
-# import matplotlib.pyplot as plt
-import csv
-# import multiprocessing
-# import pcdl
-# import pandas as pd
+# Run to analysis the stochatic replicates of the invasive cellular front (Painter model)
+# Needs run in the stochastic replicates directory. 
+# Items are hard coded - expecting 20 folders with the output files and exacting the last output file to be output00000005.xml
+# Saves the set of 95th percentiles of cell count bin center to a csv file.
 
+import numpy as np
+import csv
 
 try:
     from pyMCDS_ECM import *
