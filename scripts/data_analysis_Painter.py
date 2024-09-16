@@ -1,10 +1,6 @@
-# Run to analysis the stochatic replicates of the invasive cellular front (Painter model)
-# Needs run in the stochastic replicates directory. 
-# Items are hard coded - expecting 20 folders with the output files and exacting the last output file to be output00000005.xml
-# Saves the set of 95th percentiles of cell count bin center to a csv file.
-
 import numpy as np
 import csv
+
 
 try:
     from pyMCDS_ECM import *
@@ -47,7 +43,7 @@ def create_density_histogram(mcds):
     return bin_centers[percentile_95]
 
 percentile_centers = []
-for n in range(1, 20):
+for n in range(1, 21):
     # folder name needs padded with 1 zero
     if n < 10:
         folder_name = "0" + str(n)
@@ -67,6 +63,16 @@ for n in range(1, 20):
 
     percentile_centers.append(create_density_histogram(mcds))
 
-print(percentile_centers)
+# add in value for the extra run (the run used for detail in the paper)
 
-np.savetxt("95th_percentile_center.csv", percentile_centers, delimiter=",", fmt="%s")
+percentile_centers.append(0.0) # placeholder for the extra run - these were determined by outputing the value from the image processing code. so just make the image 
+                            # processing code output the value and then copy it here.   
+
+print(percentile_centers)
+print('Mean of 95th percentile centers:')
+print(np.mean(percentile_centers))
+
+print('Standard deviation of 95th percentile centers:')
+print(np.std(percentile_centers))
+
+np.savetxt("95th_percentile_center.csv", percentile_centers, delimiter=",", fmt="%s") # rename as needed

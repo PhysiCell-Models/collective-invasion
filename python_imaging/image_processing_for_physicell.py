@@ -418,7 +418,7 @@ class PhysiCellPlotter():
 
             # Add a horizontal line at 95% of total count
             inset_ax.axvline(x=bin_centers[percentile_95], color='blue', linestyle='--')
-
+            print('95th percentile value:', bin_centers[percentile_95])
             # Set the same y-axis limits for the inset
             inset_ax.set_xlim(-500, 500)
             # inset_ax.set_xlim(0, inset_ax.get_xlim()[1])
