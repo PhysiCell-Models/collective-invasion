@@ -13,13 +13,13 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install dependencies
-      run : brew install gcc@11
+      run : brew install gcc@13
     
     - name: Build model
       run: |
-        make PHYSICELL_CPP=g++-11
-        make invasive_carcinoma PHYSICELL_CPP=g++-11
-        make fibrosis PHYSICELL_CPP=g++-11
+        make PHYSICELL_CPP=g++-13
+        make invasive_carcinoma PHYSICELL_CPP=g++-13
+        make fibrosis PHYSICELL_CPP=g++-13
         
     - name: Run model
       run: |
