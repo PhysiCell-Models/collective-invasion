@@ -2,12 +2,17 @@
 
 `image_processing_for_physicell.py` contains the class `PhysiCellPlotter`. This class enables reproducible visualization with many options - including setting which layers to include (cell, ECM components, diffusing fields), positional tracking of cell movement history, and smoothly generating stills and movies sequentially. It uses a modified version of [`pyMCDS.py`](https://github.com/PhysiCell-Tools/python-loader) - `pyMCDS_ECM.py`. The modifications include loading ECM data .mat outputs and formatting that data for use in visualizations. 
 
-See `shell_scripts` for usage examples. 
+See the folder `scripts` for usage examples of the scripts. 
 
 Note that due to continous development and iteration on the plots for the article accompanying this ECM extention, some now out of date figure numbers have crystallized into the the scripts included here. To the best of our ability, we include functional notes that include broadly which images were produced with which scripts. Future work includes smoothing these now historical names to broader/more generic names.  
 
+## Random extra scripts
 
-## Scripts
+`run_movie_scripts_orthogonal.py` is in the folder `scripts` and is used to invoke the making of the movies for the stochastic replicates by invoking the appropriate video making script multiple times. This specific example is for the invasive cellular front orthgonal scenario, with similar scripts used to make the videos for the other stochastic replicates. 
+
+Finally, there is a data vizualization in the paper accompanying this code. The code to produce that (Figure Supplementary Figure 5) is in `scripts`. It is `invasive_front_vizualization_of_variance.py` and uses output from `data_analysis_Painter.py`. 
+
+## Simulation visualization scripts
 
 Advanced scripts - using the PhysiCellPlotter class in `image_processing_for_physicell.py`. Place scripts in `output` or other directory at same level or alter path assignment. Examples used to produce stills and movies for [this preprint](https://www.biorxiv.org/content/10.1101/2022.11.21.514608) are given below. Using the various options available in the PhysiCellPlotter class, other visualizations can be created. 
 * `full_history_movie_script.py`: Generates movie using all available outputs and plots the full cell positional histories as well as current cell positions and ECM fiber element orientations. 
