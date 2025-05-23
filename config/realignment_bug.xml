@@ -2,7 +2,7 @@
 
     <cell_rules>
         <rulesets>
-            <ruleset protocol="CBHG" version="2.0" format="csv" enabled="false">
+            <ruleset protocol="CBHG" version="3.0" format="csv" enabled="false">
                 <folder />
                 <filename />
             </ruleset>
@@ -23,7 +23,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">14400.0</max_time>
+        <max_time units="min">600.0</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -38,11 +38,11 @@
     <save>
         <folder>leader_follower</folder>
         <full_data>
-            <interval units="min">6</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
         </full_data>
         <SVG>
-            <interval units="min">6</interval>
+            <interval units="min">60</interval>
             <enable>true</enable>
             <plot_substrate enabled="false" limits="false">
                 <substrate>oxygen</substrate>
@@ -59,6 +59,7 @@
         <legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
         <virtual_wall_at_domain_edge>true</virtual_wall_at_domain_edge>
         <disable_automated_spring_adhesions>true</disable_automated_spring_adhesions>
+        <random_seed>0</random_seed>
     </options>
 
     <microenvironment_setup>
@@ -97,6 +98,10 @@
                     <phase_transition_rates units="1/min">
                         <rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
                     </phase_transition_rates>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="leader cell" units="dimensionless">1.0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="follower cell" units="dimensionless">0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
@@ -155,11 +160,12 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">0.5</speed>
                     <persistence_time units="min">10</persistence_time>
-                    <migration_bias units="dimensionless">0.95</migration_bias>
+                    <migration_bias units="dimensionless">0.2</migration_bias>
                     <options>
                         <enabled>true</enabled>
                         <use_2D>true</use_2D>
@@ -186,7 +192,9 @@
                     </substrate>
                 </secretion>
                 <cell_interactions>
-                    <dead_phagocytosis_rate units="1/min">0.0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0.0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0.0</necrotic_phagocytosis_rate>
+                    <other_dead_phagocytosis_rate units="1/min">0.0</other_dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="leader cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="follower cell" units="1/min">0.0</phagocytosis_rate>
@@ -195,7 +203,8 @@
                         <attack_rate name="leader cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="follower cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
                     <fusion_rates>
                         <fusion_rate name="leader cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="follower cell" units="1/min">0.0</fusion_rate>
@@ -207,25 +216,31 @@
                         <transformation_rate name="follower cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <min_ECM_motility_density conserved="false" units="dimensionless" description="">0.0</min_ECM_motility_density>
                 <max_ECM_motility_density conserved="false" units="dimensionless" description="">1.0</max_ECM_motility_density>
                 <ideal_ECM_motility_density conserved="false" units="dimensionless" description="">0.5</ideal_ECM_motility_density>
                 <max_speed conserved="false" units="micron/min" description="">0.5</max_speed>
-                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.05</chemotaxis_bias>
+                <chemotaxis_bias conserved="false" units="dimensionless" description="">0.1</chemotaxis_bias>
                 <ECM_sensitivity conserved="false" units="dimensionless" description="">0.0</ECM_sensitivity>
                 <hypoxic_switch_value conserved="false" units="mmHg" description="">38</hypoxic_switch_value>
                 <target_ECM_density conserved="false" units="dimensionless" description="">0.5</target_ECM_density>
                 <Base_hysteresis_bias conserved="false" units="dimensionless" description="">1.0</Base_hysteresis_bias>
                 <previous_anisotropy conserved="false" units="dimensionless" description="">0</previous_anisotropy>
-                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.004</Anisotropy_increase_rate>
-                <Fiber_realignment_rate conserved="false" units="1/min" description="">4.0</Fiber_realignment_rate>
+                <Anisotropy_increase_rate conserved="false" units="1/min" description="">0.001</Anisotropy_increase_rate>
+                <Fiber_realignment_rate conserved="false" units="1/min" description="">0.01</Fiber_realignment_rate>
                 <link_anisotropy_and_bias conserved="false" units="dimensionless" description="Selects if chemotaxtic bias on followers is coupled exactly to ECM anisotropy or not: 1 = not coupled; 0 = coupled">1.0</link_anisotropy_and_bias>
                 <ECM_production_rate conserved="false" units="1/min" description="">0.0</ECM_production_rate>
                 <migration_bias_norm conserved="false" units="" description="Do not mess with this.">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
+            <initial_parameter_distributions enabled="false">
+          </initial_parameter_distributions>
         </cell_definition>
         <cell_definition name="follower cell" ID="1">
             <phenotype>
@@ -233,6 +248,10 @@
                     <phase_transition_rates units="1/min">
                         <rate start_index="0" end_index="0" fixed_duration="false">0.0</rate>
                     </phase_transition_rates>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="leader cell" units="dimensionless">0</asymmetric_division_probability>
+                        <asymmetric_division_probability name="follower cell" units="dimensionless">1.0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
@@ -291,6 +310,7 @@
                     <attachment_elastic_constant units="1/min">0.01</attachment_elastic_constant>
                     <attachment_rate units="1/min">0.0</attachment_rate>
                     <detachment_rate units="1/min">0.0</detachment_rate>
+                    <maximum_number_of_attachments>12</maximum_number_of_attachments>
                 </mechanics>
                 <motility>
                     <speed units="micron/min">0.5</speed>
@@ -322,7 +342,9 @@
                     </substrate>
                 </secretion>
                 <cell_interactions>
-                    <dead_phagocytosis_rate units="1/min">0.0</dead_phagocytosis_rate>
+                    <apoptotic_phagocytosis_rate units="1/min">0.0</apoptotic_phagocytosis_rate>
+                    <necrotic_phagocytosis_rate units="1/min">0.0</necrotic_phagocytosis_rate>
+                    <other_dead_phagocytosis_rate units="1/min">0.0</other_dead_phagocytosis_rate>
                     <live_phagocytosis_rates>
                         <phagocytosis_rate name="leader cell" units="1/min">0.0</phagocytosis_rate>
                         <phagocytosis_rate name="follower cell" units="1/min">0.0</phagocytosis_rate>
@@ -331,7 +353,8 @@
                         <attack_rate name="leader cell" units="1/min">0.0</attack_rate>
                         <attack_rate name="follower cell" units="1/min">0.0</attack_rate>
                     </attack_rates>
-                    <damage_rate units="1/min">1.0</damage_rate>
+                    <attack_damage_rate units="1/min">1.0</attack_damage_rate>
+                    <attack_duration units="min">0.1</attack_duration>
                     <fusion_rates>
                         <fusion_rate name="leader cell" units="1/min">0.0</fusion_rate>
                         <fusion_rate name="follower cell" units="1/min">0.0</fusion_rate>
@@ -343,6 +366,10 @@
                         <transformation_rate name="follower cell" units="1/min">0.0</transformation_rate>
                     </transformation_rates>
                 </cell_transformations>
+                <cell_integrity>
+                    <damage_rate units="1/min">0.0</damage_rate>
+                    <damage_repair_rate units="1/min">0.0</damage_repair_rate>
+                </cell_integrity>
             </phenotype>
             <custom_data>
                 <min_ECM_motility_density conserved="false" units="dimensionless" description="">0.0</min_ECM_motility_density>
@@ -362,6 +389,8 @@
                 <migration_bias_norm conserved="false" units="" description="Do not mess with this.">1.0</migration_bias_norm>
                 <rules_based_speed_multiplier conserved="false" units="" description="Keep set to 1.0">1.0</rules_based_speed_multiplier>
             </custom_data>
+            <initial_parameter_distributions enabled="false">
+          </initial_parameter_distributions>
         </cell_definition>
     </cell_definitions>
 
@@ -373,19 +402,19 @@
     </initial_conditions>
 
     <user_parameters>
-        <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.0</initial_anisotropy>
+        <initial_anisotropy type="double" units="dimensionless" description="Initial ECM anisotropy">0.3</initial_anisotropy>
         <initial_ECM_density type="double" units="dimensionless" description="Initial ECM density">0.5</initial_ECM_density>
         <cell_setup type="string" units="" description="single, random, lesion, cells at y = 0, circle of cells, or cells at left boundary/march">lesion</cell_setup>
         <tumor_radius type="double" units="microns" description="Initial cell lesion radius (lesion only)">175</tumor_radius>
-        <initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized (lesion only)">0.05</initial_leader_cell_fraction>
+        <initial_leader_cell_fraction type="double" units="dimensionless" description="Average percentage of leaders initialized (lesion only)">1</initial_leader_cell_fraction>
         <oxygen_uptake type="double" units="mmHg/min" description="deprecated">10</oxygen_uptake>
         <default_cell_speed type="double" units="microns/minute" description="deprecated">0.5</default_cell_speed>
         <default_persistence_time type="double" units="minutes" description="deprecated">10.0</default_persistence_time>
         <leader_adhesion type="double" units="micron/minute" description="deprecated">10.0</leader_adhesion>
         <leader_repulsion type="double" units="micron/minute" description="deprecated">25.0</leader_repulsion>
         <oxygen_migration_bias_for_leaders type="double" units="dimensionless" description="deprecated">0.95</oxygen_migration_bias_for_leaders>
-        <anisotropy_increase_rate type="double" units="1/min" description="deprecated">0.004</anisotropy_increase_rate>
-        <fiber_realignment_rate type="double" units="1/min" description="deprecated">4.0</fiber_realignment_rate>
+        <anisotropy_increase_rate type="double" units="1/min" description="deprecated">0.001</anisotropy_increase_rate>
+        <fiber_realignment_rate type="double" units="1/min" description="deprecated">0.0</fiber_realignment_rate>
         <default_ECM_density_target type="double" units="dimenionless" description="deprecated">0.5</default_ECM_density_target>
         <follower_adhesion type="double" units="micron/minute" description="deprecated">10.0</follower_adhesion>
         <follower_repulsion type="double" units="micron/minute" description="deprecated">25.0</follower_repulsion>

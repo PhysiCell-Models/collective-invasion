@@ -394,19 +394,35 @@ void ECM_remodeling_function( Cell* pCell, Phenotype& phenotype, double dt )
 		std::vector<double> f_minus_d;
 		f_minus_d.resize(3,0.0);
 
+
+		// Realignment bug fixed
 		for(int i = 0; i < 3; i++)
 		{
-			if (ddotf<0.0)
-			{
-				ECM_orientation = -1.0 * ECM_orientation;
-			}
-			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; 
-			// Note that its theoretically possible for cells to write to the same voxel at the same time, possibly causing a segmentation fault. 
-			// This would be more likely to occur in a very densely packed region of cells.
-			ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment[i] -= dt * r_realignment * f_minus_d[i]; 
-		}
+			// The following condition in the loop has been commented out as it makes the fibers within the voxel become vertically aligned over time when the a voxel's fiber orientation is changed many times (for example if the cells do not move much).
+			
+			// if (ddotf<0.0)
+			// {
+			// 	ECM_orientation = -1.0 * ECM_orientation;
+			// }
 
-		normalize(&(ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment)); 
+			f_minus_d[i] = ECM_orientation[i] - norm_cell_motility[i]; 
+			
+			//Changed the update from ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment to ECM_orientation, since ECM_orientation has been flipped, while ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment has not been flipped yet.
+			
+			// ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignmentM_orientation[i] -= dt * r_realignment * f_minus_d[i]; 
+
+			ECM_orientation[i] -= dt * r_realignment * f_minus_d[i]; 
+		}
+		
+		// old normalization
+		// normalize(&ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment);
+
+		// Normalize the local ECM orientation vector
+		normalize(&(ECM_orientation)); 
+
+		// Assign the new ECM orientation to the voxel's ecm_fiber_alignment
+		ecm.ecm_voxels[nearest_ecm_voxel_index].ecm_fiber_alignment = ECM_orientation;
+
 
 		// End Cell-ECM Fiber realingment
 
